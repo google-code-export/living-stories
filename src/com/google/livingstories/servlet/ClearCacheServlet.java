@@ -16,7 +16,7 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.fourthestate.server.rpcimpl.Caches;
+import com.google.livingstories.server.rpcimpl.Caches;
 
 import java.io.IOException;
 

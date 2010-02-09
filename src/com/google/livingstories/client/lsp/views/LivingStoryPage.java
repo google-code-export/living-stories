@@ -176,7 +176,7 @@ public class LivingStoryPage extends Composite {
     };    
     $wnd.showLightbox = function(title, atom) {
       instance.
-          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightbox(Ljava/lang/String;Lcom/google/fourthestate/client/BaseAtom;)
+          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightbox(Ljava/lang/String;Lcom/google/livingstories/client/BaseAtom;)
           .call(instance, title, atom);
     };
     $wnd.showLightboxForAtom = function(title, atomId) {
