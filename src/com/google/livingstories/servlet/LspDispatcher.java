@@ -39,15 +39,6 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet to serve the new version of the lsp page.
  */
 public class LspDispatcher extends HttpServlet {
-  // These IDs are assigned by friend connect.  Each ID applies to one root url,
-  // so we need to switch them depending on whether we're running locally,
-  // deployed internally, or deployed externally.
-  // The root url for each ID can be managed through the friend connect admin pages.
-  private static final String LOCAL_FRIEND_CONNECT_SITE_ID = "06472697331222075712";
-  private static final String INTERNAL_FRIEND_CONNECT_SITE_ID = "08713752064473386876";
-  private static final String PUBLIC_DOGFOOD_FRIEND_CONNECT_SITE_ID = "05439374789167226920";
-  private static final String EXTERNAL_FRIEND_CONNECT_SITE_ID = "16438544277001602951";
-  
   protected LivingStoryDataService livingStoryDataService;
   protected UserLoginService userLoginService;
   protected UserDataService userDataService;
@@ -106,6 +97,8 @@ public class LspDispatcher extends HttpServlet {
       livingStory = livingStoryDataService.retrieveById(livingStoryId, false);
     }
     
+    ExternalServiceKeyChain keyChain = new ExternalServiceKeyChain(getServletContext());
+    
     String currentUrl = req.getRequestURI();
     // Display the page according to when the user last visited the story
     LivingStoryHtml.write(
@@ -120,7 +113,9 @@ public class LspDispatcher extends HttpServlet {
         lastVisitTime,
         subscribedToEmails,
         defaultView,
-        getFriendConnectSiteId(req.getServerName()),
+        keyChain.getFriendConnectSiteId(req.getServerName()),
+        keyChain.getMapsKey(),
+        keyChain.getAnalyticsAccountId(),
         livingStoryDataService.retrieveByPublisher(livingStory.getPublisher(),
             PublishState.PUBLISHED, true));
     
@@ -134,17 +129,5 @@ public class LspDispatcher extends HttpServlet {
   private String getSubscriptionUrl(Long livingStoryId, String livingStoryUrl) {
     return userLoginService.createLoginUrl("/subscribe?lspId=" + livingStoryId + "&amp;lspUrl="
         + livingStoryUrl);
-  }
-
-  protected String getFriendConnectSiteId(String hostname) {
-    if (hostname.endsWith("prom.corp.google.com")) {
-      return INTERNAL_FRIEND_CONNECT_SITE_ID;
-    } else if (hostname.endsWith("appspot.com")) {
-      return PUBLIC_DOGFOOD_FRIEND_CONNECT_SITE_ID;
-    } else if (hostname.endsWith("googlelabs.com")) {
-      return EXTERNAL_FRIEND_CONNECT_SITE_ID;
-    } else {
-      return LOCAL_FRIEND_CONNECT_SITE_ID;
-    }
   }
 }

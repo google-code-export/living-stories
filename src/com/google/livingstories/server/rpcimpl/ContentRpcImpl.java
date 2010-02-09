@@ -45,6 +45,7 @@ import com.google.livingstories.server.UserLspEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 import com.google.livingstories.server.util.AlertSender;
 import com.google.livingstories.server.util.StringUtil;
+import com.google.livingstories.servlet.ExternalServiceKeyChain;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +62,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
+import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -76,6 +78,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   private static final Logger logger =
       Logger.getLogger(ContentRpcImpl.class.getCanonicalName());
   
+  private InternetAddress fromAddress = null;
+
   @Override
   public synchronized BaseAtom createOrChangeAtom(BaseAtom clientAtom) {
     // Get the list of atoms to link within the content first so that if there is an exception with
@@ -273,7 +277,14 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
             .append(UserServiceFactory.getUserService().createLoginURL(baseLspUrl))
             .append("\">this page</a>.</span>");
 
-        AlertSender.sendEmail(users, "Update: " + livingStory.getTitle(), emailContent.toString());
+        // getServletContext() doesn't return a valid result at construction-time, so
+        // we initialize fromAddress lazily.
+        if (fromAddress == null) {
+          fromAddress = new ExternalServiceKeyChain(getServletContext()).getFromAddress();
+        }
+
+        AlertSender.sendEmail(fromAddress, users,
+            "Update: " + livingStory.getTitle(), emailContent.toString());
         
       }
     } finally {

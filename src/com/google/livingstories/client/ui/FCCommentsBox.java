@@ -45,9 +45,13 @@ public class FCCommentsBox extends Composite {
   public void loadCommentsBox(String instanceId) {
     try {
       if (!loaded) {
-        container.getElement().setId("FCCommentsBox" + instanceId);
-        loadCommentsBoxInternal(LivingStoryData.getFriendConnectSiteId(), instanceId);
-        loaded = true;
+        String siteId = LivingStoryData.getFriendConnectSiteId();
+        
+        if (!siteId.isEmpty()) {
+          container.getElement().setId("FCCommentsBox" + instanceId);
+          loadCommentsBoxInternal(siteId, instanceId);
+          loaded = true;
+        }
       }
     } catch (JavaScriptException e) {
       // Do nothing

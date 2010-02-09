@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+<!-- Copyright 2010 Google Inc. -->
+<!-- All Rights Reserved -->
+<!-- author: hiller@google.com (Matt Hiller) -->
+<!-- block for analytics async tracking code -->
+<gxp:template name="com.google.livingstories.gxps.AnalyticsBlock"
+              xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:expr="http://google.com/2001/gxp/expressions">
+  <gxp:param name="analyticsAccountId" type="String"/>
+
+  <gxp:if cond="analyticsAccountId.isEmpty()">
+    <script type="text/javascript">var _gaq = null;</script>
+  <gxp:else/>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', <gxp:eval expr='analyticsAccountId'/>]);
+      _gaq.push(['_trackPageview']);
+      document.documentElement.firstChild.appendChild(document.createElement('script')).src = 
+          ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    </script>
+  </gxp:if>
+</gxp:template>

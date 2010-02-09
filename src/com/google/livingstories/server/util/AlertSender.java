@@ -16,7 +16,6 @@
 
 package com.google.livingstories.server.util;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
@@ -35,14 +34,15 @@ import javax.mail.internet.MimeMultipart;
  * Utility class for sending email alerts
  */
 public class AlertSender {
-  public static void sendEmail(List<String> recipients, String subject, String msgBody) {
+  public static void sendEmail(InternetAddress fromAddress, List<String> recipients, String subject,
+      String msgBody) {
     Session session = Session.getDefaultInstance(new Properties(), null);
 
     try {
       Message msg = new MimeMessage(session);
       // Note that the 'from' field may only be set to the currently logged in user,
       // or to an administrator email addreess.
-      msg.setFrom(new InternetAddress("living-stories-noreply@google.com", "Living Stories"));
+      msg.setFrom(fromAddress);
       for (String recipient : recipients) {
         msg.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
       }
@@ -55,7 +55,6 @@ public class AlertSender {
       msg.setContent(mp);
       
       Transport.send(msg);
-    } catch (UnsupportedEncodingException ignored) {
     } catch (AddressException ignored) {
     } catch (MessagingException ignored) {
     }

@@ -463,7 +463,7 @@ public abstract class ComplexAtomListElement implements AtomListElement {
       locationTitleLabel.addStyleName("atomHeader");
       mapPanel.add(locationTitleLabel);
       AjaxLoaderOptions options = AjaxLoaderOptions.newInstance();
-      options.setOtherParms("client=google-ipw&sensor=false");
+      options.setOtherParms(LivingStoryData.getMapsKey() + "&sensor=false");
       
       // Instantiating the map via a runnable breaks horribly on firefox, for reasons
       // that are still mysterious to us. If we introduce some delay, though,
@@ -783,6 +783,9 @@ public abstract class ComplexAtomListElement implements AtomListElement {
   }
 
   private boolean hasLocationMap() {
+    if (LivingStoryData.getMapsKey().isEmpty()) {
+      return false;
+    }
     Location location = atom.getLocation();
     Double latitude = location == null ? null : location.getLatitude();
     Double longitude = location == null ? null : location.getLongitude();

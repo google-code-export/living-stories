@@ -39,6 +39,8 @@
   <gxp:param name="subscriptionStatus" type="boolean"/>
   <gxp:param name="defaultStoryView" type="FilterSpec"/>
   <gxp:param name="friendConnectSiteId" type="String"/>
+  <gxp:param name="mapsKey" type="String"/>
+  <gxp:param name="analyticsAccountId" type="String"/>
   <gxp:param name="otherStories" type="List{LivingStory}"/>
   
   <html>
@@ -69,7 +71,8 @@
           USER_NAME: <gxp:eval expr='userName'/>,
           LOGIN_URL: <gxp:eval expr='loginUrl'/>,
           LOGOUT_URL: <gxp:eval expr='logoutUrl'/>,
-          FRIEND_CONNECT_SITE_ID: <gxp:eval expr='friendConnectSiteId'/>
+          FRIEND_CONNECT_SITE_ID: <gxp:eval expr='friendConnectSiteId'/>,
+          MAPS_KEY: <gxp:eval expr='mapsKey'/>,
         };
       </script>
 
@@ -77,15 +80,7 @@
       <link rel="stylesheet" href="/Timeline.css"/>
       <link rel="stylesheet" href="/LivingStory.css"/>
       
-      <!-- Analytics async tracking code -->
-      <script type="text/javascript">
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-11440842-1']);
-        _gaq.push(['_trackPageview']);
-
-        document.documentElement.firstChild.appendChild(document.createElement('script')).src = 
-            ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      </script>
+      <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
       
     </head>
     <body>

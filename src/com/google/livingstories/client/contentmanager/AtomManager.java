@@ -397,7 +397,9 @@ public class AtomManager extends ManagerPane {
     
     additionalPanel.add(title);
     additionalPanel.add(createThemeListBox());
-    additionalPanel.add(createLocationPanel());
+    if (!LivingStoryData.getMapsKey().isEmpty()) {
+      additionalPanel.add(createLocationPanel());
+    }
     additionalPanel.add(createSourceInformationPanel());
     return additionalPanel;
   }
@@ -480,7 +482,7 @@ public class AtomManager extends ManagerPane {
     buttonPanel.add(geocoderStatus);    
     
     AjaxLoaderOptions options = AjaxLoaderOptions.newInstance();
-    options.setOtherParms("client=google-ipw&sensor=false");
+    options.setOtherParms(LivingStoryData.getMapsKey() + "&sensor=false");
     AjaxLoader.loadApi("maps", "2", new Runnable() {
       @Override
       public void run() {

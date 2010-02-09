@@ -32,6 +32,7 @@
   <gxp:param name="logoutUrl" type="String" />
   <gxp:param name="lastVisitTimes" type="JSONObject"/>
   <gxp:param name="defaultStoryView" type="FilterSpec"/>
+  <gxp:param name="analyticsAccountId" type="String"/>
   
   <gxp:nomsg>
     <html>
@@ -50,16 +51,7 @@
         </script>
         
         <link rel="stylesheet" href="/LivingStory.css"/>
-        
-        <!-- Analytics async tracking code -->
-        <script type="text/javascript">
-          var _gaq = _gaq || [];
-          _gaq.push(['_setAccount', 'UA-11440842-1']);
-          _gaq.push(['_trackPageview']);
-
-          document.documentElement.firstChild.appendChild(document.createElement('script')).src = 
-              ('https:' === document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        </script>
+        <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
       </head>
       <body>
         <table width="100%">

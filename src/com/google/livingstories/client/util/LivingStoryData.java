@@ -120,6 +120,17 @@ public class LivingStoryData {
     return getLivingStoryData().getObjectValue("LAST_VISIT_TIMES");
   }
   
+  /**
+   * Returns the MAPS_KEY value, prepending key= if it seems appropriate
+   */
+  public static String getMapsKey() {
+    String ret = getLivingStoryData().getStringValue("MAPS_KEY");
+    if (!ret.isEmpty() && !ret.contains("=")) {
+      ret = "key=" + ret;
+    }
+    return ret;
+  }
+  
   private static final class LivingStoryObject extends JavaScriptObject {
     @SuppressWarnings("unused")
     protected LivingStoryObject() {}

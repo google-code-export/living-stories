@@ -43,8 +43,10 @@ public class AnalyticsUtil {
   public static void trackVerticalTimelineClick(String lspUrl, Long atomId) {
     trackEvent(lspUrl, "verticalTimeline", String.valueOf(atomId));
   }
-  
+
   private static native void trackEvent(String category, String action, String value) /*-{
-    $wnd._gaq.push(['_trackEvent', category, action, value]);
+    if ($wnd._gaq) {
+      $wnd._gaq.push(['_trackEvent', category, action, value]);
+    }
   }-*/;
 }

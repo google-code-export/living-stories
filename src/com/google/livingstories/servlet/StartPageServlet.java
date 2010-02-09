@@ -78,6 +78,7 @@ public class StartPageServlet extends HttpServlet {
         userLoginService.createLoginUrl(currentUrl),
         userLoginService.createLogoutUrl(currentUrl),
         lastVisitTimes,
-        loggedInUser == null ? null : userDataService.getDefaultStoryView(loggedInUser));
+        loggedInUser == null ? null : userDataService.getDefaultStoryView(loggedInUser),
+        new ExternalServiceKeyChain(getServletContext()).getAnalyticsAccountId());
   }
 }
