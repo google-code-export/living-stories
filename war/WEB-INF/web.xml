@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+  <!-- Must be logged in and on the whitelist to access the LSP for the 'preview' launch. -->
+  <filter>
+    <filter-name>previewAccessFilter</filter-name>
+    <filter-class>com.google.livingstories.servlet.PreviewAccessFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>previewAccessFilter</filter-name>
+    <servlet-name>startPageServlet</servlet-name>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>previewAccessFilter</filter-name>
+    <url-pattern>/lsps/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>previewAccessFilter</filter-name>
+    <url-pattern>/LivingStoryPage/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>previewAccessFilter</filter-name>
+    <url-pattern>/fourthestate/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Must be an admin to access the content manager piece of the application. -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>adminPages</web-resource-name>
+      <url-pattern>/remote_api</url-pattern>
+      <url-pattern>/ContentManager.html</url-pattern>
+      <url-pattern>/import</url-pattern>
+      <url-pattern>/gqlServlet</url-pattern>
+      <url-pattern>/clearCache</url-pattern>
+      <url-pattern>/fourthestate/whitelistingservice</url-pattern>
+      <url-pattern>/export</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- Remote api mapping -->
+
+  <servlet>
+    <servlet-name>remoteapi</servlet-name>
+    <servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>remoteapi</servlet-name>
+    <url-pattern>/remote_api</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlet Mappings -->
+  
+  <servlet>
+    <servlet-name>startPageServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.StartPageServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>startPageServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>livingStoryServlet</servlet-name>
+    <servlet-class>com.google.livingstories.server.rpcimpl.LivingStoryRpcImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>livingStoryServlet</servlet-name>
+    <url-pattern>/fourthestate/livingstoryservice</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>livingStoryServlet</servlet-name>
+    <url-pattern>/StartPage/livingstoryservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>livingStoryServlet</servlet-name>
+    <url-pattern>/LivingStoryPage/livingstoryservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>atomServlet</servlet-name>
+    <servlet-class>com.google.livingstories.server.rpcimpl.ContentRpcImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>atomServlet</servlet-name>
+    <url-pattern>/fourthestate/atomservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>atomServlet</servlet-name>
+    <url-pattern>/StartPage/atomservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>atomServlet</servlet-name>
+    <url-pattern>/LivingStoryPage/atomservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>userInfoServlet</servlet-name>
+    <servlet-class>com.google.livingstories.server.rpcimpl.UserRpcImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>userInfoServlet</servlet-name>
+    <url-pattern>/LivingStoryPage/userinfoservice</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>whitelistingServlet</servlet-name>
+    <servlet-class>com.google.livingstories.server.rpcimpl.WhitelistingRpcImpl</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>whitelistingServlet</servlet-name>
+    <url-pattern>/fourthestate/whitelistingservice</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>lspDispatcher</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.LspDispatcher</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>lspDispatcher</servlet-name>
+    <url-pattern>/lsps/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>feedServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.FeedServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>feedServlet</servlet-name>
+    <url-pattern>/feeds/*</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>subscribeServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.SubscribeServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>subscribeServlet</servlet-name>
+    <url-pattern>/subscribe</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>gqlServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.GqlServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>gqlServlet</servlet-name>
+    <url-pattern>/gqlServlet</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>clearCacheServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.ClearCacheServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>clearCacheServlet</servlet-name>
+    <url-pattern>/clearCache</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>singletonImportServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.SingletonImportServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>singletonImportServlet</servlet-name>
+    <url-pattern>/singletonImport</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>dataExportServlet</servlet-name>
+    <servlet-class>com.google.livingstories.servlet.DataExportServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>dataExportServlet</servlet-name>
+    <url-pattern>/export</url-pattern>
+  </servlet-mapping>
+
+</web-app>
