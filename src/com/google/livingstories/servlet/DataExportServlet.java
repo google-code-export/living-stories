@@ -16,7 +16,6 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
 import com.google.livingstories.server.AngleEntity;
 import com.google.livingstories.server.BaseAtomEntityImpl;
 import com.google.livingstories.server.JSONSerializable;
@@ -32,6 +31,7 @@ import java.util.List;
 
 import javax.jdo.Extent;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,25 +41,29 @@ import javax.servlet.http.HttpServletResponse;
  * This works in both local and prod instances.
  */
 public class DataExportServlet extends HttpServlet {
-  public static List<Class<? extends JSONSerializable>> EXPORT_ENTITY_CLASSES =
-    ImmutableList.<Class<? extends JSONSerializable>>of(
-        LivingStoryEntity.class,
-        AngleEntity.class,
-        BaseAtomEntityImpl.class);
-
+  
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
       JSONObject result = new JSONObject();
-
-      for (Class<? extends JSONSerializable> entityClass : EXPORT_ENTITY_CLASSES) {
-        addJSON(result, entityClass, pm);
-      }
-              
+      
+      // Write the json for living story entities and theme entities first
+      addJSON(result, LivingStoryEntity.class, pm);
+      addJSON(result, AngleEntity.class, pm);
+      
+      // Then write the json for content entities without living stories followed by content
+      // entities with living stories
+      JSONArray contentJson = new JSONArray();
+      processContentEntities(contentJson, pm, true);
+      processContentEntities(contentJson, pm, false);
+      result.put(BaseAtomEntityImpl.class.getSimpleName(), contentJson);
+      
       resp.setContentType("application/json");
       resp.getOutputStream().write(result.toString().getBytes());
+    } catch (JSONException ex) {
+      throw new RuntimeException(ex);
     } finally {
       pm.close();
     }
@@ -82,4 +86,24 @@ public class DataExportServlet extends HttpServlet {
       entities.closeAll();
     }
   }
+  
+  private void processContentEntities(JSONArray json, PersistenceManager pm,
+      boolean nullLivingStory) {
+    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    if (nullLivingStory) {
+      query.setFilter("livingStoryId == null");
+    } else {
+      query.setFilter("livingStoryId != null");
+    }
+    @SuppressWarnings("unchecked")
+    List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute();
+    try {
+      for (BaseAtomEntityImpl entity : entities) {
+        json.put(entity.toJSON());
+      }
+    } finally {
+      query.closeAll();
+    }
+  }
+  
 }

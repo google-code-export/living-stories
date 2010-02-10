@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 /**
  * Page that handles data import.
  * 
- * See comments in SingletonImportServlet.java for explanation of
+ * See comments in DataImportServlet.java for explanation of
  * how this page helps spread the import work across multiple
  * requests to avoid going over the appengine request timeout.
  */

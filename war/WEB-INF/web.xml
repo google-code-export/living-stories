@@ -90,7 +90,7 @@
 
   <servlet-mapping>
     <servlet-name>livingStoryServlet</servlet-name>
-    <url-pattern>/fourthestate/livingstoryservice</url-pattern>
+    <url-pattern>/ContentManager/livingstoryservice</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
@@ -110,7 +110,7 @@
 
   <servlet-mapping>
     <servlet-name>atomServlet</servlet-name>
-    <url-pattern>/fourthestate/atomservice</url-pattern>
+    <url-pattern>/ContentManager/atomservice</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -140,7 +140,7 @@
 
   <servlet-mapping>
     <servlet-name>whitelistingServlet</servlet-name>
-    <url-pattern>/fourthestate/whitelistingservice</url-pattern>
+    <url-pattern>/ContentManager/whitelistingservice</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -205,7 +205,7 @@
 
   <servlet>
     <servlet-name>singletonImportServlet</servlet-name>
-    <servlet-class>com.google.livingstories.servlet.SingletonImportServlet</servlet-class>
+    <servlet-class>com.google.livingstories.servlet.DataImportServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

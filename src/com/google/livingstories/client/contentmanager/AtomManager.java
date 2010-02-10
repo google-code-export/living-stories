@@ -153,6 +153,10 @@ public class AtomManager extends ManagerPane {
   private Map<Long, PlayerAtom> unassignedPlayersIdToAtomMap;
   
   private ItemList<Theme> themeListBox;
+  
+  // Location related stuff
+  private boolean mapsKeyExists;
+  private String mapsKey;
   private TextBox latitudeTextBox;
   private TextBox longitudeTextBox;
   private TextArea locationDescriptionTextArea;
@@ -164,6 +168,8 @@ public class AtomManager extends ManagerPane {
   private Label geocoderStatus;
   private MapWidget map;
   private Marker mapMarker;
+  
+  // Source related stuff
   private TextBox sourceDescriptionBox;
   private SingleAtomSelectionPanel sourceAtomSelector;
   private DockPanel pickerPanel;
@@ -223,6 +229,9 @@ public class AtomManager extends ManagerPane {
   private Map<AtomType, Integer> atomTypeToEditorPanelMap = new HashMap<AtomType, Integer>();
   
   public AtomManager() {
+    mapsKey = LivingStoryData.getMapsKey();
+    mapsKeyExists = mapsKey != null && !mapsKey.isEmpty();
+    
     HorizontalPanel container = new HorizontalPanel();
     
     container.add(createControlsPanel());
@@ -397,7 +406,7 @@ public class AtomManager extends ManagerPane {
     
     additionalPanel.add(title);
     additionalPanel.add(createThemeListBox());
-    if (!LivingStoryData.getMapsKey().isEmpty()) {
+    if (mapsKeyExists) {
       additionalPanel.add(createLocationPanel());
     }
     additionalPanel.add(createSourceInformationPanel());
@@ -482,7 +491,7 @@ public class AtomManager extends ManagerPane {
     buttonPanel.add(geocoderStatus);    
     
     AjaxLoaderOptions options = AjaxLoaderOptions.newInstance();
-    options.setOtherParms(LivingStoryData.getMapsKey() + "&sensor=false");
+    options.setOtherParms(mapsKey + "&sensor=false");
     AjaxLoader.loadApi("maps", "2", new Runnable() {
       @Override
       public void run() {
@@ -1218,23 +1227,24 @@ public class AtomManager extends ManagerPane {
         formatCurrentContributorList();
         contributorSuggestPanel.clear();
         
-        Location location = selectedAtom.getLocation();
-        if (location != null) {
-          Double latitude = location.getLatitude();
-          latitudeTextBox.setText(latitude == null ? "" : latitude.toString());
-          Double longitude = location.getLongitude();
-          longitudeTextBox.setText(longitude == null ? "" : longitude.toString());
-          if (latitude != null && longitude != null) {
-            recenterMap();
-          }   
-          
-          String description = location.getDescription();
-          locationDescriptionTextArea.setText(description == null ? "" : description);
+        if (mapsKeyExists) {
+          Location location = selectedAtom.getLocation();
+          if (location != null) {
+            Double latitude = location.getLatitude();
+            latitudeTextBox.setText(latitude == null ? "" : latitude.toString());
+            Double longitude = location.getLongitude();
+            longitudeTextBox.setText(longitude == null ? "" : longitude.toString());
+            if (latitude != null && longitude != null) {
+              recenterMap();
+            }   
+
+            String description = location.getDescription();
+            locationDescriptionTextArea.setText(description == null ? "" : description);
+          }
+          // Ensure that the state of the location controls are accurate for the atom data.
+          adjustLocationControls();
+          controlGeocodeButton();
         }
-        // Ensure that the state of the location controls are accurate for the atom data.
-        adjustLocationControls();
-        controlGeocodeButton();
-        
         // Set the source information related fields
         String sourceDescription = selectedAtom.getSourceDescription();
         sourceDescriptionBox.setText(sourceDescription == null ? "" : sourceDescription);
@@ -1367,35 +1377,39 @@ public class AtomManager extends ManagerPane {
         return;
       }
       
+      Location location = new Location(null, null, "");
       // Initialize the location if it was entered
-      Double latitude = null;
-      Double longitude = null;
-      String latitudeString = latitudeTextBox.getText();
-      if (!latitudeString.isEmpty()) {
-        String longitudeString = longitudeTextBox.getText();
-        if (longitudeString.isEmpty()) {
-          showInputError("Both latitude and longitude have to be entered.");
-          return;
-        }
-        try {
-          latitude = Double.valueOf(latitudeString);
-          longitude = Double.valueOf(longitudeString);
-          if (latitude > 90.0 || latitude < -90.0) {
-            showInputError("Latitude should be between -90 and +90");
+      if (mapsKeyExists) {
+        Double latitude = null;
+        Double longitude = null;
+        String latitudeString = latitudeTextBox.getText();
+        if (!latitudeString.isEmpty()) {
+          String longitudeString = longitudeTextBox.getText();
+          if (longitudeString.isEmpty()) {
+            showInputError("Both latitude and longitude have to be entered.");
             return;
           }
-          if (longitude > 180 || longitude < -180) {
-            showInputError("Longitude should be between -180 and +180");
+          try {
+            latitude = Double.valueOf(latitudeString);
+            longitude = Double.valueOf(longitudeString);
+            if (latitude > 90.0 || latitude < -90.0) {
+              showInputError("Latitude should be between -90 and +90");
+              return;
+            }
+            if (longitude > 180 || longitude < -180) {
+              showInputError("Longitude should be between -180 and +180");
+              return;
+            }
+          } catch (NumberFormatException e) {
+            showInputError("Latitude and Longitude should be decimal numbers.");
             return;
           }
-        } catch (NumberFormatException e) {
-          showInputError("Latitude and Longitude should be decimal numbers.");
-          return;
         }
+        location = new Location(latitude, longitude, locationDescriptionTextArea.getText());
       }
-      Location location = new Location(latitude, longitude, locationDescriptionTextArea.getText());
-      Set<Long> currentContributorIds = new HashSet<Long>(currentContributorIdsToNamesMap.keySet());
       
+      Set<Long> currentContributorIds = new HashSet<Long>(currentContributorIdsToNamesMap.keySet());
+
       BaseAtom atom;
       switch (atomType) {
         case EVENT:
