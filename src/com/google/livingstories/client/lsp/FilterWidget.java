@@ -36,7 +36,7 @@ import com.google.livingstories.client.UserRpcServiceAsync;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.ThemeSelectedEvent;
 import com.google.livingstories.client.util.AnalyticsUtil;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryData;
 import com.google.livingstories.client.util.NullCallback;
@@ -133,7 +133,7 @@ public class FilterWidget extends Composite {
    * @param selectedThemeId the new selectedThemeId
    */
   public void setSelectedTheme(Long selectedThemeId) {
-    boolean isChange = !FourthestateUtil.equal(this.selectedThemeId, selectedThemeId);
+    boolean isChange = !GlobalUtil.equal(this.selectedThemeId, selectedThemeId);
     this.selectedThemeId = selectedThemeId;
     FilterSpec filterCopy = copyCurrentFilterSpec();
 

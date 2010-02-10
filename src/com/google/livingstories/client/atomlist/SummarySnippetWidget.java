@@ -24,7 +24,7 @@ import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.EventAtom;
 import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.GwtNodeAdapter;
 
@@ -70,7 +70,7 @@ public class SummarySnippetWidget extends Composite {
       NarrativeAtom narrative = (NarrativeAtom)atom;
       String summary = narrative.getNarrativeSummary();
       String content = narrative.getContent();
-      boolean isSummaryAvailable = !FourthestateUtil.isContentEmpty(summary);
+      boolean isSummaryAvailable = !GlobalUtil.isContentEmpty(summary);
       if (isSummaryAvailable) {
         expandedWidget = createSummaryWidget(summary);
       }
@@ -119,7 +119,7 @@ public class SummarySnippetWidget extends Composite {
   }
   
   private Widget createSummaryWidget(String summary) {
-    if (FourthestateUtil.isContentEmpty(summary)) {
+    if (GlobalUtil.isContentEmpty(summary)) {
       return null;
     } else {
       return new ContentRenderer(summary, false);

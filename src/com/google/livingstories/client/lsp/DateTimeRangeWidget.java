@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.livingstories.client.EventAtom;
 import com.google.livingstories.client.util.DateUtil;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Date;
 
@@ -71,7 +71,7 @@ public class DateTimeRangeWidget extends Composite {
     
     FlowPanel panel = new FlowPanel();
     panel.add(dateLabel);
-    FourthestateUtil.addIfNotNull(panel, timeLabel);
+    GlobalUtil.addIfNotNull(panel, timeLabel);
     
     initWidget(panel);
   }

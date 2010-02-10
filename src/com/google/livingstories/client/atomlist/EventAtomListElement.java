@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.EventAtom;
 import com.google.livingstories.client.lsp.AtomRenderer;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Date;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class EventAtomListElement extends ComplexAtomListElement {
 
   @Override
   public SummarySnippetWidget getSummarySnippetWidget() {
-    if (FourthestateUtil.isContentEmpty(event.getEventSummary())) {
+    if (GlobalUtil.isContentEmpty(event.getEventSummary())) {
       return null; 
     } else { 
       return new SummarySnippetWidget(event, alreadySeen); 
@@ -64,7 +64,7 @@ public class EventAtomListElement extends ComplexAtomListElement {
   @Override
   public Widget getDetailsWidget() {
     Widget eventDetailsWidget = null;
-    if (!FourthestateUtil.isContentEmpty(event.getContent())) {
+    if (!GlobalUtil.isContentEmpty(event.getContent())) {
       eventDetailsWidget = new AtomRenderer(event, true, false, event.getContributorIds());
     }
     return eventDetailsWidget;

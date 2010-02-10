@@ -32,7 +32,7 @@ import com.google.livingstories.client.ui.ImagePreview;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel.IconPlacement;
 
@@ -60,11 +60,11 @@ public class ImageAssetPreview extends Composite {
     
     String previewUrl = atom.getPreviewUrl();
     String captionText = atom.getCaption();
-    if (!FourthestateUtil.isContentEmpty(previewUrl)) {
+    if (!GlobalUtil.isContentEmpty(previewUrl)) {
       imagePreview = createPreviewImage(atom);
       preview.add(imagePreview);
     }
-    if (!FourthestateUtil.isContentEmpty(captionText)) {
+    if (!GlobalUtil.isContentEmpty(captionText)) {
       caption.setHTML(captionText);
     }
     if (hasContent()) {
@@ -104,6 +104,6 @@ public class ImageAssetPreview extends Composite {
   }
   
   private boolean hasContent() {
-    return !FourthestateUtil.isContentEmpty(atom.getContent());
+    return !GlobalUtil.isContentEmpty(atom.getContent());
   }
 }

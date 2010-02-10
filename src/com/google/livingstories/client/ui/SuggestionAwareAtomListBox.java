@@ -17,7 +17,7 @@
 package com.google.livingstories.client.ui;
 
 import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Collections;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class SuggestionAwareAtomListBox extends AtomListBox {
    * in the dropdown if appropriate.
    */
   public void setSuggestedAtomIds(Set<Long> suggestedAtomIds) {
-    this.suggestedAtomIds = FourthestateUtil.copySet(suggestedAtomIds);
+    this.suggestedAtomIds = GlobalUtil.copySet(suggestedAtomIds);
     
     int lastIndex = filter.getItemCount() - 1;
     boolean hasSuggestionOption = filter.getValue(lastIndex).equals(SUGGESTIONS_TEXT);

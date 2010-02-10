@@ -30,7 +30,7 @@ import com.google.livingstories.client.DisplayAtomBundle;
 import com.google.livingstories.client.atomlist.AtomClickHandler;
 import com.google.livingstories.client.atomlist.AtomList;
 import com.google.livingstories.client.ui.Slideshow;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 
 import java.util.ArrayList;
@@ -125,7 +125,7 @@ public class LspAtomListWidget extends Composite {
       List<BaseAtom> imagesAsBase = atomList.getAtomList();
       List<AssetAtom> images = new ArrayList<AssetAtom>(imagesAsBase.size());
       for (BaseAtom atom : imagesAsBase) {
-        if (!FourthestateUtil.isContentEmpty(atom.getContent())) {
+        if (!GlobalUtil.isContentEmpty(atom.getContent())) {
           images.add((AssetAtom) atom);
           if (atom.equals(clickedAtom)) {
             clickedIndex = i;

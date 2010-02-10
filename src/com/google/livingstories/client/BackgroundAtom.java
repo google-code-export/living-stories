@@ -18,7 +18,7 @@ package com.google.livingstories.client;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.GwtNodeAdapter;
 
@@ -46,7 +46,7 @@ public class BackgroundAtom extends BaseAtom {
   }
   
   public boolean isConcept() {
-    return !FourthestateUtil.isContentEmpty(conceptName);
+    return !GlobalUtil.isContentEmpty(conceptName);
   }
   
   public String getConceptName() {

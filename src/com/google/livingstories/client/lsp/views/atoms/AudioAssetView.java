@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetAtom;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 /**
  * Renders an audio asset inline, without popping up a lightbox to show the full content.
@@ -48,7 +48,7 @@ public class AudioAssetView extends Composite {
     iconPanel.add(new Image(AUDIO_ICON));
     content.setHTML(atom.getContent());
     String captionText = atom.getCaption();
-    if (!FourthestateUtil.isContentEmpty(captionText)) {
+    if (!GlobalUtil.isContentEmpty(captionText)) {
       caption.setHTML(captionText);
     }
   }

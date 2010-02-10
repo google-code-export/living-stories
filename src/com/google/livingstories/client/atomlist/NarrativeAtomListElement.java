@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Date;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class NarrativeAtomListElement extends ComplexAtomListElement {
   @Override
   public Widget getDetailsWidget() {
     Widget contentWidget = new ContentRenderer(narrative.getContent(), false);
-    if (FourthestateUtil.isContentEmpty(narrative.getNarrativeSummary())) {
+    if (GlobalUtil.isContentEmpty(narrative.getNarrativeSummary())) {
       return contentWidget;
     } else {
       FlowPanel panel = new FlowPanel();

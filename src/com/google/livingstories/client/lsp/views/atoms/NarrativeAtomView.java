@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.lsp.BylineWidget;
 import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Set;
 
@@ -59,7 +59,7 @@ public class NarrativeAtomView extends Composite {
     }
 
     String summaryText = atom.getNarrativeSummary();
-    if (!FourthestateUtil.isContentEmpty(summaryText)) {
+    if (!GlobalUtil.isContentEmpty(summaryText)) {
       summary.add(new ContentRenderer(summaryText, false));
       summary.add(new Label("--"));
     }

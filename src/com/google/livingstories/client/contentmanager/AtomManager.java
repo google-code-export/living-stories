@@ -93,7 +93,7 @@ import com.google.livingstories.client.ui.SingleAtomSelectionPanel;
 import com.google.livingstories.client.ui.SuggestionAwareAtomListBox;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.DateUtil;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryData;
 
 import java.util.ArrayList;
@@ -1177,7 +1177,7 @@ public class AtomManager extends ManagerPane {
             if (selectedAtom.getLivingStoryId() == null) {
               PlayerAtom playerAtom = (PlayerAtom) selectedAtom;
               nameTextBox.setText(playerAtom.getName());
-              aliasesTextBox.setText(FourthestateUtil.join(",", playerAtom.getAliases()));
+              aliasesTextBox.setText(GlobalUtil.join(",", playerAtom.getAliases()));
               playerTypeSelector.selectConstant(playerAtom.getPlayerType());
               photoSelector.setSelection(playerAtom.getPhotoAtom());
             } else {
@@ -1747,7 +1747,7 @@ public class AtomManager extends ManagerPane {
 
         // remember which linked atoms were suggested, but fix up the returned atom so
         // that nothing incorrect gets cached locally.
-        Set<Long> suggestionIds = FourthestateUtil.copySet(returnedAtom.getLinkedAtomIds());
+        Set<Long> suggestionIds = GlobalUtil.copySet(returnedAtom.getLinkedAtomIds());
         suggestionIds.removeAll(sentAtom.getLinkedAtomIds());
         returnedAtom.setLinkedAtomIds(sentAtom.getLinkedAtomIds());
 

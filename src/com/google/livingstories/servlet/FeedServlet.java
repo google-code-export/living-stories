@@ -24,7 +24,7 @@ import com.google.livingstories.client.EventAtom;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.NarrativeAtom;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.JavaNodeAdapter;
 import com.google.livingstories.server.rpcimpl.ContentRpcImpl;
@@ -127,7 +127,7 @@ public class FeedServlet extends HttpServlet {
         content.setType("text/html");
         String narrativeSummary = StringUtil.stripForExternalSites(
             narrative.getNarrativeSummary());
-        if (FourthestateUtil.isContentEmpty(narrativeSummary)) {
+        if (GlobalUtil.isContentEmpty(narrativeSummary)) {
           content.setValue(SnippetUtil.createSnippet(
               JavaNodeAdapter.fromHtml(narrative.getContent()), MAXIMUM_SNIPPET_LENGTH));
         } else {

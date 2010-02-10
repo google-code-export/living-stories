@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.lsp.BylineWidget;
 import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -139,19 +139,19 @@ public abstract class BaseAtom implements Serializable {
   }
 
   public Set<Long> getContributorIds() {
-    return FourthestateUtil.copySet(contributorIds);
+    return GlobalUtil.copySet(contributorIds);
   }
 
   public void setContributorIds(Set<Long> contributorIds) {
-    this.contributorIds = FourthestateUtil.copySet(contributorIds);
+    this.contributorIds = GlobalUtil.copySet(contributorIds);
   }
 
   public Set<Long> getLinkedAtomIds() {
-    return FourthestateUtil.copySet(linkedAtomIds);
+    return GlobalUtil.copySet(linkedAtomIds);
   }
 
   public void setLinkedAtomIds(Set<Long> linkedAtomIds) {
-    this.linkedAtomIds = FourthestateUtil.copySet(linkedAtomIds);
+    this.linkedAtomIds = GlobalUtil.copySet(linkedAtomIds);
   }
   
   public void addAllLinkedAtomIds(Collection<Long> newLinkedAtomIds) {
@@ -167,11 +167,11 @@ public abstract class BaseAtom implements Serializable {
   }
   
   public Set<Long> getThemeIds() {
-    return FourthestateUtil.copySet(themeIds);
+    return GlobalUtil.copySet(themeIds);
   }
   
   public void setThemeIds(Set<Long> themeIds) {
-    this.themeIds = FourthestateUtil.copySet(themeIds);
+    this.themeIds = GlobalUtil.copySet(themeIds);
   }
   
   public Location getLocation() {
@@ -203,7 +203,7 @@ public abstract class BaseAtom implements Serializable {
   }
   
   public boolean hasSourceInformation() {
-    return sourceAtom != null || !FourthestateUtil.isContentEmpty(sourceDescription);
+    return sourceAtom != null || !GlobalUtil.isContentEmpty(sourceDescription);
   }
 
   public String getTypeString() {

@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.ui.AutoHidePopupPanel;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 /**
  * Create a popup that shows source information.
@@ -39,7 +39,7 @@ public class SourcePopupWidget extends Composite {
   public void show(String description, BaseAtom atom, Element showRelativeTo) {
     // Create the contents of the popup
     VerticalPanel sourcePanel = new VerticalPanel();
-    if (!FourthestateUtil.isContentEmpty(description)) {
+    if (!GlobalUtil.isContentEmpty(description)) {
       sourcePanel.add(new HTML(description));
     }
     if (atom != null) {

@@ -36,7 +36,7 @@ import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.PlayerAtom;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.contentmanager.SearchTerms;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.JavaNodeAdapter;
 import com.google.livingstories.server.BaseAtomEntityImpl;
@@ -88,7 +88,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     // any content.
     boolean runAutoLink = clientAtom.getLivingStoryId() != null 
         && clientAtom.getAtomType() != AtomType.PLAYER
-        && !FourthestateUtil.isContentEmpty(clientAtom.getContent());
+        && !GlobalUtil.isContentEmpty(clientAtom.getContent());
     List<PlayerAtom> playerAtoms = null;
     List<BackgroundAtom> concepts = null;
     
@@ -202,7 +202,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         getPublishedAtomsByType(lspId, AtomType.BACKGROUND);
     List<BackgroundAtom> backgroundAtoms = Lists.newArrayList();
     for (BaseAtomEntityImpl backgroundEntity : backgroundEntities) {
-      if (!FourthestateUtil.isContentEmpty(backgroundEntity.getName())) {
+      if (!GlobalUtil.isContentEmpty(backgroundEntity.getName())) {
         backgroundAtoms.add((BackgroundAtom)(backgroundEntity.toClientObject()));
       }
     }
@@ -257,8 +257,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         emailContent.append("</span>");
         String eventSummary = eventAtom.getEventSummary();
         String eventDetails = eventAtom.getContent();
-        if (FourthestateUtil.isContentEmpty(eventSummary) 
-            && !FourthestateUtil.isContentEmpty(eventDetails)) {
+        if (GlobalUtil.isContentEmpty(eventSummary) 
+            && !GlobalUtil.isContentEmpty(eventDetails)) {
           eventSummary = SnippetUtil.createSnippet(JavaNodeAdapter.fromHtml(eventDetails), 
                   EMAIL_ALERT_SNIPPET_LENGTH);
         }

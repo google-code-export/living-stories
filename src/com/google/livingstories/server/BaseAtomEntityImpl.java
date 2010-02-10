@@ -35,7 +35,7 @@ import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.QuoteAtom;
 import com.google.livingstories.client.ReactionAtom;
 import com.google.livingstories.client.StoryPlayerAtom;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.server.rpcimpl.ContentRpcImpl;
 import com.google.livingstories.server.util.TimeUtil;
 
@@ -329,11 +329,11 @@ public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSe
   }
 
   public Set<Long> getContributorIds() {
-    return FourthestateUtil.copySet(contributorIds);
+    return GlobalUtil.copySet(contributorIds);
   }
   
   public void setContributorIds(Set<Long> contributorIds) {
-    this.contributorIds = FourthestateUtil.copySet(contributorIds);
+    this.contributorIds = GlobalUtil.copySet(contributorIds);
   }
 
   public void addContributorId(long contributorId) {
@@ -350,11 +350,11 @@ public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSe
   }
   
   public Set<Long> getLinkedAtomIds() {
-    return FourthestateUtil.copySet(linkedAtomIds);
+    return GlobalUtil.copySet(linkedAtomIds);
   }
   
   public void setLinkedAtomIds(Set<Long> linkedAtomIds) {
-    this.linkedAtomIds = FourthestateUtil.copySet(linkedAtomIds);
+    this.linkedAtomIds = GlobalUtil.copySet(linkedAtomIds);
   }
   
   public void addLinkedAtomId(long linkedAtomId) {
@@ -371,11 +371,11 @@ public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSe
   }
 
   public Set<Long> getThemeIds() {
-    return FourthestateUtil.copySet(angleIds);
+    return GlobalUtil.copySet(angleIds);
   }
   
   public void setThemeIds(Set<Long> themeIds) {
-    this.angleIds = FourthestateUtil.copySet(themeIds);
+    this.angleIds = GlobalUtil.copySet(themeIds);
   }
   
   public void removeThemeId(long themeId) {

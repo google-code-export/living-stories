@@ -41,7 +41,7 @@ import com.google.livingstories.client.PlayerAtom;
 import com.google.livingstories.client.PlayerType;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.ui.EnumDropdown;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -185,14 +185,14 @@ public class OnTheFlyPlayerBox extends PopupPanel {
         String name = nameBox.getText();
         String previewPhotoUrl = previewPhotoUrlBox.getText();
         String photoUrl = photoUrlBox.getText();
-        if (FourthestateUtil.isContentEmpty(photoUrl)) {
+        if (GlobalUtil.isContentEmpty(photoUrl)) {
           photoUrl = previewPhotoUrl;
         }
         
         // If a photo URL is provided, we first have to save the photo atom via an RPC call, and
         // then save the player atom via another RPC. If there is no photo URL provided, the player
         // can be saved via 1 RPC call directly.
-        if (FourthestateUtil.isContentEmpty(photoUrl)) {
+        if (GlobalUtil.isContentEmpty(photoUrl)) {
           savePlayer(null);
         } else {
           AssetAtom photo = new AssetAtom(null, new Date(), new HashSet<Long>(), photoUrl, 

@@ -40,7 +40,7 @@ import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.lsp.views.ManagementLinks;
 import com.google.livingstories.client.util.DateUtil;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.HistoryManager;
 
 import java.util.Date;
@@ -86,7 +86,7 @@ public class StartPage implements EntryPoint {
   
   private void populate(List<LivingStory> stories, Map<Long, List<BaseAtom>> storyIdToUpdateMap) {
     for (LivingStory story : stories) {
-      FourthestateUtil.addIfNotNull(startPageWidget,
+      GlobalUtil.addIfNotNull(startPageWidget,
           createStoryWidget(story, storyIdToUpdateMap.get(story.getId())));
     }
   }

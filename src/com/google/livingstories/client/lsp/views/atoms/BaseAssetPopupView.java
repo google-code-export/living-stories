@@ -34,7 +34,7 @@ import com.google.livingstories.client.lsp.BylineWidget;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.PopupImageLoadedEvent;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 /**
  * Renders an asset with an HTML panel.
@@ -55,7 +55,7 @@ public class BaseAssetPopupView extends Composite {
     
     // Set the caption if there is one
     String captionText = atom.getCaption();
-    if (!FourthestateUtil.isContentEmpty(captionText)) {
+    if (!GlobalUtil.isContentEmpty(captionText)) {
       caption.appendChild(new ContentRenderer(captionText, false).getElement());
     }
 

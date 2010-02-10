@@ -37,7 +37,7 @@ import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.ui.ImagePreview;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel.IconPlacement;
 
@@ -139,7 +139,7 @@ public class AssetAtom extends BaseAtom {
       content.add(new InlineHTML(getContent()), DockPanel.EAST);
       return content;
     } else {
-      boolean hasFullView = !FourthestateUtil.isContentEmpty(getContent());
+      boolean hasFullView = !GlobalUtil.isContentEmpty(getContent());
       Widget image = null;
       if (assetType == AssetType.DOCUMENT) {
         image = new Image(DOCUMENT_ICON);
@@ -267,7 +267,7 @@ public class AssetAtom extends BaseAtom {
       case VIDEO:
       case AUDIO:
       case INTERACTIVE:
-        FourthestateUtil.addIfNotNull(
+        GlobalUtil.addIfNotNull(
             panel, BylineWidget.makeContextSensitive(this, containingContributorIds));
         break;
       default:

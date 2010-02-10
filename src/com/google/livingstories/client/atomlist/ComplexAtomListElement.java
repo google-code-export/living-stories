@@ -66,7 +66,7 @@ import com.google.livingstories.client.lsp.views.atoms.LinkedViewFactory;
 import com.google.livingstories.client.ui.PartialDisclosurePanel;
 import com.google.livingstories.client.ui.WindowScroll;
 import com.google.livingstories.client.util.AnalyticsUtil;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.LivingStoryData;
@@ -680,7 +680,7 @@ public abstract class ComplexAtomListElement implements AtomListElement {
     
     for (AssetAtom image : images) {
       image.setRenderAsSeen(alreadySeen);
-      if (FourthestateUtil.isContentEmpty(image.getContent())) {
+      if (GlobalUtil.isContentEmpty(image.getContent())) {
         thumbnailOnlyImages.add(image);
       } else {
         slideshowImages.add(image);

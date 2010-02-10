@@ -26,7 +26,7 @@ import com.google.livingstories.client.AssetAtom;
 import com.google.livingstories.client.AssetType;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 /**
  * Renders the preview for image atoms.
@@ -43,7 +43,7 @@ public class ImagePreview extends Composite {
   
   public ImagePreview(AssetAtom atom, boolean alreadySeen, boolean hasFullView) {
     assert atom.getAssetType() == AssetType.IMAGE
-        && !FourthestateUtil.isContentEmpty(atom.getPreviewUrl());
+        && !GlobalUtil.isContentEmpty(atom.getPreviewUrl());
     
     BoundedImage image;
     

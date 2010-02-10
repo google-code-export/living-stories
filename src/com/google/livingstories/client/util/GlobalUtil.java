@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  * A utility class containing data and widget manipulations common to several classes
 */
-public class FourthestateUtil {
+public class GlobalUtil {
   
   /**
    * Copies a set, returning an empty set in the case of a null incoming

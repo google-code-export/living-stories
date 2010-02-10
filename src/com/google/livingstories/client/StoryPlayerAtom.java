@@ -17,7 +17,7 @@
 package com.google.livingstories.client;
 
 import com.google.livingstories.client.util.Constants;
-import com.google.livingstories.client.util.FourthestateUtil;
+import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Date;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class StoryPlayerAtom extends PlayerAtom {
   @Override
   public String getPreviewContentToRender() {
     String storySpecificDescription = getContent();
-    if (FourthestateUtil.isContentEmpty(storySpecificDescription)) {
+    if (GlobalUtil.isContentEmpty(storySpecificDescription)) {
       return parentPlayerAtom.getPreviewContentToRender();
     } else {
       return storySpecificDescription.split(Constants.BREAK_TAG)[0];
@@ -60,7 +60,7 @@ public class StoryPlayerAtom extends PlayerAtom {
   @Override
   public String getFullContentToRender() {
     String storySpecificDescription = getContent();
-    if (FourthestateUtil.isContentEmpty(storySpecificDescription)) {
+    if (GlobalUtil.isContentEmpty(storySpecificDescription)) {
       return parentPlayerAtom.getFullContentToRender();
     } else {
       return storySpecificDescription + "<br/><br/>" + parentPlayerAtom.getFullContentToRender();
