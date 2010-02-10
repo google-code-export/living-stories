@@ -57,7 +57,7 @@ public class NarrativeAtomListElement extends ComplexAtomListElement {
 
   @Override
   public SummarySnippetWidget getSummarySnippetWidget() {
-    return new SummarySnippetWidget(narrative, alreadySeen);
+    return SummarySnippetWidget.create(narrative);
   }
   
   @Override

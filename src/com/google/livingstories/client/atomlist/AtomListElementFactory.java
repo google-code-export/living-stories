@@ -18,7 +18,14 @@ package com.google.livingstories.client.atomlist;
 
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.lsp.views.atoms.EventStreamView;
+import com.google.livingstories.client.util.LivingStoryData;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,7 +46,34 @@ public class AtomListElementFactory {
   public static AtomListElement createAtomListElement(BaseAtom atom, 
       Map<Long, BaseAtom> idToAtomMap, AtomClickHandler handler, boolean noHistoryOnToggle) {
     if (atom.getAtomType() == AtomType.EVENT) {
-      return new EventAtomListElement(atom, idToAtomMap, noHistoryOnToggle);
+      // TODO(ericzhang): Move this stuff to a 'StreamViewFactory' and extract out the
+      // linked atom processing code.
+      Date lastVisitDate = LivingStoryData.getLastVisitDate();
+      if (lastVisitDate != null) {
+        atom.setRenderAsSeen(atom.getTimestamp().before(lastVisitDate));
+      }
+      
+      Map<AtomType, List<BaseAtom>> linkedAtomsByType = new HashMap<AtomType, List<BaseAtom>>();
+      for (AtomType type : AtomType.values()) {
+        linkedAtomsByType.put(type, new ArrayList<BaseAtom>());
+      }
+      for (Long atomId : atom.getLinkedAtomIds()) {
+        BaseAtom linkedAtom = idToAtomMap.get(atomId);
+        linkedAtomsByType.get(linkedAtom.getAtomType()).add(linkedAtom);
+
+        if (atom.getRenderAsSeen() && lastVisitDate != null
+            && linkedAtom.getTimestamp().after(lastVisitDate)) {
+          atom.setRenderAsSeen(false);
+        }
+      }
+      for (BaseAtom narrative : linkedAtomsByType.get(AtomType.NARRATIVE)) {
+        List<BaseAtom> linkedAtoms = new ArrayList<BaseAtom>();
+        for (Long atomId : narrative.getLinkedAtomIds()) {
+          linkedAtoms.add(idToAtomMap.get(atomId));
+        }
+        narrative.setLinkedAtoms(linkedAtoms);
+      }
+      return new EventStreamView((EventAtom) atom, linkedAtomsByType);
     } else if (atom.getAtomType() == AtomType.NARRATIVE) {
       return new NarrativeAtomListElement(atom, idToAtomMap, noHistoryOnToggle);
     } else {

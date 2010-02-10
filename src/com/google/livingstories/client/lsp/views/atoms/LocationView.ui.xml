@@ -16,14 +16,13 @@
 -->
 
 <!-- 
-  Encapsulates the (simple) structure of the share link widget
+  Renders a map view.
 -->
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
-  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
-  ui:generateLocales="default">
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
-  <g:InlineLabel ui:field="label" styleName="{res.css.clickable}">
-    <ui:msg description="label to click to share a story">Share</ui:msg>
-  </g:InlineLabel>
+  <g:HTMLPanel>
+    <div class="{res.css.atomHeader}">Location</div>
+    <g:SimplePanel ui:field="content"/>
+  </g:HTMLPanel>
 </ui:UiBinder> 

@@ -246,13 +246,13 @@ public class AtomList extends Composite {
       AtomListElement listElement = row.atomListElement;
 
       if (atomIds.contains(entry.getKey().getId())) {
-        listElement.setExpansion(true, true);
+        listElement.setExpansion(true);
         if (atomIds.size() == 1) {
           singleRowToScrollTo = row;
         }
         countFound++;
       } else {
-        listElement.setExpansion(false, true);
+        listElement.setExpansion(false);
       }
     }
     

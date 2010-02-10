@@ -1,6 +1,3 @@
-@def primaryLinkColor #2200cc;
-@def secondaryLinkColor #7777cc;
-
 .clickable {
   cursor: pointer;
   color: primaryLinkColor;
@@ -10,7 +7,7 @@
   color: #333;
 }
 
-.read .clickable, .read a:hover, .read a:visited {
+.read .clickable, .read a, .read a:hover, .read a:visited {
   color: secondaryLinkColor;
 }
 
@@ -30,4 +27,14 @@
 
 .substituteHeaderSpacing {
   margin-top: 0.9em;
+}
+
+.linkedAtomsPanel {
+  float: right;
+  padding-left: 16px;
+  width: 210px;
+}
+
+.hidden {
+  display: none;
 }

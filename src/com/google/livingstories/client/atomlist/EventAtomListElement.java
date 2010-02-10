@@ -57,7 +57,7 @@ public class EventAtomListElement extends ComplexAtomListElement {
     if (GlobalUtil.isContentEmpty(event.getEventSummary())) {
       return null; 
     } else { 
-      return new SummarySnippetWidget(event, alreadySeen); 
+      return SummarySnippetWidget.create(event);
     }
   }
   

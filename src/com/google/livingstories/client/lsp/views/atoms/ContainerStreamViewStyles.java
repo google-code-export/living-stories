@@ -14,30 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.client.atomlist;
+package com.google.livingstories.client.lsp.views.atoms;
 
-import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.Importance;
-
-import java.util.Set;
+import com.google.gwt.resources.client.CssResource;
 
 /**
- * Interface that an element that wishes to be displayed in the atom list on the LSP has to 
- * implement.
+ * CssResouce declaration for inline styles for the ContainerStreamView.
  */
-public interface AtomListElement {
-  
-  Long getId();
-  
-  Importance getImportance();
-  
-  Set<Long> getThemeIds();
-  
-  Widget render(boolean includeAtomName);
-  
-  boolean setExpansion(boolean expand);
-
-  String getDateString();
-  
-  void setTimeVisible(boolean visible);
+public interface ContainerStreamViewStyles extends CssResource {
+  String headline();
 }

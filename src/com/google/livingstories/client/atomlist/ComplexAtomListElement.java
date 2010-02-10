@@ -59,8 +59,9 @@ import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.Location;
 import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.lsp.BylineWidget;
-import com.google.livingstories.client.lsp.DateTimeRangeWidget;
+import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.LspMessageHolder;
+import com.google.livingstories.client.lsp.views.DateTimeRangeWidget;
 import com.google.livingstories.client.lsp.views.ShareLinkWidget;
 import com.google.livingstories.client.lsp.views.atoms.LinkedViewFactory;
 import com.google.livingstories.client.ui.PartialDisclosurePanel;
@@ -135,6 +136,8 @@ public abstract class ComplexAtomListElement implements AtomListElement {
   private DateTimeRangeWidget dateTimeWidget;
   private BylineWidget bylineWidget;
   private SummarySnippetWidget summaryWidget;
+  private Widget fullSummaryWidget;
+  private SimplePanel summary;
   private VerticalPanel mapPanel;
   private MapWidget mapWidget;
   private PartialDisclosurePanel disclosurePanel;
@@ -248,8 +251,18 @@ public abstract class ComplexAtomListElement implements AtomListElement {
       atomBlock.addStyleName("newBlockText");
     }
     atomBlock.add(createBlockHeader());
-    
+
+    summary = new SimplePanel();
     summaryWidget = getSummarySnippetWidget();
+    // This is a temporary stopgap that allows us to continue using this class for
+    // narrative atoms, since the SummarySnippetWidget no longer handles the expanded
+    // case.  This class will eventually get deleted so this won't be here for long.
+    if (atom.getAtomType() == AtomType.NARRATIVE) {
+      String summary = ((NarrativeAtom)atom).getNarrativeSummary();
+      if (!GlobalUtil.isContentEmpty(summary)) {
+        fullSummaryWidget = new ContentRenderer(summary, false);
+      }
+    }
     Widget narrativePreviewWidget = getNarrativePreviewWidget();
     FlowPanel leftPanel = getLeftPanel();
     FlowPanel rightPanel = getRightPanel();
@@ -259,7 +272,8 @@ public abstract class ComplexAtomListElement implements AtomListElement {
     if (summaryWidget != null) {
       // in most cases, this margin will collapse with the content below.
       DOM.setStyleAttribute(summaryWidget.getElement(), "marginBottom", "0.9em");
-      contentPanel.add(summaryWidget);
+      summary.setWidget(summaryWidget);
+      contentPanel.add(summary);
     }
     if (narrativePreviewWidget != null) {
       contentPanel.add(narrativePreviewWidget);
@@ -307,7 +321,8 @@ public abstract class ComplexAtomListElement implements AtomListElement {
       }   
     }
     
-    dateTimeWidget = new DateTimeRangeWidget(getStartDate(), getEndDate());
+    dateTimeWidget = new DateTimeRangeWidget();
+    dateTimeWidget.setDateTime(getStartDate(), getEndDate());
     dateTimeWidget.addStyleName("floatRight");
     if (getImportance() == Importance.LOW) {
       dateTimeWidget.setTimeVisible(false);
@@ -481,7 +496,7 @@ public abstract class ComplexAtomListElement implements AtomListElement {
           t.schedule(1000);
         }
       }, options);
-      assignNavLinkString(mapPanel, "Location");
+      assignNavLinkString(mapPanel, LspMessageHolder.consts.locationTitle());
       mapPanel.setVisible(false);
       rightPanel.add(mapPanel);
       rightPanel.setWidth(Math.max(RIGHT_PANEL_WIDTH, MAPS_WIDTH) + "px");
@@ -530,7 +545,7 @@ public abstract class ComplexAtomListElement implements AtomListElement {
             setHistoryToken(atom.getId());
           }
         });
-    ShareLinkWidget shareLink = new ShareLinkWidget(atom.getId(), linkStyle);
+    ShareLinkWidget shareLink = new ShareLinkWidget(atom.getId());
     final DeckPanel navLinksOrShare = new DeckPanel();
     navLinksOrShare.add(navLinks);
     navLinksOrShare.add(shareLink);
@@ -577,8 +592,9 @@ public abstract class ComplexAtomListElement implements AtomListElement {
             bylineWidget.setVisible(true);  
           }
         }
-        if (summaryWidget != null) {
-          summaryWidget.expand();
+        summary.clear();
+        if (fullSummaryWidget != null) {
+          summary.setWidget(fullSummaryWidget);
         }
         navLinksOrShare.showWidget(1);
         AnalyticsUtil.trackOpenEventAction(LivingStoryData.getLspUrl(), atom.getId());
@@ -596,8 +612,9 @@ public abstract class ComplexAtomListElement implements AtomListElement {
             bylineWidget.setVisible(false); 
           }
         }
+        summary.clear();
         if (summaryWidget != null) {
-          summaryWidget.collapse();
+          summary.setWidget(summaryWidget);
         }
         navLinksOrShare.showWidget(0);
         
@@ -741,33 +758,16 @@ public abstract class ComplexAtomListElement implements AtomListElement {
     }
   }
   
-  /**
-   * @param expand if true, will open the disclosure panel; if false, will close it.
-   * If there is no disclosure panel, because the atom is not expandable, will not do
-   * anything.
-   * @return true if the state of the disclosure panel changed, false otherwise.
-   */
   @Override
   public boolean setExpansion(boolean expand) {
     boolean ret = disclosurePanel != null && disclosurePanel.isOpen() != expand;
     if (ret) {
-      disclosurePanel.setAnimationEnabled(false);
-      disclosurePanel.setOpen(expand);
-      disclosurePanel.setAnimationEnabled(true);
-    }
-    return ret;
-  }
-  
-  @Override
-  public boolean setExpansion(boolean expand, boolean skipExtraActions) {
-    boolean ret = false;
-    try {
-      if (skipExtraActions) {
+      try {
         suppressScrollOnClose = true;
-      }
-      ret = setExpansion(expand);
-    } finally {
-      if (skipExtraActions) {
+        disclosurePanel.setAnimationEnabled(false);
+        disclosurePanel.setOpen(expand);
+        disclosurePanel.setAnimationEnabled(true);
+      } finally {
         suppressScrollOnClose = false;
       }
     }
