@@ -42,9 +42,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.lsp.event.BlockToggledEvent;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.util.Constants;
-import com.google.livingstories.client.util.HistoryManager;
-import com.google.livingstories.client.util.LivingStoryControls;
-import com.google.livingstories.client.util.HistoryManager.HistoryPages;
 
 /**
  * A widget that consists of a header and a content panel.  The content panel
@@ -240,14 +237,6 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
             if (atomId.equals(e.getAtomId())) {
               setOpen(e.isOpened(), e.shouldAnimate());
               e.finish();
-              if (e.shouldSetHistory()) {
-                // Set this atom as the focused atom in the history.
-                // When the user navigates away from this and then clicks back, this atom will
-                // appear expanded, and the viewport will be scrolled to its position.
-                HistoryManager.newToken(HistoryPages.OVERVIEW,
-                    LivingStoryControls.getCurrentFilterSpec().getFilterParams(),
-                    String.valueOf(atomId));
-              }
             }
           }
         });

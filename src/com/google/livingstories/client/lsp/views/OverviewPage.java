@@ -17,6 +17,7 @@
 package com.google.livingstories.client.lsp.views;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -39,6 +40,8 @@ import com.google.livingstories.client.lsp.LspAtomListWidget;
 import com.google.livingstories.client.lsp.Page;
 import com.google.livingstories.client.lsp.RecentEventsList;
 import com.google.livingstories.client.lsp.ThemeListWidget;
+import com.google.livingstories.client.lsp.event.BlockToggledEvent;
+import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.ui.AnchoredPanel;
 import com.google.livingstories.client.ui.FCCommentsBox;
 import com.google.livingstories.client.ui.UpdateCountWidget;
@@ -72,6 +75,8 @@ public class OverviewPage extends Page {
   @UiField AnchoredPanel rightPanel;
   @UiField RecentEventsList recentEvents;
   @UiField FCCommentsBox comments;
+  
+  private HandlerRegistration toggleEventHandler;
   
   public OverviewPage() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -136,6 +141,34 @@ public class OverviewPage extends Page {
     repositionAnchoredPanel();
   }
   
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    toggleEventHandler = EventBus.INSTANCE.addHandler(BlockToggledEvent.TYPE,
+        new BlockToggledEvent.Handler() {
+          @Override
+          public void onToggle(BlockToggledEvent e) {
+            if (e.isOpened() && e.shouldSetHistory()) {
+              // Set this atom as the focused atom in the history.
+              // When the user navigates away from this and then clicks back, this atom will
+              // appear expanded, and the viewport will be scrolled to its position.
+              HistoryManager.newToken(HistoryPages.OVERVIEW,
+                  LivingStoryControls.getCurrentFilterSpec().getFilterParams(),
+                  String.valueOf(e.getAtomId()));
+            }
+          }
+        });
+  }
+  
+  @Override
+  public void onUnload() {
+    super.onUnload();
+    if (toggleEventHandler != null) {
+      toggleEventHandler.removeHandler();
+      toggleEventHandler = null;
+    }
+  }
+
   private class AtomCallback implements AsyncCallback<DisplayAtomBundle> {
     private Long focusedAtomId;
 

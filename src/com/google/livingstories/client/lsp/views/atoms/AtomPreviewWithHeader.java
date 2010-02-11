@@ -40,7 +40,7 @@ public class AtomPreviewWithHeader extends Composite {
   public AtomPreviewWithHeader(BaseAtom atom) {
     content = new BaseAtomPreview(atom);
     bind();
-    atomType.setText(atom.getAtomType().toString());
+    atomType.setText(atom.getTitleString());
   }
   
   protected void bind() {

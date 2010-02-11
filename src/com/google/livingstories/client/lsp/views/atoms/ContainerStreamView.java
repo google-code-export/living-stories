@@ -31,12 +31,9 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.EventAtom;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.atomlist.AtomListElement;
-import com.google.livingstories.client.lsp.AtomRenderer;
 import com.google.livingstories.client.lsp.BylineWidget;
-import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.event.BlockToggledEvent;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.views.DateTimeRangeWidget;
@@ -46,19 +43,30 @@ import com.google.livingstories.client.ui.WindowScroll;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * The stream view for an event entity.  Displays the content of the event
- * as well as linked content.
+ * Code for rendering a stream view for a content entity.  Displays the entity
+ * content as well as linked content.  This class is extended by EventStreamView
+ * and NarrativeStreamView.
  */
-public class EventStreamView extends Composite implements AtomListElement {
+public abstract class ContainerStreamView<T extends BaseAtom> extends Composite
+    implements AtomListElement {
   private static EventStreamViewUiBinder uiBinder = GWT.create(EventStreamViewUiBinder.class);
+
+  @SuppressWarnings("unchecked")
   @UiTemplate("ContainerStreamView.ui.xml")
-  interface EventStreamViewUiBinder extends UiBinder<Widget, EventStreamView> {
+  interface EventStreamViewUiBinder extends UiBinder<Widget, ContainerStreamView> {
+    // This interface should theoretically use a genericized version of ContainerStreamView,
+    // but there's a bug in GWT that prevents that from working.  Instead, we use the raw
+    // type here.  This works in most situations, though there are certain things
+    // you won't be able to do (e.g. @UiHandler won't be able to bind to a method that
+    // takes a parameterized type.)
+    // TODO: fix this when the next version of GWT comes out and the bug is fixed.
   }
   
   @UiField ContainerStreamViewStyles style;
@@ -68,11 +76,13 @@ public class EventStreamView extends Composite implements AtomListElement {
   @UiField DateTimeRangeWidget timestamp;
   @UiField ToggleDisclosurePanel content;
   
-  private EventAtom atom;
+  protected T atom;
+  protected Map<AtomType, List<BaseAtom>> linkedAtomsByType;
   private HandlerRegistration toggleEventHandler;
 
-  public EventStreamView(EventAtom event, Map<AtomType, List<BaseAtom>> linkedAtomsByType) {
-    this.atom = event;
+  public ContainerStreamView(T containerAtom, Map<AtomType, List<BaseAtom>> linkedAtomsByType) {
+    this.atom = containerAtom;
+    this.linkedAtomsByType = linkedAtomsByType;
     boolean lowImportance = atom.getImportance() == Importance.LOW;
     
     initWidget(uiBinder.createAndBindUi(this));
@@ -81,11 +91,11 @@ public class EventStreamView extends Composite implements AtomListElement {
       this.addStyleName(Resources.INSTANCE.css().read());
     }
 
-    title.setHTML(atom.getEventUpdate());
+    title.setHTML(getHeadline());
     
     GlobalUtil.addIfNotNull(byline,
         BylineWidget.makeContextSensitive(atom, new HashSet<Long>()));
-    timestamp.setDateTime(atom.getEventStartDate(), atom.getEventEndDate());
+    timestamp.setDateTime(getStartDate(), getEndDate());
 
     if (lowImportance) {
       title.removeStyleName(style.headline());
@@ -93,9 +103,9 @@ public class EventStreamView extends Composite implements AtomListElement {
       timestamp.setTimeVisible(false);
     }
 
-    ShortContainerView<EventAtom> shortView
-        = new ShortContainerView<EventAtom>(atom, linkedAtomsByType);
-    LongContainerView<EventAtom> longView = new LongEventContainerView(atom, linkedAtomsByType);
+    ShortContainerView<T> shortView
+        = new ShortContainerView<T>(atom, linkedAtomsByType);
+    LongContainerView<T> longView = getLongContainerView();
 
     if (longView.hasExtraContent()) {
       title.addStyleName(Resources.INSTANCE.css().clickable());
@@ -138,6 +148,14 @@ public class EventStreamView extends Composite implements AtomListElement {
         });
   }
 
+  protected abstract String getHeadline();
+  
+  protected abstract Date getStartDate();
+  
+  protected abstract Date getEndDate();
+  
+  protected abstract LongContainerView<T> getLongContainerView();
+  
   @Override
   protected void onUnload() {
     super.onUnload();
@@ -147,31 +165,6 @@ public class EventStreamView extends Composite implements AtomListElement {
     }
   }
   
-  
-  private class LongEventContainerView extends LongContainerView<EventAtom> {
-    public LongEventContainerView(EventAtom atom, Map<AtomType, List<BaseAtom>> linkedAtomsByType) {
-      super(atom, linkedAtomsByType);
-    }
-    
-    @Override
-    protected Widget createSummary() {
-      if (GlobalUtil.isContentEmpty(getAtom().getEventSummary())) {
-        return null; 
-      } else { 
-        return new ContentRenderer(getAtom().getEventSummary(), false);
-      }
-    }
-    
-    @Override
-    protected Widget createDetails() {
-      if (GlobalUtil.isContentEmpty(getAtom().getContent())) {
-        return null;
-      } else {
-        return new AtomRenderer(getAtom(), true, false, getAtom().getContributorIds());
-      }
-    }
-  }
-
   @Override
   public String getDateString() {
     return timestamp.getDateString();
