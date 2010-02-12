@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<gxp:template name="com.google.livingstories.gxps.StartPageHtml"
+              xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:call="http://google.com/2001/gxp/call"
+              xmlns:expr="http://google.com/2001/gxp/expressions">
+  <gxp:import class="com.google.livingstories.client.FilterSpec"/>
+  <gxp:import class="com.google.livingstories.client.LivingStory"/>
+  <gxp:import class="org.json.JSONObject"/>
+  
+  <gxp:param name="currentUrl" type="String"/>
+  <gxp:param name="userName" type="String"/>
+  <gxp:param name="loginUrl" type="String" />
+  <gxp:param name="logoutUrl" type="String" />
+  <gxp:param name="lastVisitTimes" type="JSONObject"/>
+  <gxp:param name="defaultStoryView" type="FilterSpec"/>
+  <gxp:param name="analyticsAccountId" type="String"/>
+  
+  <gxp:nomsg>
+    <html>
+      <head>
+        <title>Living Stories</title>
+
+        <script type="text/javascript" language="javascript" src="StartPage/StartPage.nocache.js"></script>
+        <script type="text/javascript">
+          window.LIVING_STORY = {
+            USER_NAME: <gxp:eval expr='userName'/>,
+            LOGIN_URL: <gxp:eval expr='loginUrl'/>,
+            LOGOUT_URL: <gxp:eval expr='logoutUrl'/>,
+            LAST_VISIT_TIMES: <gxp:eval expr='lastVisitTimes'/>,
+            DEFAULT_PAGE: <gxp:eval expr='defaultStoryView == null ? null : defaultStoryView.getFilterParams()'/>
+          };
+        </script>
+        
+        <link rel="stylesheet" href="/LivingStory.css"/>
+        <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
+      </head>
+      <body>
+        <table width="100%">
+          <tr>
+            <td>
+              <img src="images/livingstories_logo.gif" alt="Living Stories"/>
+            </td>
+            <td style="vertical-align: top;">
+              <div class="loginPane" id="managementLinks"></div>
+            </td>
+          </tr>
+        </table>
+        
+        <table width="100%" style="padding-top: 10px;">
+          <tr>
+            <td width="60%" style="vertical-align: top; padding-right: 16px;">
+              <div id="storyList"></div>
+            </td>
+            <td style="vertical-align: top;">
+              <div class="sectionHeader">
+                News, made for the Web.
+              </div>
+              <div style="padding: 0 0 5px 5px;">
+                <p>
+                  The Living Stories project is an experiment in presenting news, one designed
+                  specifically for the online environment. The project was developed by Google in
+                  collaboration with two of the country's leading newspapers, The New York Times
+                  and The Washington Post.
+                </p>
+                <p>
+                  <b>All in one place</b><br/>
+                  Complete coverage of an on-going story is gathered together and prioritized on
+                  one URL. You can now quickly navigate between news articles, opinion pieces and
+                  features without long waits for pages to load.
+                </p>
+                <p>
+                  <b>Easy to explore</b><br/>
+                  Each story has an evolving summary of current developments as a well as an
+                  interactive timeline of critical events. Stories can be explored by themes,
+                  significant participants or multimedia.
+                </p>
+                <p>
+                  <b>Smarter reading</b><br/>
+                  Updates to the story are highlighted each time you come back, and older news
+                  is summarized.
+                </p>
+              </div>
+              <div class="sectionHeader">
+                Get started
+              </div>
+              <div style="padding: 0px 0px 5px 5px;">
+                <p>
+                  Just click on one of the headlines to the left to begin reading Living Stories.
+                </p>
+              </div>
+              <div class="sectionHeader">
+                What's behind Living Stories?
+              </div>
+              <div style="padding: 0px 0px 5px 5px;">
+                <p>
+                  Read more about the partnership behind Living Stories <a href="http://googleblog.blogspot.com/2009/12/exploring-new-more-dynamic-way-of.html" style="text-decoration: underline;" target="_blank">here</a>.
+                </p>
+              </div>
+              <div class="sectionHeader">
+                Have a question?
+              </div>
+              <div style="padding-left: 5px;">
+                <p>
+                  Find the answer <a href="http://www.google.com/support/News/bin/answer.py?answer=167087" style="text-decoration: underline;" target="_blank">here</a>.
+                </p>
+                <p>
+                  To learn more about Living Stories, check out the video below.
+                </p>
+                <p>
+                  <object width="380" height="228" type="application/x-shockwave-flash" data="http://www.youtube.com/v/1ZhCY9FF608&amp;hl=en_US&amp;fs=1&amp;rel=0"><param name="movie" value="http://www.youtube.com/v/1ZhCY9FF608&amp;hl=en_US&amp;fs=1&amp;rel=0"/></object>
+                </p>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <call:Footer/>
+      </body>
+    </html>
+  </gxp:nomsg>
+</gxp:template>
