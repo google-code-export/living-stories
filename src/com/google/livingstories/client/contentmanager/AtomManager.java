@@ -85,7 +85,7 @@ import com.google.livingstories.client.Theme;
 import com.google.livingstories.client.atomlist.AtomListElement;
 import com.google.livingstories.client.atomlist.AtomListElementFactory;
 import com.google.livingstories.client.ui.AtomListBox;
-import com.google.livingstories.client.ui.CoordinatedLspSelector;
+import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
 import com.google.livingstories.client.ui.EnumDropdown;
 import com.google.livingstories.client.ui.ItemList;
 import com.google.livingstories.client.ui.RichTextEditor;
@@ -127,7 +127,7 @@ public class AtomManager extends ManagerPane {
       = GWT.create(ContentRpcService.class);
   
   /**
-   * Create a remote service proxy to talk to the server-side lsp persisting service.
+   * Create a remote service proxy to talk to the server-side living story persisting service.
    */
   private final LivingStoryRpcServiceAsync livingStoryService
       = GWT.create(LivingStoryRpcService.class);
@@ -140,8 +140,8 @@ public class AtomManager extends ManagerPane {
   private RichTextEditor contentEditor;
   private Label atomIdLabel;
   private Label timestamp;
-  private CoordinatedLspSelector lspSelector;
-  private ChangeHandler lspSelectionHandler;
+  private CoordinatedLivingStorySelector livingStorySelector;
+  private ChangeHandler livingStorySelectionHandler;
   private EnumDropdown<Importance> importanceSelector;
   private AtomListBox atomListBox;
 
@@ -238,7 +238,7 @@ public class AtomManager extends ManagerPane {
     container.add(createContentPanel());
     
     // Event handlers
-    createLspSelectionHandler();
+    createLivingStorySelectionHandler();
     createAtomTypeSelectionHandler();
     createAtomSelectionHandler();
     createSaveDeleteHandlers(topSaveControls);
@@ -249,29 +249,29 @@ public class AtomManager extends ManagerPane {
 
   private Widget createControlsPanel() {
     VerticalPanel controlsPanel = new VerticalPanel();
-    controlsPanel.add(createLspSelector());
+    controlsPanel.add(createLivingStorySelector());
     controlsPanel.add(createNewAtomButton());
     controlsPanel.add(createAtomListBox());
     return controlsPanel;
   }
   
-  private Widget createLspSelector() {
-    // Our lspSelector extends the LspSelector class slightly, in that when the list
+  private Widget createLivingStorySelector() {
+    // Our livingStorySelector extends the superclass slightly, in that when the list
     // of living stories is successfully loaded up, this triggers the list boxes
     // to load the atoms and retrieve the themes for the now-selected living story.
-    lspSelector = new CoordinatedLspSelector(livingStoryService, true) {
+    livingStorySelector = new CoordinatedLivingStorySelector(livingStoryService, true) {
       @Override
       public void onSuccessNextStep() {
         super.onSuccessNextStep();
         if (hasSelection()) {
-          LivingStoryData.setLspId(getSelectedLspId());
-          atomListBox.loadItemsForLsp(getSelectedLspId());
-          linkedAtomSelector.loadItemsForLsp(getSelectedLspId());
+          LivingStoryData.setLivingStoryId(getSelectedLivingStoryId());
+          atomListBox.loadItemsForLivingStory(getSelectedLivingStoryId());
+          linkedAtomSelector.loadItemsForLivingStory(getSelectedLivingStoryId());
           themeListBox.refresh();
         }
       }
     };
-    return lspSelector;
+    return livingStorySelector;
   }
   
   private Widget createNewAtomButton() {
@@ -279,14 +279,15 @@ public class AtomManager extends ManagerPane {
     newAtomButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        createOrChangeAtom(new DefaultAtom(null, lspSelector.getSelectedLspId()), false, null);
+        createOrChangeAtom(new DefaultAtom(
+            null, livingStorySelector.getSelectedLivingStoryId()), false, null);
       }
     });
     return newAtomButton;
   }
   
   /**
-   * Create a list box for displaying all the atoms for the selected LSP so that the user
+   * Create a list box for displaying all the atoms for the selected living story so that the user
    * can select one to edit.
    */
   private Widget createAtomListBox() {
@@ -421,9 +422,10 @@ public class AtomManager extends ManagerPane {
       @Override
       public void loadItems() {
         try {
-          Long lspId = lspSelector.getSelectedLspId();
-          if (lspId != null) {
-            livingStoryService.getThemesForLsp(lspId, getCallback(new ThemeListAdaptor()));
+          Long livingStoryId = livingStorySelector.getSelectedLivingStoryId();
+          if (livingStoryId != null) {
+            livingStoryService.getThemesForLivingStory(
+                livingStoryId, getCallback(new ThemeListAdaptor()));
           }
         } catch (UnsupportedOperationException ignored) {
         }
@@ -1074,22 +1076,23 @@ public class AtomManager extends ManagerPane {
   }
   
   /**
-   * Create a handler to handle selection in the LSP list box.
+   * Create a handler to handle selection in the living story list box.
    */
-  private void createLspSelectionHandler() {
-    lspSelectionHandler = new ChangeHandler() {
+  private void createLivingStorySelectionHandler() {
+    livingStorySelectionHandler = new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
         contentPanel.showWidget(0);
-        if (lspSelector.hasSelection()) {
-          atomListBox.loadItemsForLsp(lspSelector.getSelectedLspId());
-          linkedAtomSelector.loadItemsForLsp(lspSelector.getSelectedLspId());
+        if (livingStorySelector.hasSelection()) {
+          atomListBox.loadItemsForLivingStory(livingStorySelector.getSelectedLivingStoryId());
+          linkedAtomSelector.loadItemsForLivingStory(
+              livingStorySelector.getSelectedLivingStoryId());
           themeListBox.refresh();
-          LivingStoryData.setLspId(lspSelector.getSelectedLspId());
+          LivingStoryData.setLivingStoryId(livingStorySelector.getSelectedLivingStoryId());
         }
       }
     };
-    lspSelector.addChangeHandler(lspSelectionHandler);
+    livingStorySelector.addChangeHandler(livingStorySelectionHandler);
   }
   
   /**
@@ -1365,7 +1368,7 @@ public class AtomManager extends ManagerPane {
       
       Importance importance = importanceSelector.getSelectedConstant();
 
-      Long lspId = lspSelector.getSelectedLspId();
+      Long livingStoryId = livingStorySelector.getSelectedLivingStoryId();
       
       Set<Long> themeIds = new HashSet<Long>();
       for (String id : themeListBox.getSelectedItemValues()) {
@@ -1425,11 +1428,11 @@ public class AtomManager extends ManagerPane {
             showInputError("Event update cannot be empty.");
             return;
           }
-          atom = new EventAtom(atomId, creationDate, currentContributorIds, importance, lspId, 
-              startDate, endDate, update, summaryEditor.getContent(), content);
+          atom = new EventAtom(atomId, creationDate, currentContributorIds, importance,
+              livingStoryId, startDate, endDate, update, summaryEditor.getContent(), content);
           break;
         case PLAYER:
-          if (lspId == null) {
+          if (livingStoryId == null) {
             String nameString = nameTextBox.getText();
             if (nameString.isEmpty()) {
               showInputError("Player name cannot be empty.");
@@ -1457,24 +1460,24 @@ public class AtomManager extends ManagerPane {
               return;
             }
             atom = new StoryPlayerAtom(atomId, creationDate, currentContributorIds, 
-                content, importance, lspId, parentPlayer);
+                content, importance, livingStoryId, parentPlayer);
           }
           break;
         case QUOTE:
           atom = new QuoteAtom(atomId, creationDate, currentContributorIds, content, importance,
-              lspId);
+              livingStoryId);
           break;
         case BACKGROUND:
           atom = new BackgroundAtom(atomId, creationDate, currentContributorIds,
-              content, importance, lspId, conceptNameTextBox.getText());
+              content, importance, livingStoryId, conceptNameTextBox.getText());
           break;
         case DATA:
           atom = new DataAtom(atomId, creationDate, currentContributorIds, content, importance,
-              lspId);
+              livingStoryId);
           break;
         case ASSET:
           atom = new AssetAtom(atomId, creationDate, currentContributorIds, content, importance,
-              lspId, assetType, captionTextArea.getText(), previewUrlTextBox.getText());
+              livingStoryId, assetType, captionTextArea.getText(), previewUrlTextBox.getText());
           break;
         case NARRATIVE:
           // There are 2 atom types possible for an atom that is now being saved as a narrative.
@@ -1485,7 +1488,7 @@ public class AtomManager extends ManagerPane {
           // is being resaved. In this case, we want to preserve the old value of the 
           // 'isStandalone' field.
           atom = new NarrativeAtom(atomId, creationDate, currentContributorIds,
-              content, importance, lspId, headlineTextBox.getText().trim(),
+              content, importance, livingStoryId, headlineTextBox.getText().trim(),
               narrativeTypeSelector.getSelectedConstant(),
               selectedAtom.getAtomType() == AtomType.NARRATIVE ? 
                   ((NarrativeAtom)selectedAtom).isStandalone() : true,
@@ -1493,7 +1496,7 @@ public class AtomManager extends ManagerPane {
           break;
         case REACTION:
           atom = new ReactionAtom(atomId, creationDate, currentContributorIds, content, importance,
-              lspId);
+              livingStoryId);
           break;
         default:
           throw new IllegalStateException("Unknown Atom Type");
@@ -1815,7 +1818,7 @@ public class AtomManager extends ManagerPane {
       specialAttributesPanel.showWidget(panelIndex);
       specialAttributesPanel.setVisible(true);
       if (atomType == AtomType.PLAYER) {
-        if (lspSelector.getSelectedLspId() == null) {
+        if (livingStorySelector.getSelectedLivingStoryId() == null) {
           // Display fields for name, aliases, player type and a photo selector
           playerAttributesPanel.showWidget(1);
         } else {
@@ -1839,17 +1842,17 @@ public class AtomManager extends ManagerPane {
   }
   
   @Override
-  public void onLspsChanged() {
-    lspSelector.refresh();
+  public void onLivingStoriesChanged() {
+    livingStorySelector.refresh();
     atomListBox.clear();
   }
   
   @Override
   public void onShow() {
-    lspSelector.selectCoordinatedLsp();
-    lspSelectionHandler.onChange(null);
-    if (lspSelector.hasSelection()) {
-      LivingStoryData.setLspId(lspSelector.getSelectedLspId());
+    livingStorySelector.selectCoordinatedLivingStory();
+    livingStorySelectionHandler.onChange(null);
+    if (livingStorySelector.hasSelection()) {
+      LivingStoryData.setLivingStoryId(livingStorySelector.getSelectedLivingStoryId());
     }
   }
 

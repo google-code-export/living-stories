@@ -31,7 +31,7 @@ public class UserSuggestion implements Serializable {
   }
 
   private Long id;
-  private Long lspId;
+  private Long livingStoryId;
   private Long atomId;
   private String userEmail;
   private String highlightedText;
@@ -42,10 +42,10 @@ public class UserSuggestion implements Serializable {
   public UserSuggestion() {
   }
   
-  public UserSuggestion(Long id, Long lspId, Long atomId, String userEmail, String highlightedText,
-      SuggestionType suggestionType, String comments, Status status) {
+  public UserSuggestion(Long id, Long livingStoryId, Long atomId, String userEmail,
+      String highlightedText, SuggestionType suggestionType, String comments, Status status) {
     this.id = id;
-    this.lspId = lspId;
+    this.livingStoryId = livingStoryId;
     this.atomId = atomId;
     this.userEmail = userEmail;
     this.highlightedText = highlightedText;
@@ -58,8 +58,8 @@ public class UserSuggestion implements Serializable {
     return id;
   }
 
-  public Long getLspId() {
-    return lspId;
+  public Long getLivingStoryId() {
+    return livingStoryId;
   }
 
   public Long getAtomId() {

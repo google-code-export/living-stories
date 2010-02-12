@@ -57,13 +57,13 @@ public class ContentManager implements EntryPoint {
         // TODO: this work is extra if the user didn't actually change
         // anything on the source tab.
         ManagerPane previousTab = (ManagerPane) tabs.getWidget(selectedIndex);
-        boolean lspsEdited = (previousTab == livingStoryManager);
+        boolean livingStoriesEdited = (previousTab == livingStoryManager);
         boolean atomsEdited = (previousTab == atomManager);
         for (int i = 0; i < tabs.getWidgetCount(); i++) {
           ManagerPane pane = (ManagerPane) tabs.getWidget(i);
           if (pane != previousTab) {
-            if (lspsEdited) {
-              pane.onLspsChanged();
+            if (livingStoriesEdited) {
+              pane.onLivingStoriesChanged();
             }
             if (atomsEdited) {
               pane.onAtomsChanged();

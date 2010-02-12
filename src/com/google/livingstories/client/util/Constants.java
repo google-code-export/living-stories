@@ -28,8 +28,8 @@ public final class Constants {
 
   public static String CLOSE_IMAGE_URL = "/images/lightbox-close.gif";
   
-  public static String getCookieName(String lspUrl) {
-    return lspUrl + "visit";
+  public static String getCookieName(String url) {
+    return url + "visit";
   }
   
   // prevent instantiation

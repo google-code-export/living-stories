@@ -33,7 +33,7 @@ import javax.jdo.annotations.PrimaryKey;
  * This class represents a grouping of atoms for a living story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class AngleEntity implements Serializable, JSONSerializable, HasSerializableLspId {
+public class AngleEntity implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
 
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -43,19 +43,19 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
   private String name;
   
   @Persistent
-  private Long lspId;
+  private Long livingStoryId;
   
-  public AngleEntity(String name, Long lspId) {
+  public AngleEntity(String name, Long livingStoryId) {
     this.name = name;
-    this.lspId = lspId;
+    this.livingStoryId = livingStoryId;
   }
 
   public String getName() {
     return name;
   }
 
-  public Long getLspId() {
-    return lspId;
+  public Long getLivingStoryId() {
+    return livingStoryId;
   }
   
   public Long getId() {
@@ -66,12 +66,12 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
     this.name = name;
   }
   
-  public void setLspId(Long lspId) {
-    this.lspId = lspId;
+  public void setLivingStoryId(Long livingStoryId) {
+    this.livingStoryId = livingStoryId;
   }
  
   public Theme toClientObject() {
-    return new Theme(getId(), getName(), getLspId());
+    return new Theme(getId(), getName(), getLivingStoryId());
   }
 
   @Override
@@ -89,7 +89,7 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
     try {
       object.put("id", id);
       object.put("name", name);
-      object.put("lspId", lspId);
+      object.put("livingStoryId", livingStoryId);
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
@@ -98,7 +98,9 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
   
   public static AngleEntity fromJSON(JSONObject json) {
     try {
-      return new AngleEntity(json.getString("name"), json.getLong("lspId"));
+      return new AngleEntity(json.getString("name"), json.getLong("livingStoryId"));
+      // Note: if the JSON that you're importing uses a different naming convention for
+      // the living story id, convert it before processing here.
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }

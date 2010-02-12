@@ -30,7 +30,7 @@ import java.util.Map;
 public interface ContentRpcServiceAsync {
   void createOrChangeAtom(BaseAtom clientAtom, AsyncCallback<BaseAtom> callback);
   
-  void getAtomsForLsp(Long livingStoryId, boolean onlyPublished, 
+  void getAtomsForLivingStory(Long livingStoryId, boolean onlyPublished, 
       AsyncCallback<List<BaseAtom>> callback);
   
   void getAtom(Long id, boolean getLinkedAtoms, AsyncCallback<BaseAtom> callback);
@@ -46,16 +46,19 @@ public interface ContentRpcServiceAsync {
   
   void deleteAtom(Long id, AsyncCallback<Void> callback);
   
-  void getUpdateCountSinceTime(Long lspId, Date time, AsyncCallback<Integer> callback);
+  void getUpdateCountSinceTime(Long livingStoryId, Date time, AsyncCallback<Integer> callback);
   
-  void getUpdatesSinceTime(Long lspId, Date time, AsyncCallback<List<BaseAtom>> callback);
+  void getUpdatesSinceTime(Long livingStoryId, Date time, AsyncCallback<List<BaseAtom>> callback);
 
   void getDisplayAtomBundle(Long livingStoryId, FilterSpec filterSpec, Long focusedAtomId,
       Date cutoff, AsyncCallback<DisplayAtomBundle> callback);
   
-  void getImportantEventsForLsp(Long livingStoryId, AsyncCallback<List<EventAtom>> callback);
+  void getImportantEventsForLivingStory(Long livingStoryId,
+      AsyncCallback<List<EventAtom>> callback);
 
-  void getImportantPlayersForLsp(Long livingStoryId, AsyncCallback<List<PlayerAtom>> callback);
+  void getImportantPlayersForLivingStory(Long livingStoryId,
+      AsyncCallback<List<PlayerAtom>> callback);
   
-  void getContributorsByIdForLsp(Long livingStoryId, AsyncCallback<Map<Long, PlayerAtom>> callback);
+  void getContributorsByIdForLivingStory(Long livingStoryId,
+      AsyncCallback<Map<Long, PlayerAtom>> callback);
 }

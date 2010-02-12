@@ -21,55 +21,55 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 
 /**
- * An LspSelector variant that keeps track of what LSPs, by ID, that the user
- * has actively selected from among all CoordinatedLspSelector instances.
- * When reloading or newly showing this LspSelector, choose the most recent
- * actively-selected LSP by default.
+ * A LivingStorySelector variant that keeps track of what living story, by ID, that the user
+ * has actively selected from among all CoordinatedLivingStorySelector instances.
+ * When reloading or newly showing this LivingStorySelector, choose the most recent
+ * actively-selected living story by default.
  */
-public class CoordinatedLspSelector extends LspSelector {
-  // shared among all CoordinatedLspSelector instances
-  private static Long coordinatedLspId = -1L;
+public class CoordinatedLivingStorySelector extends LivingStorySelector {
+  // shared among all CoordinatedLivingStorySelector instances
+  private static Long coordinatedLivingStoryId = -1L;
   
-  public CoordinatedLspSelector(LivingStoryRpcServiceAsync livingStoryService,
+  public CoordinatedLivingStorySelector(LivingStoryRpcServiceAsync livingStoryService,
       boolean showUnassigned) {
     super(livingStoryService, showUnassigned);
     addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        setCoordinatedLspIdFromSelection();
+        setCoordinatedLivingStoryIdFromSelection();
       }
     });
   }
   
-  public CoordinatedLspSelector(LivingStoryRpcServiceAsync livingStoryService) {
+  public CoordinatedLivingStorySelector(LivingStoryRpcServiceAsync livingStoryService) {
     this(livingStoryService, false);
   }
   
-  public void selectCoordinatedLsp() {
-    if (coordinatedLspId == null) {
+  public void selectCoordinatedLivingStory() {
+    if (coordinatedLivingStoryId == null) {
       selectItemWithValue(UNASSIGNED);
-    } else if (coordinatedLspId != -1) {
-      selectItemWithValue(String.valueOf(coordinatedLspId));
+    } else if (coordinatedLivingStoryId != -1) {
+      selectItemWithValue(String.valueOf(coordinatedLivingStoryId));
     }
     if (!hasSelection() && getItemCount() > 0) {
       // in that case, just select the first item by default
       setItemSelected(0, true);
-      setCoordinatedLspIdFromSelection();
+      setCoordinatedLivingStoryIdFromSelection();
     }
   }
   
-  public void setCoordinatedLspIdFromSelection() {
-    coordinatedLspId = hasSelection() ? getSelectedLspId() : Long.valueOf(-1L);
-    // the Long.valueOf prevents unboxing of the getSelectedLspId() result.
+  public void setCoordinatedLivingStoryIdFromSelection() {
+    coordinatedLivingStoryId = hasSelection() ? getSelectedLivingStoryId() : Long.valueOf(-1L);
+    // the Long.valueOf prevents unboxing of the getSelectedivingStoryId() result.
   }
   
-  public void clearCoordinatedLspId() {
-    coordinatedLspId = -1L;
+  public void clearCoordinatedLivingStoryId() {
+    coordinatedLivingStoryId = -1L;
   }
   
   @Override
   protected void onSuccessNextStep() {
     super.onSuccessNextStep();
-    selectCoordinatedLsp();
+    selectCoordinatedLivingStory();
   }
 }

@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 import com.google.livingstories.client.Theme;
-import com.google.livingstories.client.ui.CoordinatedLspSelector;
+import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
 import com.google.livingstories.client.ui.ItemList;
 import com.google.livingstories.client.ui.RadioGroup;
 import com.google.livingstories.client.ui.RadioGroup.Layout;
@@ -50,15 +50,15 @@ public class ThemeManager extends ManagerPane {
   }
   
   /**
-   * Create a remote service proxy to talk to the server-side lsp persisting service.
+   * Create a remote service proxy to talk to the server-side living story persisting service.
    */
   private final LivingStoryRpcServiceAsync livingStoryService
       = GWT.create(LivingStoryRpcService.class);
   
   private RadioGroup<EditMode> modeSelector;
   private TextBox nameBox;
-  private CoordinatedLspSelector lspSelector;
-  private ChangeHandler lspSelectionHandler;
+  private CoordinatedLivingStorySelector livingStorySelector;
+  private ChangeHandler livingStorySelectionHandler;
   private ItemList<Theme> themeListBox;
   private Button saveButton;
   private Button deleteButton;
@@ -69,7 +69,7 @@ public class ThemeManager extends ManagerPane {
   public ThemeManager() {
     final VerticalPanel contentPanel = new VerticalPanel();
     
-    contentPanel.add(createLspSelectorPanel());
+    contentPanel.add(createLivingStorySelectorPanel());
     
     // Add the radio buttons to create or edit themes
     contentPanel.add(createModeSelector());
@@ -84,7 +84,7 @@ public class ThemeManager extends ManagerPane {
     contentPanel.add(createSaveDeletePanel());
     
     // Event handlers
-    createLspSelectionHandler();
+    createLivingStorySelectionHandler();
     createThemeSelectionHandler();
     createSaveButtonHandler();
     createDeleteButtonHandler();
@@ -92,9 +92,9 @@ public class ThemeManager extends ManagerPane {
     initWidget(contentPanel);
   }
   
-  private Widget createLspSelectorPanel() {
-    lspSelector = new CoordinatedLspSelector(livingStoryService);
-    return lspSelector.makeContainingPanel();
+  private Widget createLivingStorySelectorPanel() {
+    livingStorySelector = new CoordinatedLivingStorySelector(livingStoryService);
+    return livingStorySelector.makeContainingPanel();
   }
   
   /**
@@ -134,15 +134,15 @@ public class ThemeManager extends ManagerPane {
   }
     
   /**
-   * Create a list box for displaying all the themes for the selected LSP so that the user
+   * Create a list box for displaying all the themes for the selected living story so that the user
    * can select one to edit.
    */
   private Widget createThemeListBox() {
     themeListBox = new ItemList<Theme>() {
       @Override
       public void loadItems() {
-        // Don't load the list of content pieces for an LSP by default. They are only loaded when
-        // the user selects the 'edit' radio button.
+        // Don't load the list of themes for a living story by default. They are only
+        // loaded when the user selects the 'edit' radio button.
       }
     };
     themeListBox.setVisibleItemCount(15);
@@ -169,10 +169,10 @@ public class ThemeManager extends ManagerPane {
   }
   
   /**
-   * Create a handler to handle selection in the LSP list box.
+   * Create a handler to handle selection in the living story list box.
    */
-  private void createLspSelectionHandler() {
-    lspSelectionHandler = new ChangeHandler() {
+  private void createLivingStorySelectionHandler() {
+    livingStorySelectionHandler = new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
         modeSelector.setValue(EditMode.CREATE);
@@ -180,7 +180,7 @@ public class ThemeManager extends ManagerPane {
         themeListBox.setVisible(false);
       }
     };
-    lspSelector.addChangeHandler(lspSelectionHandler);
+    livingStorySelector.addChangeHandler(livingStorySelectionHandler);
   }
   
   /**
@@ -211,14 +211,14 @@ public class ThemeManager extends ManagerPane {
       @Override
       public void onClick(ClickEvent event) {
         boolean createNewContent = (modeSelector.getValue() == EditMode.CREATE);
-        Long lspId = Long.valueOf(lspSelector.getSelectedItemValue());
+        Long livingStoryId = Long.valueOf(livingStorySelector.getSelectedItemValue());
         String name = nameBox.getText();
         
         Long id = null;
         if (!createNewContent) {
           id = Long.valueOf(themeListBox.getSelectedItemValue());
         }
-        createOrChangeTheme(createNewContent, id, name, lspId);
+        createOrChangeTheme(createNewContent, id, name, livingStoryId);
       }
     };
     saveButton.addClickHandler(saveHandler);
@@ -241,7 +241,8 @@ public class ThemeManager extends ManagerPane {
    * Make an RPC call to the server to persist a new theme entity or change an
    * existing theme entity in the datastore.
    */
-  private void createOrChangeTheme(final boolean createNewTheme, Long id, String name, Long lspId) {
+  private void createOrChangeTheme(final boolean createNewTheme, Long id, String name,
+      Long livingStoryId) {
     AsyncCallback<Theme> callback = new AsyncCallback<Theme>() {
       public void onFailure(Throwable caught) {
         statusLabel.setText("Save not successful. Try again.");
@@ -261,7 +262,8 @@ public class ThemeManager extends ManagerPane {
       }
     };
     
-    livingStoryService.saveTheme(new Theme(createNewTheme ? null : id, name, lspId), callback);
+    livingStoryService.saveTheme(
+        new Theme(createNewTheme ? null : id, name, livingStoryId), callback);
   }
   
   /**
@@ -294,7 +296,7 @@ public class ThemeManager extends ManagerPane {
   }
   
   /**
-   * Retrieve the list of themes associated with a given LSP from the server and populate
+   * Retrieve the list of themes associated with a given living story from the server and populate
    * the given list box with the initial snippet from each of them. 
    */
   private void populateThemeList() {
@@ -315,18 +317,18 @@ public class ThemeManager extends ManagerPane {
       }
     };
     
-    livingStoryService.getThemesForLsp(Long.valueOf(lspSelector.getSelectedItemValue()),
-        callback);
+    livingStoryService.getThemesForLivingStory(
+        Long.valueOf(livingStorySelector.getSelectedItemValue()), callback);
   }
   
   @Override
-  public void onLspsChanged() {
-    lspSelector.refresh();
+  public void onLivingStoriesChanged() {
+    livingStorySelector.refresh();
   }
   
   @Override
   public void onShow() {
-    lspSelector.selectCoordinatedLsp();
-    lspSelectionHandler.onChange(null);
+    livingStorySelector.selectCoordinatedLivingStory();
+    livingStorySelectionHandler.onChange(null);
   }
 }

@@ -32,7 +32,7 @@ import java.util.Map;
 public interface ContentRpcService extends RemoteService {
   BaseAtom createOrChangeAtom(BaseAtom clientAtom);
   
-  List<BaseAtom> getAtomsForLsp(Long livingStoryId, boolean onlyPublished);
+  List<BaseAtom> getAtomsForLivingStory(Long livingStoryId, boolean onlyPublished);
   
   BaseAtom getAtom(Long id, boolean getLinkedAtoms);
   
@@ -46,16 +46,16 @@ public interface ContentRpcService extends RemoteService {
   
   void deleteAtom(Long id);
   
-  Integer getUpdateCountSinceTime(Long lspId, Date time);
+  Integer getUpdateCountSinceTime(Long livingStoryId, Date time);
   
-  List<BaseAtom> getUpdatesSinceTime(Long lspId, Date time);
+  List<BaseAtom> getUpdatesSinceTime(Long livingStoryId, Date time);
 
   DisplayAtomBundle getDisplayAtomBundle(Long livingStoryId, FilterSpec filterSpec,
       Long focusedAtomId, Date cutoff);  
   
-  List<EventAtom> getImportantEventsForLsp(Long livingStoryId);
+  List<EventAtom> getImportantEventsForLivingStory(Long livingStoryId);
   
-  List<PlayerAtom> getImportantPlayersForLsp(Long livingStoryId);
+  List<PlayerAtom> getImportantPlayersForLivingStory(Long livingStoryId);
   
-  Map<Long, PlayerAtom> getContributorsByIdForLsp(Long livingStoryId);
+  Map<Long, PlayerAtom> getContributorsByIdForLivingStory(Long livingStoryId);
 }

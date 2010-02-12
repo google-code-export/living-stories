@@ -118,7 +118,7 @@ public class ThemeListWidget extends Composite {
     
     public void onClick(ClickEvent e) {
       setSelectedThemeId(themeId);
-      AnalyticsUtil.trackThemeClick(LivingStoryData.getLspUrl(), name);
+      AnalyticsUtil.trackThemeClick(LivingStoryData.getLivingStoryUrl(), name);
     }
   }
 }

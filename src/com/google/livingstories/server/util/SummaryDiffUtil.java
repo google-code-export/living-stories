@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class that creates html for a diffed lsp summary based on the
+ * Utility class that creates html for a diffed living story summary based on the
  * supplied last visit time.  Assumes that all interesting text is in
  * paragraph tags, and ignores everything else.
  */
@@ -51,14 +51,14 @@ public class SummaryDiffUtil {
   
   private static final Logger logger = Logger.getLogger(SummaryDiffUtil.class.getCanonicalName());
 
-  public static String getDiffedSummary(LivingStory lsp, Date lastVisitTime) {
+  public static String getDiffedSummary(LivingStory livingStory, Date lastVisitTime) {
     // Short circuits
     if (lastVisitTime == null) {
-      return lsp.getSummary();
+      return livingStory.getSummary();
     }
 
-    String currentRevisionString = lsp.getSummary();
-    String lastRevisionString = lsp.getLastSummaryRevisionBeforeTime(lastVisitTime);
+    String currentRevisionString = livingStory.getSummary();
+    String lastRevisionString = livingStory.getLastSummaryRevisionBeforeTime(lastVisitTime);
     if (currentRevisionString.equals(lastRevisionString)) {
       return currentRevisionString;
     }
@@ -132,9 +132,9 @@ public class SummaryDiffUtil {
     } else {
       // Something went terribly wrong; this shouldn't happen.
       // Just return the current revision without doing any diffing or parsing.
-      logger.warning("Failed to get diffed summary HTML for lsp " + lsp.getUrl()
+      logger.warning("Failed to get diffed summary HTML for living story " + livingStory.getUrl()
           + " and timestamp " + DateFormat.getDateTimeInstance().format(lastVisitTime));
-      return lsp.getSummary();
+      return livingStory.getSummary();
     }
   }
 

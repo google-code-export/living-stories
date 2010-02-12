@@ -19,6 +19,6 @@ package com.google.livingstories.server;
 /**
  * An interface that any Entity assignable to a specific LSP should implement.
  */
-public interface HasSerializableLspId extends JSONSerializable {
-  public Long getLspId();
+public interface HasSerializableLivingStoryId extends JSONSerializable {
+  public Long getLivingStoryId();
 }

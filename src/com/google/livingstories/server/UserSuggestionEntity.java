@@ -43,7 +43,7 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
   private Long id;
   
   @Persistent
-  private Long lspId;
+  private Long livingStoryId;
   
   @Persistent
   private Long atomId;
@@ -63,8 +63,8 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
   @Persistent
   private Status status;
   
-  public UserSuggestionEntity(Long lspId, Long atomId, SuggestionType suggestionType) {
-    this.lspId = lspId;
+  public UserSuggestionEntity(Long livingStoryId, Long atomId, SuggestionType suggestionType) {
+    this.livingStoryId = livingStoryId;
     this.atomId = atomId;
     this.suggestionType = suggestionType;
     this.status = UserSuggestion.Status.NEW;
@@ -74,12 +74,12 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
     return id;
   }
 
-  public Long getLspId() {
-    return lspId;
+  public Long getLivingStoryId() {
+    return livingStoryId;
   }
   
-  public void setLspId(Long lspId) {
-    this.lspId = lspId;
+  public void setLivingStoryId(Long livingStoryId) {
+    this.livingStoryId = livingStoryId;
   }
 
   public Long getAtomId() {
@@ -135,8 +135,8 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
   }
 
   public UserSuggestion toClientObject() {
-    return new UserSuggestion(id, lspId, atomId, userEmail, getHighlightedText(), suggestionType,
-        getComments(), status);
+    return new UserSuggestion(id, livingStoryId, atomId, userEmail, getHighlightedText(),
+        suggestionType, getComments(), status);
   }
 
   @Override
@@ -153,7 +153,7 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
     JSONObject object = new JSONObject();
     try {
       object.put("id", id);
-      object.put("lspId", lspId);
+      object.put("livingStoryId", livingStoryId);
       object.put("atomId", atomId);
       object.put("userEmail", userEmail);
       object.put("highlightedText", getHighlightedText());
@@ -168,8 +168,11 @@ public class UserSuggestionEntity implements Serializable, JSONSerializable {
   
   public static UserSuggestionEntity fromJSON(JSONObject json) {
     try {
-      UserSuggestionEntity entity = new UserSuggestionEntity(json.getLong("lspId"), 
+      UserSuggestionEntity entity = new UserSuggestionEntity(json.getLong("livingStoryId"), 
           json.getLong("atomId"), SuggestionType.valueOf(json.getString("suggestionType")));
+      // Note: if the JSON that you're importing uses a different naming convention for
+      // the living story id, convert it before processing here.
+
       entity.setStatus(Status.valueOf(json.getString("status")));
       if (json.has("userEmail")) {
         entity.setUserEmail(json.getString("userEmail"));

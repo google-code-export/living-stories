@@ -22,8 +22,8 @@ import java.util.HashSet;
 public class DefaultAtom extends EventAtom {
   public DefaultAtom() {}
   
-  public DefaultAtom(Long id, Long lspId) {
-    super(id, new Date(), null, Importance.MEDIUM, lspId, null, null, "", "", "");
+  public DefaultAtom(Long id, Long livingStoryId) {
+    super(id, new Date(), null, Importance.MEDIUM, livingStoryId, null, null, "", "", "");
     setThemeIds(new HashSet<Long>());
     setLocation(new Location(null, null, ""));
   }

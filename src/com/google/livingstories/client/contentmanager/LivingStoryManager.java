@@ -42,7 +42,7 @@ import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.ui.CoordinatedLspSelector;
+import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
 import com.google.livingstories.client.ui.EnumDropdown;
 import com.google.livingstories.client.ui.RichTextEditor;
 import com.google.livingstories.client.util.LivingStoryData;
@@ -57,11 +57,11 @@ public class LivingStoryManager extends ManagerPane {
   private final LivingStoryRpcServiceAsync livingStoryService
       = GWT.create(LivingStoryRpcService.class);
 
-  @UiField CoordinatedLspSelector lspSelector;
+  @UiField CoordinatedLivingStorySelector livingStorySelector;
   @UiField Button createButton;
   
   @UiField DeckPanel contentPanel;
-  @UiField Label lspIdLabel;
+  @UiField Label livingStoryIdLabel;
   @UiField TextBox urlTextBox;
   @UiField TextBox titleTextBox;
   @UiField EnumDropdown<Publisher> publisherSelector;
@@ -74,7 +74,7 @@ public class LivingStoryManager extends ManagerPane {
   @UiField Label statusMessage;
   @UiField SimplePanel previewPanel;
 
-  /* Widgets for the create lsp dialog */
+  /* Widgets for the create living story dialog */
   private DialogBox createDialog;
   private TextBox createDialogTextBox;
   private Button createDialogSaveButton;
@@ -136,11 +136,11 @@ public class LivingStoryManager extends ManagerPane {
           createDialogTextBox.setText("");
           createDialog.hide();
           String idString = String.valueOf(story.getId());
-          if (!lspSelector.hasItemWithValue(idString)) {
-            lspSelector.addItem(story.getTitle(), idString);
+          if (!livingStorySelector.hasItemWithValue(idString)) {
+            livingStorySelector.addItem(story.getTitle(), idString);
           }
-          lspSelector.selectItemWithValue(idString);
-          lspSelector.setCoordinatedLspIdFromSelection();
+          livingStorySelector.selectItemWithValue(idString);
+          livingStorySelector.setCoordinatedLivingStoryIdFromSelection();
           populateStoryContent(story);
         }
         
@@ -160,13 +160,13 @@ public class LivingStoryManager extends ManagerPane {
     boolean delete = Window.confirm("Are you sure you want to delete this living story? " +
         "Doing so will also delete all atoms that belong to it.");
     if (delete) {
-      final String selectedStoryId = lspSelector.getSelectedItemValue();
+      final String selectedStoryId = livingStorySelector.getSelectedItemValue();
       AsyncCallback<Void> callback = new AsyncCallback<Void>() {
         public void onSuccess(Void nothing) {
-          lspSelector.removeItemWithValue(selectedStoryId);
+          livingStorySelector.removeItemWithValue(selectedStoryId);
           clearStoryContent();
           contentPanel.showWidget(0);
-          lspSelector.clearCoordinatedLspId();
+          livingStorySelector.clearCoordinatedLivingStoryId();
         }
         
         public void onFailure(Throwable caught) {
@@ -202,7 +202,7 @@ public class LivingStoryManager extends ManagerPane {
         statusMessage.setStylePrimaryName("serverResponseLabelSuccess");
         publishStateLabel.setText(story.getPublishState().toString());
         // If the story title has been changed, refresh it in the list box
-        lspSelector.setItemText(lspSelector.getSelectedIndex(), story.getTitle());
+        livingStorySelector.setItemText(livingStorySelector.getSelectedIndex(), story.getTitle());
       }
       
       public void onFailure(Throwable caught) {
@@ -212,7 +212,7 @@ public class LivingStoryManager extends ManagerPane {
     };
 
     updatePreview(null);
-    livingStoryService.saveLivingStory(Long.valueOf(lspSelector.getSelectedItemValue()),
+    livingStoryService.saveLivingStory(Long.valueOf(livingStorySelector.getSelectedItemValue()),
         urlTextBox.getText(), titleTextBox.getText(), publisherSelector.getSelectedConstant(), 
         publishState, summaryEditor.getContent(), callback);
   }
@@ -221,14 +221,14 @@ public class LivingStoryManager extends ManagerPane {
     return EnumDropdown.newInstance(Publisher.class);
   }
   
-  @UiFactory CoordinatedLspSelector createLivingStoryList() {
-    return new CoordinatedLspSelector(livingStoryService);
+  @UiFactory CoordinatedLivingStorySelector createLivingStoryList() {
+    return new CoordinatedLivingStorySelector(livingStoryService);
   }
 
-  @UiHandler("lspSelector")
+  @UiHandler("livingStorySelector")
   void changeLivingStories(ChangeEvent event) {
-    if (lspSelector.hasSelection()) {
-      LivingStoryData.setLspId(Long.valueOf(lspSelector.getSelectedItemValue()));
+    if (livingStorySelector.hasSelection()) {
+      LivingStoryData.setLivingStoryId(Long.valueOf(livingStorySelector.getSelectedItemValue()));
 
       AsyncCallback<LivingStory> callback = new AsyncCallback<LivingStory>() {
         public void onFailure(Throwable caught) {
@@ -241,14 +241,14 @@ public class LivingStoryManager extends ManagerPane {
       };
 
       livingStoryService.getLivingStoryById(
-          Long.valueOf(lspSelector.getSelectedItemValue()), false, callback);
+          Long.valueOf(livingStorySelector.getSelectedItemValue()), false, callback);
     }
   }
 
   
   private void populateStoryContent(LivingStory story) {
     contentPanel.showWidget(1);
-    lspIdLabel.setText(Long.toString(story.getId()));
+    livingStoryIdLabel.setText(Long.toString(story.getId()));
     urlTextBox.setText(story.getUrl());
     titleTextBox.setText(story.getTitle());
     Publisher publisher = story.getPublisher();
@@ -260,7 +260,7 @@ public class LivingStoryManager extends ManagerPane {
   }
   
   private void clearStoryContent() {
-    lspIdLabel.setText("");
+    livingStoryIdLabel.setText("");
     urlTextBox.setText("");
     titleTextBox.setText("");
     summaryEditor.setContent("");
@@ -271,11 +271,11 @@ public class LivingStoryManager extends ManagerPane {
   
   @Override
   public void onShow() {
-    lspSelector.selectCoordinatedLsp();
+    livingStorySelector.selectCoordinatedLivingStory();
     changeLivingStories(null);
 
-    if (lspSelector.hasSelection()) {
-      LivingStoryData.setLspId(Long.valueOf(lspSelector.getSelectedItemValue()));
+    if (livingStorySelector.hasSelection()) {
+      LivingStoryData.setLivingStoryId(Long.valueOf(livingStorySelector.getSelectedItemValue()));
     }
   }
 }

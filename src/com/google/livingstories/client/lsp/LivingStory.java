@@ -42,7 +42,7 @@ public class LivingStory implements EntryPoint {
 
     AjaxLoader.init();
 
-    String cookieName = Constants.getCookieName(LivingStoryData.getLspUrl());
+    String cookieName = Constants.getCookieName(LivingStoryData.getLivingStoryUrl());
     String cookieValue = Cookies.getCookie(cookieName);
     
     if (cookieValue != null) {
@@ -66,8 +66,8 @@ public class LivingStory implements EntryPoint {
     // Also set appropriate i18n text for a couple of constants:
     Document doc = Document.get();
     doc.getElementById("rssLink").setAttribute(
-        "title", LspMessageHolder.msgs.rssFeedTitle(LivingStoryData.getLspTitle()));
+        "title", LspMessageHolder.msgs.rssFeedTitle(LivingStoryData.getLivingStoryTitle()));
     doc.getElementById("readOtherStories").setInnerText(
-        LspMessageHolder.msgs.otherStoriesText(LivingStoryData.getLspPublisher()));
+        LspMessageHolder.msgs.otherStoriesText(LivingStoryData.getLivingStoryPublisher()));
   }
 }

@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 
-public class LspSelector extends ItemList<LivingStory> {
+public class LivingStorySelector extends ItemList<LivingStory> {
   public static final String UNASSIGNED = "Unassigned";
   
   private final LivingStoryRpcServiceAsync livingStoryService;
@@ -30,7 +30,8 @@ public class LspSelector extends ItemList<LivingStory> {
 
   private HorizontalPanel containingPanel;
 
-  public LspSelector(LivingStoryRpcServiceAsync livingStoryService, boolean showUnassigned) {
+  public LivingStorySelector(LivingStoryRpcServiceAsync livingStoryService,
+      boolean showUnassigned) {
     // we don't load items on init, not until this.livingStoryService is set
     // below.
     super(false, false);
@@ -81,22 +82,22 @@ public class LspSelector extends ItemList<LivingStory> {
   }
 
   /**
-   * Returns the selected LSP id, or null if the user has selected "unassigned"
+   * Returns the selected living story id, or null if the user has selected "unassigned"
    */
-  public Long getSelectedLspId() {
+  public Long getSelectedLivingStoryId() {
     String selectedItemValue = getSelectedItemValue();
     if (selectedItemValue == null) {  // no selection
-      throw new UnsupportedOperationException("no lsp selected");
+      throw new UnsupportedOperationException("no living story selected");
     }
     return selectedItemValue.equals(UNASSIGNED) ? null : Long.valueOf(selectedItemValue);
   }
   
   /**
    * Returns true if the user has selected "unassigned". Mostly a convenience wrapper around
-   * @link{getSelectedLspId}.
+   * @link{getSelectedLivingStoryId}.
    */
   public boolean isUnassignedSelected() {
-    return (hasSelection() && getSelectedLspId() == null);
+    return (hasSelection() && getSelectedLivingStoryId() == null);
   }
 
   public void selectUnassigned() {
