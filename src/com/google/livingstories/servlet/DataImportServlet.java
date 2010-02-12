@@ -414,6 +414,16 @@ public class DataImportServlet extends HttpServlet {
           }
         }
         
+        // Parent player atom id
+        if (content.getAtomType() == AtomType.PLAYER && content.getParentPlayerAtomId() != null) {
+          BaseAtomEntityImpl atom = contentMap.get(content.getParentPlayerAtomId().toString());
+          if (atom == null) {
+            content.setParentPlayerAtomId(null);
+          } else {
+            content.setParentPlayerAtomId(atom.getId());
+          }
+        }
+        
         if (timeout()) {
           return true;
         }
@@ -514,8 +524,8 @@ public class DataImportServlet extends HttpServlet {
   }
   
   /**
-   * This is a final cleanup step that deletes contributors that have been orphaned
-   * from deleting the old version of a living story.
+   * This is a final cleanup step that deletes unassigned entities that have been orphaned
+   * from deleting the old version of an lsp.
    * 
    * This MUST happen after the persistence managers are closed, otherwise
    * the new entities won't be visible to the task.
@@ -538,7 +548,7 @@ public class DataImportServlet extends HttpServlet {
             allUnassignedAtoms.add(atom);
           }
           
-          // Put the ids of the contributors and photos in a set
+          // Put the ids of the contributors, player parents and used photos in a set
           Set<Long> contributorIds = atom.getContributorIds();
           if (contributorIds != null) {
             allUsedUnassignedIds.addAll(contributorIds);
@@ -546,6 +556,10 @@ public class DataImportServlet extends HttpServlet {
           Long photoAtomId = atom.getPhotoAtomId();
           if (photoAtomId != null) {
             allUsedUnassignedIds.add(photoAtomId);
+          }
+          Long parentPlayerId = atom.getParentPlayerAtomId();
+          if (parentPlayerId != null) {
+            allUsedUnassignedIds.add(parentPlayerId);
           }
         }
   

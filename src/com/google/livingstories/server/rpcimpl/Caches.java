@@ -233,24 +233,6 @@ public class Caches {
   private static String getStartPageBundleCacheKey() {
     return "startpage:";
   }
-  
-  /** Whitelist restriction cache methods **/
-  
-  public static Boolean getIsRestrictedToWhitelist() {
-    return get(getRestrictedToWhitelistKey());
-  }
-  
-  public static void setRestrictedToWhitelist(Boolean restrictedToWhitelist) {
-    put(getRestrictedToWhitelistKey(), restrictedToWhitelist);
-  }
-  
-  public static void clearRestrictedToWhitelist() {
-    remove(getRestrictedToWhitelistKey());
-  }
-  
-  private static String getRestrictedToWhitelistKey() {
-    return "whitelistRestriction:";
-  }
 
   /**
    * Configures a cache instance with an expiration of expirationSeconds.

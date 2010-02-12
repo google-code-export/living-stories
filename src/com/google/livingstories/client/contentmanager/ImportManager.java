@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -45,15 +46,43 @@ public class ImportManager extends ManagerPane {
   public ImportManager() {
     final VerticalPanel contentPanel = new VerticalPanel();
     
+    contentPanel.add(createExportLink());
+    contentPanel.add(createImportInstructions());
     contentPanel.add(createFileUploadForm());
     contentPanel.add(createProgressForm());
     
     initWidget(contentPanel);
   }
   
+  private Widget createExportLink() {
+    Label titleLabel = new Label("Export");
+    titleLabel.setStylePrimaryName("header");
+    
+    HTML instructions = new HTML("<a href=\"/export\">Click here</a> to export all living story" +
+        " data to a JSON file (does not export user data).");
+    
+    VerticalPanel exportPanel = new VerticalPanel();
+    exportPanel.add(titleLabel);
+    exportPanel.add(instructions);
+    return exportPanel;
+  }
+  
+  private Widget createImportInstructions() {
+    Label titleLabel = new Label("Import");
+    titleLabel.setStylePrimaryName("header");
+    
+    Label instructions = new Label("Import data from a JSON file created via the export link above."
+        + " All existing data will be deleted!");
+
+    VerticalPanel exportPanel = new VerticalPanel();
+    exportPanel.add(titleLabel);
+    exportPanel.add(instructions);
+    return exportPanel;
+  }
+  
   private Widget createFileUploadForm() {
     fileUploadForm = new FormPanel();
-    fileUploadForm.setAction("/singletonImport");
+    fileUploadForm.setAction("/import");
     fileUploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
     fileUploadForm.setMethod(FormPanel.METHOD_POST);
 
@@ -64,7 +93,8 @@ public class ImportManager extends ManagerPane {
     upload.setName("data");
     fileUploadPanel.add(upload);
     
-    CheckBox override = new CheckBox("Override running servlet");
+    CheckBox override = new CheckBox("Check this box if the previous import attempt resulted in " +
+        "an error.");
     override.setName("override");
     override.setFormValue("true");
     fileUploadPanel.add(override);
@@ -90,7 +120,7 @@ public class ImportManager extends ManagerPane {
 
   private Widget createProgressForm() {
     progressForm = new FormPanel();
-    progressForm.setAction("/singletonImport");
+    progressForm.setAction("/import");
     progressForm.setEncoding(FormPanel.ENCODING_URLENCODED);
     progressForm.setMethod(FormPanel.METHOD_POST);
 

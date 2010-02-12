@@ -42,6 +42,4 @@ public interface UserRpcService extends RemoteService {
   FilterSpec getDefaultStoryView();
   
   void setDefaultStoryView(FilterSpec defaultStoryView);
-  
-  boolean isWhitelisted();
 }
