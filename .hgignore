@@ -1,0 +1,10 @@
+syntax: glob
+
+*~
+.settings/*
+genfiles/*
+war/WEB-INF/classes/*
+war/ContentManager/*
+war/LivingStoryPage/*
+war/StartPage/*
+war/WEB-INF/appengine-generated/*
