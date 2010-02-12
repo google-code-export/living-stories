@@ -41,7 +41,7 @@ import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.JavaNodeAdapter;
 import com.google.livingstories.server.BaseAtomEntityImpl;
 import com.google.livingstories.server.LivingStoryEntity;
-import com.google.livingstories.server.UserLspEntity;
+import com.google.livingstories.server.UserLivingStoryEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 import com.google.livingstories.server.util.AlertSender;
 import com.google.livingstories.server.util.StringUtil;
@@ -153,7 +153,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       }
 
       // TODO(ericzhang): may also want to invalidate linked atoms if they changed
-      // and aren't from the same lsp.
+      // and aren't from the same living story.
       invalidateCache(clientAtom.getLivingStoryId());
     } finally {
       if (tx != null && tx.isActive()) {
@@ -188,8 +188,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     return getPlayers(null);
   }
   
-  private List<PlayerAtom> getPlayers(Long lspId) {
-    List<BaseAtomEntityImpl> playerEntities = getPublishedAtomsByType(lspId, AtomType.PLAYER);
+  private List<PlayerAtom> getPlayers(Long livingStoryId) {
+    List<BaseAtomEntityImpl> playerEntities =
+        getPublishedAtomsByType(livingStoryId, AtomType.PLAYER);
     List<PlayerAtom> playerAtoms = Lists.newArrayList();
     for (BaseAtomEntityImpl playerEntity : playerEntities) {
       playerAtoms.add((PlayerAtom)(playerEntity.toClientObject()));
@@ -197,9 +198,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     return playerAtoms;
   }
   
-  private List<BackgroundAtom> getConcepts(Long lspId) {
+  private List<BackgroundAtom> getConcepts(Long livingStoryId) {
     List<BaseAtomEntityImpl> backgroundEntities = 
-        getPublishedAtomsByType(lspId, AtomType.BACKGROUND);
+        getPublishedAtomsByType(livingStoryId, AtomType.BACKGROUND);
     List<BackgroundAtom> backgroundAtoms = Lists.newArrayList();
     for (BaseAtomEntityImpl backgroundEntity : backgroundEntities) {
       if (!GlobalUtil.isContentEmpty(backgroundEntity.getName())) {
@@ -209,18 +210,18 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     return backgroundAtoms;
   }
   
-  private List<BaseAtomEntityImpl> getPublishedAtomsByType(Long lspId, AtomType atomType) {
+  private List<BaseAtomEntityImpl> getPublishedAtomsByType(Long livingStoryId, AtomType atomType) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     Query query = pm.newQuery(BaseAtomEntityImpl.class); 
-    query.setFilter("livingStoryId == lspIdParam " +
+    query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED " +
         "&& atomType == '" + atomType.name() + "'");
-    query.declareParameters("java.lang.Long lspIdParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute(lspId);
+      List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
       pm.retrieveAll(entities);
       return entities;
     } finally {
@@ -233,16 +234,16 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     // Get list of users
-    Query query = pm.newQuery(UserLspEntity.class); 
-    query.setFilter("lspId == lspIdParam && subscribedToEmails == true");
-    query.declareParameters("long lspIdParam");
+    Query query = pm.newQuery(UserLivingStoryEntity.class); 
+    query.setFilter("livingStoryId == livingStoryIdParam && subscribedToEmails == true");
+    query.declareParameters("long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
-      List<UserLspEntity> userLspEntities = (List<UserLspEntity>) query.execute(
-          eventAtom.getLivingStoryId());
+      List<UserLivingStoryEntity> userLivingStoryEntities =
+          (List<UserLivingStoryEntity>) query.execute(eventAtom.getLivingStoryId());
       List<String> users = new ArrayList<String>();
-      for (UserLspEntity entity : userLspEntities) {
+      for (UserLivingStoryEntity entity : userLivingStoryEntities) {
         users.add(entity.getId().getParent().getName());
       }
       if (!users.isEmpty()) {
@@ -302,9 +303,11 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized List<BaseAtom> getAtomsForLsp(Long livingStoryId, boolean onlyPublished) {
-    List<BaseAtom> atoms = Caches.getLspAtoms(livingStoryId, onlyPublished);
-    if (atoms != null) {
+  public synchronized List<BaseAtom> getAtomsForLivingStory(
+      Long livingStoryId, boolean onlyPublished) {
+    List<BaseAtom> atoms = Caches.getLivingStoryAtoms(livingStoryId, onlyPublished);
+    if
+    (atoms != null) {
       return atoms;
     }
  
@@ -324,7 +327,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         BaseAtom atom = result.toClientObject();
         clientAtoms.add(atom);
       }
-      Caches.setLspAtoms(livingStoryId, onlyPublished, clientAtoms);
+      Caches.setLivingStoryAtoms(livingStoryId, onlyPublished, clientAtoms);
       return clientAtoms;
     } finally {
       query.closeAll();
@@ -377,7 +380,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     // a story, which could be a bit expensive if there's a cache miss. By and large, though,
     // we'd expect a lot more cache hits than cache misses, unlike the case with, say,
     // a twitter "following" feed, which is more likely to be unique to that user.
-    List<BaseAtom> allAtoms = getAtomsForLsp(livingStoryId, true);
+    List<BaseAtom> allAtoms = getAtomsForLivingStory(livingStoryId, true);
     
     Map<Long, BaseAtom> idToAtomMap = Maps.newHashMap();
     List<BaseAtom> relevantAtoms = Lists.newArrayList();
@@ -716,8 +719,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   private void invalidateCache(Long livingStoryId) {
-    Caches.clearLspAtoms(livingStoryId);
-    Caches.clearLspThemeInfo(livingStoryId);
+    Caches.clearLivingStoryAtoms(livingStoryId);
+    Caches.clearLivingStoryThemeInfo(livingStoryId);
     Caches.clearStartPageBundle();
   }
   
@@ -746,7 +749,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   private List<Query> getUpdateQueries(PersistenceManager pm, Date timeParam, int range) {
-    String commonQueryFilter = "livingStoryId == lspIdParam "
+    String commonQueryFilter = "livingStoryId == livingStoryIdParam "
         + "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED "
         + (timeParam == null ? "" : "&& timestamp > timeParam ");
     
@@ -757,7 +760,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     if (range != 0) {
       eventsQuery.setRange(0, range);
     }
-    eventsQuery.declareParameters("Long lspIdParam" 
+    eventsQuery.declareParameters("Long livingStoryIdParam" 
         + (timeParam == null ? "" : ", java.util.Date timeParam"));
     
     Query narrativesQuery = pm.newQuery(BaseAtomEntityImpl.class);
@@ -768,14 +771,14 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     if (range != 0) {
       narrativesQuery.setRange(0, range);
     }
-    narrativesQuery.declareParameters("Long lspIdParam" 
+    narrativesQuery.declareParameters("Long livingStoryIdParam" 
         + (timeParam == null ? "" : ", java.util.Date timeParam"));
     
     return ImmutableList.of(eventsQuery, narrativesQuery);
   }
   
   @Override
-  public synchronized Integer getUpdateCountSinceTime(Long lspId, Date time) {
+  public synchronized Integer getUpdateCountSinceTime(Long livingStoryId, Date time) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     List<Query> updateQueries = getUpdateQueries(pm, time, 0);
@@ -784,7 +787,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       int result = 0;
       for (Query query : updateQueries) {
         query.setResult("count(id)");
-        result += (Integer) query.execute(lspId, time);
+        result += (Integer) query.execute(livingStoryId, time);
       }
       return result;
     } finally {
@@ -796,7 +799,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   @Override
-  public List<BaseAtom> getUpdatesSinceTime(Long lspId, Date time) {
+  public List<BaseAtom> getUpdatesSinceTime(Long livingStoryId, Date time) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     List<Query> updateQueries = getUpdateQueries(pm, time, 0);
@@ -806,7 +809,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
         List<BaseAtomEntityImpl> results = 
-            (List<BaseAtomEntityImpl>) query.execute(lspId, time);
+            (List<BaseAtomEntityImpl>) query.execute(livingStoryId, time);
         for (BaseAtomEntityImpl result : results) {
           BaseAtom atom = result.toClientObject();
           updates.add(atom);
@@ -825,7 +828,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
    * Return the latest 3 updates on top-level display items for a story, sorted in reverse-
    * chronological order.
    */
-  public List<BaseAtom> getUpdatesForStartPage(Long lspId) {
+  public List<BaseAtom> getUpdatesForStartPage(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     List<Query> updateQueries = getUpdateQueries(pm, null, 3);
     try {
@@ -834,7 +837,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       // from those 6 because there is no way to do one appengine query for that
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
-        List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(lspId);
+        List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
         for (BaseAtomEntityImpl result : results) {
           BaseAtom atom = result.toClientObject();
           updates.add(atom);
@@ -852,15 +855,15 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   @Override
-  public List<EventAtom> getImportantEventsForLsp(Long livingStoryId) {
+  public List<EventAtom> getImportantEventsForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseAtomEntityImpl.class);
-    query.setFilter("livingStoryId == lspIdParam " +
+    query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& atomType == com.google.livingstories.client.AtomType.EVENT " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED");
-    query.declareParameters("Long lspIdParam");
+    query.declareParameters("Long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
@@ -882,18 +885,18 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   /**
    * This method will return a list of all the players in the living story,
    * sorted by importance.  Our importance ranking is currently based solely
-   * on the number of atoms in the lsp that are linked to each player. 
+   * on the number of atoms in the living story that are linked to each player. 
    */
   @Override
-  public List<PlayerAtom> getImportantPlayersForLsp(Long livingStoryId) {
+  public List<PlayerAtom> getImportantPlayersForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseAtomEntityImpl.class);
-    query.setFilter("livingStoryId == lspIdParam " +
+    query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& atomType == com.google.livingstories.client.AtomType.PLAYER " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED");
-    query.declareParameters("Long lspIdParam");
+    query.declareParameters("Long livingStoryIdParam");
     
     List<PlayerAtom> players = Lists.newArrayList();
     try {
@@ -911,16 +914,16 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   /**
-   * Returns all the contributors for this lsp.
+   * Returns all the contributors for this living story.
    */
   @Override
-  public Map<Long, PlayerAtom> getContributorsByIdForLsp(Long livingStoryId) {
-    Map<Long, PlayerAtom> result = Caches.getContributorsForLsp(livingStoryId);
+  public Map<Long, PlayerAtom> getContributorsByIdForLivingStory(Long livingStoryId) {
+    Map<Long, PlayerAtom> result = Caches.getContributorsForLivingStory(livingStoryId);
     if (result != null) {
       return result;
     }
     
-    List<BaseAtom> allAtoms = getAtomsForLsp(livingStoryId, true);
+    List<BaseAtom> allAtoms = getAtomsForLivingStory(livingStoryId, true);
     
     Set<Long> allContributorIds = new HashSet<Long>();
     for (BaseAtom atom : allAtoms) {
@@ -938,7 +941,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       }
     }
 
-    Caches.setContributorsForLsp(livingStoryId, result);
+    Caches.setContributorsForLivingStory(livingStoryId, result);
     return result;
   }
 }

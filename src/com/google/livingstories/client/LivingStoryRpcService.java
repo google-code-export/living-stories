@@ -43,11 +43,11 @@ public interface LivingStoryRpcService extends RemoteService {
   
   void deleteLivingStory(long id);
   
-  // Theme management functions. Themes are sufficiently tied to LSPs that
+  // Theme management functions. Themes are sufficiently tied to living stories that
   // their implementation belongs on the same service.
-  List<Theme> getThemesForLsp(long livingStoryId);
+  List<Theme> getThemesForLivingStory(long livingStoryId);
   
-  Map<Long, AtomTypesBundle> getThemeInfoForLsp(long livingStoryId);
+  Map<Long, AtomTypesBundle> getThemeInfoForLivingStory(long livingStoryId);
   
   Theme getThemeById(long id);
   

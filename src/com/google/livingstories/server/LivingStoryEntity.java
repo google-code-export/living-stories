@@ -46,7 +46,8 @@ import javax.jdo.annotations.PrimaryKey;
  * Persistable entity for living stories.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class LivingStoryEntity implements Serializable, JSONSerializable, HasSerializableLspId {
+public class LivingStoryEntity
+    implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
   private Long id;
@@ -142,7 +143,7 @@ public class LivingStoryEntity implements Serializable, JSONSerializable, HasSer
     return id;
   }
   
-  public Long getLspId() {
+  public Long getLivingStoryId() {
     return getId();
   }
   

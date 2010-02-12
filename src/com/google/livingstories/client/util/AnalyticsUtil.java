@@ -20,28 +20,28 @@ package com.google.livingstories.client.util;
  * Helper method to track specific events on the page in Analytics.
  */
 public class AnalyticsUtil {
-  public static void trackOpenEventAction(String lspUrl, Long atomId) {
-    trackEvent(lspUrl, "openEvent", String.valueOf(atomId));
+  public static void trackOpenEventAction(String url, Long atomId) {
+    trackEvent(url, "openEvent", String.valueOf(atomId));
   }
   
-  public static void trackThemeClick(String lspUrl, String theme) {
-    trackEvent(lspUrl, "angleClick", theme);
+  public static void trackThemeClick(String url, String theme) {
+    trackEvent(url, "angleClick", theme);
   }
   
-  public static void trackFilterClick(String lspUrl, String filterName) {
-    trackEvent(lspUrl, "filterClick", filterName);
+  public static void trackFilterClick(String url, String filterName) {
+    trackEvent(url, "filterClick", filterName);
   }
   
-  public static void trackSummaryExpansion(String lspUrl) {
-    trackEvent(lspUrl, "summaryExpansion", "");
+  public static void trackSummaryExpansion(String url) {
+    trackEvent(url, "summaryExpansion", "");
   }
   
-  public static void trackHorizontalTimelineClick(String lspUrl, Long atomId) {
-    trackEvent(lspUrl, "horizontalTimeline", String.valueOf(atomId));
+  public static void trackHorizontalTimelineClick(String url, Long atomId) {
+    trackEvent(url, "horizontalTimeline", String.valueOf(atomId));
   }
   
-  public static void trackVerticalTimelineClick(String lspUrl, Long atomId) {
-    trackEvent(lspUrl, "verticalTimeline", String.valueOf(atomId));
+  public static void trackVerticalTimelineClick(String url, Long atomId) {
+    trackEvent(url, "verticalTimeline", String.valueOf(atomId));
   }
 
   private static native void trackEvent(String category, String action, String value) /*-{

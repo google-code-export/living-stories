@@ -51,7 +51,7 @@ public class EventTimelineCreator {
         width, height, new TimelineWidget.OnClickBehavior<Long>() {
           @Override
           public void onClick(ClickEvent event, Long data) {
-            AnalyticsUtil.trackHorizontalTimelineClick(LivingStoryData.getLspUrl(), data);
+            AnalyticsUtil.trackHorizontalTimelineClick(LivingStoryData.getLivingStoryUrl(), data);
             LivingStoryControls.goToAtom(data);
           }
         });

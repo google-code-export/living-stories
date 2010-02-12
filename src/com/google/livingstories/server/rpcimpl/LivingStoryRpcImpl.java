@@ -76,22 +76,22 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   
   @Override
   public synchronized List<LivingStory> getAllLivingStories(boolean onlyPublished) {
-    List<LivingStory> allLsps = Caches.getLivingStories();
-    if (allLsps == null) {
-      allLsps = livingStoryDataService.retrieveAll(null, true);
-      Caches.setLivingStories(allLsps);
+    List<LivingStory> allLivingStories = Caches.getLivingStories();
+    if (allLivingStories == null) {
+      allLivingStories = livingStoryDataService.retrieveAll(null, true);
+      Caches.setLivingStories(allLivingStories);
     }
 
     if (!onlyPublished) {
-      return allLsps;
+      return allLivingStories;
     } else {
-      List<LivingStory> publishedLsps = Lists.newArrayList();
-      for (LivingStory lsp : allLsps) {
-        if (lsp.getPublishState() == PublishState.PUBLISHED) {
-          publishedLsps.add(lsp);
+      List<LivingStory> publishedLivingStories = Lists.newArrayList();
+      for (LivingStory story : allLivingStories) {
+        if (story.getPublishState() == PublishState.PUBLISHED) {
+          publishedLivingStories.add(story);
         }
       }
-      return publishedLsps;
+      return publishedLivingStories;
     }
   }
   
@@ -125,33 +125,33 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   public synchronized void deleteLivingStory(long id) {
     livingStoryDataService.delete(id);
     Caches.clearLivingStories();
-    Caches.clearLspAtoms(id);
-    Caches.clearLspThemes(id);
-    Caches.clearLspThemeInfo(id);
+    Caches.clearLivingStoryAtoms(id);
+    Caches.clearLivingStoryThemes(id);
+    Caches.clearLivingStoryThemeInfo(id);
     Caches.clearStartPageBundle();
   }
 
   @Override
-  public synchronized List<Theme> getThemesForLsp(long livingStoryId) {
-    List<Theme> themes = Caches.getLspThemes(livingStoryId);
+  public synchronized List<Theme> getThemesForLivingStory(long livingStoryId) {
+    List<Theme> themes = Caches.getLivingStoryThemes(livingStoryId);
     if (themes == null) {
       themes = themeDataService.retrieveByLivingStory(livingStoryId);
-      Caches.setLspThemes(livingStoryId, themes);
+      Caches.setLivingStoryThemes(livingStoryId, themes);
     }
     return themes;
   }
 
   /**
    * Returns a map from theme id to AtomTypesBundles. It lists the published atom and asset types
-   * for the lsp, broken down by theme id. Each AtomTypeBundle includes an theme name field,
+   * for the story, broken down by theme id. Each AtomTypeBundle includes an theme name field,
    * so this call will give client-facing code all the information it needs to present
    * themes and filters to the user.
    * @param livingStoryId living story id
    * @return a map of AtomTypeBundles appropriately filled in.
    */
   @Override
-  public synchronized Map<Long, AtomTypesBundle> getThemeInfoForLsp(long livingStoryId) {
-    Map<Long, AtomTypesBundle> result = Caches.getLspThemeInfo(livingStoryId); 
+  public synchronized Map<Long, AtomTypesBundle> getThemeInfoForLivingStory(long livingStoryId) {
+    Map<Long, AtomTypesBundle> result = Caches.getLivingStoryThemeInfo(livingStoryId); 
     if (result != null) {
       return result;
     }
@@ -162,14 +162,14 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
 
     // put an entry in the map for each theme, too. Since some themes may have no atoms,
     // we should not do this on-demand.
-    for (Theme theme : getThemesForLsp(livingStoryId)) {
+    for (Theme theme : getThemesForLivingStory(livingStoryId)) {
       result.put(theme.getId(), new AtomTypesBundle(theme.getName()));
     }
     
     // In principle, we could try to track when we've found every atom type that we care about, in
     // every possible theme, but it's such a micro-optimization at this point that it's not
     // worthwhile.
-    List<BaseAtom> allAtoms = contentRpcService.getAtomsForLsp(livingStoryId, true);
+    List<BaseAtom> allAtoms = contentRpcService.getAtomsForLivingStory(livingStoryId, true);
     
     for (BaseAtom atom : allAtoms) {
       if (!addAtomToTypesBundle(atom, globalBundle)) {
@@ -187,7 +187,7 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
       }
     }
 
-    Caches.setLspThemeInfo(livingStoryId, result);
+    Caches.setLivingStoryThemeInfo(livingStoryId, result);
     return result;
   }      
 
@@ -229,8 +229,8 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   public synchronized Theme saveTheme(Theme theme) {
     Theme result = themeDataService.save(theme);
     // Clear caches
-    Caches.clearLspThemes(theme.getLivingStoryId());
-    Caches.clearLspThemeInfo(theme.getLivingStoryId());
+    Caches.clearLivingStoryThemes(theme.getLivingStoryId());
+    Caches.clearLivingStoryThemeInfo(theme.getLivingStoryId());
     return result;
   }
   
@@ -238,8 +238,8 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   public synchronized void deleteTheme(long id) {
     themeDataService.delete(id);
     // Clear caches
-    Caches.clearLspThemes(id);
-    Caches.clearLspThemeInfo(id);
+    Caches.clearLivingStoryThemes(id);
+    Caches.clearLivingStoryThemeInfo(id);
   }
   
   @Override

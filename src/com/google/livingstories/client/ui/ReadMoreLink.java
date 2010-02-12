@@ -64,7 +64,7 @@ public class ReadMoreLink extends Link {
     }
     this.setVisible(false);
     if (trackReadMoreWithAnalytics) {
-      AnalyticsUtil.trackSummaryExpansion(LivingStoryData.getLspUrl());
+      AnalyticsUtil.trackSummaryExpansion(LivingStoryData.getLivingStoryUrl());
     }
   }
 }

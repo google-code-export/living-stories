@@ -25,7 +25,7 @@ import java.util.Set;
 
 /**
  * Represents the atoms that are relevant for events in a particular time range
- * of the LSP, including information on whether the client can request earlier or later
+ * for a living story, including information on whether the client can request earlier or later
  * events.
  */
 public class DisplayAtomBundle implements Serializable {

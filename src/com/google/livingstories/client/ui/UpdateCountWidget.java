@@ -28,7 +28,7 @@ import com.google.livingstories.client.ContentRpcServiceAsync;
 import java.util.Date;
 
 /**
- * Class that displays the number of updates in the lsp since the specified date.
+ * Class that displays the number of updates in the living story since the specified date.
  */
 public class UpdateCountWidget extends Composite {
   private ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
@@ -41,9 +41,9 @@ public class UpdateCountWidget extends Composite {
     initWidget(label);
   }
 
-  public void load(long lspId, final Date lastVisitTime) {
+  public void load(long livingStoryId, final Date lastVisitTime) {
     if (lastVisitTime != null) {
-      atomService.getUpdateCountSinceTime(lspId, lastVisitTime,
+      atomService.getUpdateCountSinceTime(livingStoryId, lastVisitTime,
           new AsyncCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {}
