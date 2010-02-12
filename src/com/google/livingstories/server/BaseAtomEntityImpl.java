@@ -108,7 +108,7 @@ public class BaseAtomEntityImpl
   private Set<Long> linkedAtomIds;
   
   @Persistent
-  private Set<Long> angleIds;
+  private Set<Long> themeIds;
   
   @Persistent
   @Embedded
@@ -369,16 +369,16 @@ public class BaseAtomEntityImpl
   }
 
   public Set<Long> getThemeIds() {
-    return GlobalUtil.copySet(angleIds);
+    return GlobalUtil.copySet(themeIds);
   }
   
   public void setThemeIds(Set<Long> themeIds) {
-    this.angleIds = GlobalUtil.copySet(themeIds);
+    this.themeIds = GlobalUtil.copySet(themeIds);
   }
   
   public void removeThemeId(long themeId) {
-    if (angleIds != null) {
-      angleIds.remove(themeId);
+    if (themeIds != null) {
+      themeIds.remove(themeId);
     }
   }
   
@@ -653,7 +653,7 @@ public class BaseAtomEntityImpl
   public BaseAtom toClientObject() {
     BaseAtom ret = toClientObjectImpl();
     ret.setPublishState(publishState);
-    ret.setThemeIds(angleIds);
+    ret.setThemeIds(themeIds);
     ret.setLinkedAtomIds(linkedAtomIds);
     ret.setLocation(location.toClientObject());
     ret.setTimeElapsedSinceLastUpdate(TimeUtil.getElapsedTimeString(this.timestamp));
@@ -754,7 +754,7 @@ public class BaseAtomEntityImpl
       object.put("publishState", getPublishState().name());
       object.put("contributorIds", new JSONArray(getContributorIds()));
       object.put("linkedAtomIds", new JSONArray(getLinkedAtomIds()));
-      object.put("angleIds", new JSONArray(getThemeIds()));
+      object.put("themeIds", new JSONArray(getThemeIds()));
       object.put("location", location.toJSON());
       object.put("sourceDescription", getSourceDescription());
       object.put("sourceAtomId", getSourceAtomId());
@@ -836,7 +836,7 @@ public class BaseAtomEntityImpl
       entity.setLinkedAtomIds(linkedAtomIds);
       
       Set<Long> themeIds = new HashSet<Long>();
-      JSONArray themeIdsJSON = json.getJSONArray("angleIds");
+      JSONArray themeIdsJSON = json.getJSONArray("themeIds");
       for (int i = 0; i < themeIdsJSON.length(); i++) {
         themeIds.add(themeIdsJSON.getLong(i));
       }

@@ -23,11 +23,11 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.livingstories.client.AtomType;
-import com.google.livingstories.server.AngleEntity;
 import com.google.livingstories.server.BaseAtomEntityImpl;
 import com.google.livingstories.server.HasSerializableLivingStoryId;
 import com.google.livingstories.server.JSONSerializable;
 import com.google.livingstories.server.LivingStoryEntity;
+import com.google.livingstories.server.ThemeEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 import com.google.livingstories.server.rpcimpl.Caches;
 
@@ -84,14 +84,14 @@ public class DataImportServlet extends HttpServlet {
   public static List<Class<? extends HasSerializableLivingStoryId>> EXPORTED_ENTITY_CLASSES = 
     ImmutableList.<Class<? extends HasSerializableLivingStoryId>>of(
         LivingStoryEntity.class,
-        AngleEntity.class,
+        ThemeEntity.class,
         BaseAtomEntityImpl.class);
 
 
   private static final Map<Class<?>, Function<JSONObject, String>> identifierFunctionMap =
       new ImmutableMapBuilder<Class<?>, Function<JSONObject, String>>()
           .put(LivingStoryEntity.class, createIdentifierFunction("id"))
-          .put(AngleEntity.class, createIdentifierFunction("id"))
+          .put(ThemeEntity.class, createIdentifierFunction("id"))
           .put(BaseAtomEntityImpl.class, createIdentifierFunction("id"))
           .getMap();
 
@@ -118,7 +118,7 @@ public class DataImportServlet extends HttpServlet {
   private static List<Function<Void, Boolean>> workQueue;
 
   private static Map<String, LivingStoryEntity> livingStoryMap;
-  private static Map<String, AngleEntity> angleMap;
+  private static Map<String, ThemeEntity> themeMap;
   private static Map<String, BaseAtomEntityImpl> contentMap;
 
   @Override
@@ -195,14 +195,14 @@ public class DataImportServlet extends HttpServlet {
     }
     
     livingStoryMap = Maps.newHashMap();
-    angleMap = Maps.newHashMap();
+    themeMap = Maps.newHashMap();
     contentMap = Maps.newHashMap();
 
     workQueue = Lists.newArrayList();
     workQueue.add(new DeleteAllDataFunction());
     workQueue.add(new CreateEntitiesFunction<LivingStoryEntity>(
         LivingStoryEntity.class, livingStoryMap));
-    workQueue.add(new CreateEntitiesFunction<AngleEntity>(AngleEntity.class, angleMap));
+    workQueue.add(new CreateEntitiesFunction<ThemeEntity>(ThemeEntity.class, themeMap));
     workQueue.add(new CreateEntitiesFunction<BaseAtomEntityImpl>(
         BaseAtomEntityImpl.class, contentMap));
     workQueue.add(new MapIdsFunction());
@@ -231,7 +231,7 @@ public class DataImportServlet extends HttpServlet {
     inputData = null;
     workQueue = null;
     livingStoryMap = null;
-    angleMap = null;
+    themeMap = null;
     contentMap = null;
   }
 
@@ -343,8 +343,8 @@ public class DataImportServlet extends HttpServlet {
     public Boolean apply(Void ignore) {
       message = "Mapping IDs";
 
-      for (AngleEntity angle : angleMap.values()) {
-        angle.setLivingStoryId(livingStoryMap.get(angle.getLivingStoryId().toString()).getId());
+      for (ThemeEntity theme : themeMap.values()) {
+        theme.setLivingStoryId(livingStoryMap.get(theme.getLivingStoryId().toString()).getId());
       }
       return false;
     }
@@ -374,15 +374,15 @@ public class DataImportServlet extends HttpServlet {
           }
         }
         
-        // Angle ids
-        Set<Long> angleIds = Sets.newHashSet();
-        for (Long angleId : content.getThemeIds()) {
-          AngleEntity angle = angleMap.get(angleId.toString());
-          if (angle != null) {
-            angleIds.add(angle.getId());
+        // Theme ids
+        Set<Long> themeIds = Sets.newHashSet();
+        for (Long themeId : content.getThemeIds()) {
+          ThemeEntity theme = themeMap.get(themeId.toString());
+          if (theme != null) {
+            themeIds.add(theme.getId());
           }
         }
-        content.setThemeIds(angleIds);
+        content.setThemeIds(themeIds);
         
         // Contributor ids
         Set<Long> contributorIds = Sets.newHashSet();

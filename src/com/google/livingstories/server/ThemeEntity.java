@@ -30,10 +30,11 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * This class represents a grouping of atoms for a living story.
+ * This class represents a grouping of content for a living story that fall into the same sub-theme
+ * of the story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class AngleEntity implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
+public class ThemeEntity implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
 
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -45,7 +46,7 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
   @Persistent
   private Long livingStoryId;
   
-  public AngleEntity(String name, Long livingStoryId) {
+  public ThemeEntity(String name, Long livingStoryId) {
     this.name = name;
     this.livingStoryId = livingStoryId;
   }
@@ -96,9 +97,9 @@ public class AngleEntity implements Serializable, JSONSerializable, HasSerializa
     return object;
   }
   
-  public static AngleEntity fromJSON(JSONObject json) {
+  public static ThemeEntity fromJSON(JSONObject json) {
     try {
-      return new AngleEntity(json.getString("name"), json.getLong("livingStoryId"));
+      return new ThemeEntity(json.getString("name"), json.getLong("livingStoryId"));
       // Note: if the JSON that you're importing uses a different naming convention for
       // the living story id, convert it before processing here.
     } catch (JSONException ex) {
