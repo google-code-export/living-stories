@@ -20,28 +20,6 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-
-  <!-- Must be logged in and on the whitelist to access the LSP for the 'preview' launch. -->
-  <filter>
-    <filter-name>previewAccessFilter</filter-name>
-    <filter-class>com.google.livingstories.servlet.PreviewAccessFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>previewAccessFilter</filter-name>
-    <servlet-name>startPageServlet</servlet-name>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>previewAccessFilter</filter-name>
-    <url-pattern>/lsps/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>previewAccessFilter</filter-name>
-    <url-pattern>/LivingStoryPage/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>previewAccessFilter</filter-name>
-    <url-pattern>/fourthestate/*</url-pattern>
-  </filter-mapping>
   
   <!-- Must be an admin to access the content manager piece of the application. -->
   <security-constraint>
@@ -52,7 +30,6 @@
       <url-pattern>/import</url-pattern>
       <url-pattern>/gqlServlet</url-pattern>
       <url-pattern>/clearCache</url-pattern>
-      <url-pattern>/fourthestate/whitelistingservice</url-pattern>
       <url-pattern>/export</url-pattern>
     </web-resource-collection>
     <auth-constraint>
@@ -134,16 +111,6 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>whitelistingServlet</servlet-name>
-    <servlet-class>com.google.livingstories.server.rpcimpl.WhitelistingRpcImpl</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>whitelistingServlet</servlet-name>
-    <url-pattern>/ContentManager/whitelistingservice</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>lspDispatcher</servlet-name>
     <servlet-class>com.google.livingstories.servlet.LspDispatcher</servlet-class>
   </servlet>
@@ -204,13 +171,13 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>singletonImportServlet</servlet-name>
+    <servlet-name>dataImportServlet</servlet-name>
     <servlet-class>com.google.livingstories.servlet.DataImportServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>singletonImportServlet</servlet-name>
-    <url-pattern>/singletonImport</url-pattern>
+    <servlet-name>dataImportServlet</servlet-name>
+    <url-pattern>/import</url-pattern>
   </servlet-mapping>
 
   <servlet>

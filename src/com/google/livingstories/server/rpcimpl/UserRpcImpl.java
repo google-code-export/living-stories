@@ -88,24 +88,6 @@ public class UserRpcImpl extends RemoteServiceServlet implements UserRpcService 
     userDataService.setDefaultStoryView(getLoggedInUserId(), defaultStoryView);
   }
   
-  /**
-   * The following types of users are whitelisted for accessing the lsps: app admins, anyone with
-   * an @google.com email address and explicitly listed external google accounts.
-   */
-  @Override
-  public synchronized boolean isWhitelisted() {
-    if (isUserLoggedIn()) {
-      String userEmail = getLoggedInUserId();
-      if (userLoginService.isAdmin() || userEmail.endsWith("@google.com")) {
-        return true;
-      } else {
-        return new WhitelistingRpcImpl().isUserWhitelisted(userEmail);
-      }
-    } else {
-      return false;
-    }
-  }
-  
   public Publisher getPublisherForAdminUser() {
     if (userLoginService.isAdmin()) {
       return userDataService.getPublisherForAdminUser(getLoggedInUserId());

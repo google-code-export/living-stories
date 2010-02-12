@@ -34,7 +34,6 @@ public class ContentManager implements EntryPoint {
   private Widget livingStoryManager = new LivingStoryManager();
   private Widget themeManager = new ThemeManager();
   private Widget atomManager = new AtomManager();
-  private Widget whitelistManager = new WhitelistManager();
   private Widget importManager = new ImportManager();
   
   public void onModuleLoad() {
@@ -46,8 +45,7 @@ public class ContentManager implements EntryPoint {
     tabs.add(atomManager, "Manage Content");
     tabs.add(livingStoryManager, "Manage Living Stories");
     tabs.add(themeManager, "Manage Themes");
-    tabs.add(whitelistManager, "Manage Whitelist");
-    tabs.add(importManager, "Import Data");
+    tabs.add(importManager, "Import/Export Data");
     
     tabs.selectTab(0);
     selectedIndex = 0;
