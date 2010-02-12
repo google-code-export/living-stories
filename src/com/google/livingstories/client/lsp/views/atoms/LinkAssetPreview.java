@@ -39,14 +39,19 @@ public class LinkAssetPreview extends Composite {
 
   private static final String LINK_ICON = "/images/link_icon.gif";
 
-  @UiField Label atomType;
+  @UiField Label header;
   @UiField SimplePanel iconPanel;
   @UiField SimplePanel content;
 
   public LinkAssetPreview(AssetAtom atom) {
     initWidget(uiBinder.createAndBindUi(this));
-    atomType.setText("Resource");
+    header.setText("Resource");
     iconPanel.add(new Image(LINK_ICON));
     content.add(new HTML(atom.getContent()));
+  }
+  
+  public LinkAssetPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
 }

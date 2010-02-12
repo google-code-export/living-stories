@@ -25,8 +25,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.AtomTypesBundle;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
@@ -118,8 +116,6 @@ public class OverviewPage extends Page {
         atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filter, focusedAtomId,
             null, new AtomCallback(focusedAtomId));
         atomList.clear();
-        atomList.setIsImageList(filter.atomType == AtomType.ASSET
-            && filter.assetType == AssetType.IMAGE);
         atomList.beginLoading();
         beginLoading();
       }

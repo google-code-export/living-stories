@@ -19,7 +19,6 @@ package com.google.livingstories.client.lsp;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.livingstories.client.atomlist.AtomList;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.ShowMoreEvent;
 
@@ -27,11 +26,6 @@ import com.google.livingstories.client.lsp.event.ShowMoreEvent;
  * Extends behaviors of the LspAtomListWidget in ways that are appropriate for the Player Page
  */
 public class PlayerPageAtomListWidget extends LspAtomListWidget {
-  @Override
-  protected AtomList createAtomList() {
-    return AtomList.createNoHistoryOnToggle(true);
-  }
-  
   @Override
   protected void addMoreLinkHandler(HasClickHandlers moreLink) {
     moreLink.addClickHandler(new ClickHandler() {

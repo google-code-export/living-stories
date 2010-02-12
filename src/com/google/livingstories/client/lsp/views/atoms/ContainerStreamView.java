@@ -25,7 +25,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiTemplate;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,8 +53,7 @@ import java.util.Set;
  * content as well as linked content.  This class is extended by EventStreamView
  * and NarrativeStreamView.
  */
-public abstract class ContainerStreamView<T extends BaseAtom> extends Composite
-    implements AtomListElement {
+public abstract class ContainerStreamView<T extends BaseAtom> extends AtomListElement {
   private static EventStreamViewUiBinder uiBinder = GWT.create(EventStreamViewUiBinder.class);
 
   @SuppressWarnings("unchecked")
@@ -176,6 +174,11 @@ public abstract class ContainerStreamView<T extends BaseAtom> extends Composite
   }
 
   @Override
+  public BaseAtom getAtom() {
+    return atom;
+  }
+  
+  @Override
   public Importance getImportance() {
     return atom.getImportance();
   }
@@ -183,11 +186,6 @@ public abstract class ContainerStreamView<T extends BaseAtom> extends Composite
   @Override
   public Set<Long> getThemeIds() {
     return atom.getThemeIds();
-  }
-
-  @Override
-  public Widget render(boolean includeAtomName) {
-    return this;
   }
 
   /**

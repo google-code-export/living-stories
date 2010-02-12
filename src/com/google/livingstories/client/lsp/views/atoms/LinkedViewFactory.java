@@ -42,7 +42,7 @@ public class LinkedViewFactory {
         widget = new NarrativeAtomView((NarrativeAtom) atom, containerContributorIds);
         break;
       case QUOTE:
-        widget = new QuoteAtomView((QuoteAtom) atom, containerContributorIds);
+        widget = new QuoteAtomView((QuoteAtom) atom);
         break;
       case PLAYER:
         widget = new BasePlayerPreview((PlayerAtom) atom);

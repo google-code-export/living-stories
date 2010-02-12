@@ -32,5 +32,8 @@
       padding: 0;
     }
   </ui:style>
-  <g:SimplePanel ui:field="content" styleName="{style.quote} {res.css.substituteHeaderSpacing}"/>
+  <g:FlowPanel>
+    <g:Label ui:field="header" styleName="{res.css.substituteHeaderSpacing}"/>
+    <g:SimplePanel ui:field="content" styleName="{style.quote}"/>
+  </g:FlowPanel>
 </ui:UiBinder>

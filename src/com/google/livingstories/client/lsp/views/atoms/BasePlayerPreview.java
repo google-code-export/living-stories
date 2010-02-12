@@ -53,6 +53,7 @@ public class BasePlayerPreview extends Composite {
   interface BasePlayerPreviewUiBinder extends UiBinder<Widget, BasePlayerPreview> {
   }
 
+  @UiField Label header;
   @UiField SimplePanel image;
   @UiField Label name;
   @UiField SimplePanel description;
@@ -77,6 +78,11 @@ public class BasePlayerPreview extends Composite {
 
   protected void bind() {
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public BasePlayerPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
   
   @UiHandler("name") void goToPlayerPage(ClickEvent e) {

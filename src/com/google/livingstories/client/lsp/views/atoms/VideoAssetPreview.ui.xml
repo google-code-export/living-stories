@@ -25,7 +25,9 @@
   ui:generateLocales="default">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
   <g:HTMLPanel>
-    <div class="{res.css.atomHeader}"><ui:msg description="label above a video-player launcher">Video</ui:msg></div>
+    <g:Label ui:field="header" styleName="{res.css.atomHeader}">
+      <ui:msg description="label above a video-player launcher">Video</ui:msg>
+    </g:Label>
     <g:FocusPanel ui:field="panel">
       <g:HTMLPanel>
         <g:SimplePanel ui:field="preview"/>

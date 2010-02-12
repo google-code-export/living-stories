@@ -26,9 +26,9 @@
     ui:generateLocales="default">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
   <g:HTMLPanel>
-    <div class="{res.css.atomHeader}"> 
+    <g:Label ui:field="header" styleName="{res.css.atomHeader}">
       <ui:msg description="Title for a slideshow widget">Slideshow</ui:msg>
-    </div>
+    </g:Label>
     <g:FocusPanel ui:field="previewImage"/>
   </g:HTMLPanel>
 </ui:UiBinder>

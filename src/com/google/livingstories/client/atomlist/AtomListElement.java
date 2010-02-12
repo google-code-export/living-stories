@@ -16,7 +16,8 @@
 
 package com.google.livingstories.client.atomlist;
 
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.Importance;
 
 import java.util.Set;
@@ -25,19 +26,19 @@ import java.util.Set;
  * Interface that an element that wishes to be displayed in the atom list on the LSP has to 
  * implement.
  */
-public interface AtomListElement {
+public abstract class AtomListElement extends Composite {
   
-  Long getId();
+  public abstract Long getId();
   
-  Importance getImportance();
+  public abstract BaseAtom getAtom();
   
-  Set<Long> getThemeIds();
+  public abstract Importance getImportance();
   
-  Widget render(boolean includeAtomName);
+  public abstract Set<Long> getThemeIds();
   
-  boolean setExpansion(boolean expand);
+  public abstract boolean setExpansion(boolean expand);
 
-  String getDateString();
+  public abstract String getDateString();
   
-  void setTimeVisible(boolean visible);
+  public abstract void setTimeVisible(boolean visible);
 }

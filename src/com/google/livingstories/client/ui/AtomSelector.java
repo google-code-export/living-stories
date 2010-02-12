@@ -145,7 +145,7 @@ public class AtomSelector extends PopupPanel {
   }
   
   private Widget createCart() {
-    cart = AtomList.createWithHandler(true, new AtomClickHandler() {
+    cart = AtomList.createClickable(new AtomClickHandler() {
       public void onClick(BaseAtom atom) {
         cart.removeAtom(atom.getId());
         submitButton.setEnabled(cart.getAtomCount() != 0);
