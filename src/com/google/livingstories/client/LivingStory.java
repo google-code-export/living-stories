@@ -28,7 +28,6 @@ public class LivingStory implements Serializable {
   private long id;
   private String url;
   private String title;
-  private Publisher publisher;
   private PublishState publishState;
   private List<Summary> summaryRevisions;
   
@@ -50,24 +49,21 @@ public class LivingStory implements Serializable {
   public LivingStory() {
   }
   
-  public LivingStory(long id, String url, String title, String summary, Publisher publisher,
-      PublishState publishState) {
-    init(id, url, title, publisher, publishState);
+  public LivingStory(long id, String url, String title, String summary, PublishState publishState) {
+    init(id, url, title, publishState);
     this.summaryRevisions.add(new Summary(summary, new Date()));
   }
   
-  public LivingStory(long id, String url, String title, Publisher publisher,
-      PublishState publishState, List<Summary> summaryRevisions) {
-    init(id, url, title, publisher, publishState);
+  public LivingStory(long id, String url, String title, PublishState publishState, 
+      List<Summary> summaryRevisions) {
+    init(id, url, title, publishState);
     this.summaryRevisions = new ArrayList<Summary>(summaryRevisions);
   }
   
-  private void init(long id, String url, String title, Publisher publisher, 
-      PublishState publishState) {
+  private void init(long id, String url, String title, PublishState publishState) {
     this.id = id;
     this.url = url;
     this.title = title;
-    this.publisher = publisher;
     this.publishState = publishState;
   }
 
@@ -82,10 +78,6 @@ public class LivingStory implements Serializable {
   
   public String getTitle() {
     return title;
-  }
-
-  public Publisher getPublisher() {
-    return publisher;
   }
 
   public PublishState getPublishState() {

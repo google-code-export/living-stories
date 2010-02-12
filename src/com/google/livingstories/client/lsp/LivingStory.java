@@ -56,9 +56,7 @@ public class LivingStory implements EntryPoint {
     Date now = new Date();
     Date cookieExpiry = new Date(now.getTime() + SIXTY_DAYS_IN_MILLISECONDS);
     Cookies.setCookie(cookieName, String.valueOf(now.getTime()), cookieExpiry);
-    // TODO: consider setting the domain appropriately, and the path
-    // here to "/lsps/"
-
+    
     RootPanel.get("storyBody").add(new LivingStoryPage());
 
     HistoryManager.initialize();
@@ -67,7 +65,6 @@ public class LivingStory implements EntryPoint {
     Document doc = Document.get();
     doc.getElementById("rssLink").setAttribute(
         "title", LspMessageHolder.msgs.rssFeedTitle(LivingStoryData.getLivingStoryTitle()));
-    doc.getElementById("readOtherStories").setInnerText(
-        LspMessageHolder.msgs.otherStoriesText(LivingStoryData.getLivingStoryPublisher()));
+    doc.getElementById("readOtherStories").setInnerText(LspMessageHolder.consts.otherStories());
   }
 }

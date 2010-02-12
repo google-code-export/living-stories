@@ -28,7 +28,6 @@ import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.NarrativeAtom;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.Theme;
 import com.google.livingstories.client.util.DateUtil;
@@ -52,13 +51,11 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   private LivingStoryDataService livingStoryDataService;
   private ThemeDataService themeDataService;
   private ContentRpcImpl contentRpcService;
-  private UserRpcImpl userRpcService;
   
   public LivingStoryRpcImpl() {
     this.livingStoryDataService = DataImplFactory.getLivingStoryService();
     this.themeDataService = DataImplFactory.getThemeService();
     this.contentRpcService = new ContentRpcImpl();
-    this.userRpcService = new UserRpcImpl();
   }
 
   
@@ -67,8 +64,7 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
 
   @Override
   public synchronized LivingStory createLivingStory(String url, String title) {
-    LivingStory story = livingStoryDataService.save(null, url, title, PublishState.DRAFT, 
-        Publisher.NYT, "");
+    LivingStory story = livingStoryDataService.save(null, url, title, PublishState.DRAFT, "");
     Caches.clearLivingStories();
     Caches.clearStartPageBundle();
     return story;
@@ -97,8 +93,7 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   
   @Override
   public synchronized List<LivingStory> getLivingStoriesForContentManager() {
-    return livingStoryDataService.retrieveByPublisher(userRpcService.getPublisherForAdminUser(),
-        null, true);
+    return livingStoryDataService.retrieveAll(null, true);
   }
   
   @Override
@@ -113,9 +108,8 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   
   @Override
   public synchronized LivingStory saveLivingStory(long id, String url, String title, 
-      Publisher publisher, PublishState publishState, String summary) {
-    LivingStory story = livingStoryDataService.save(id, url, title, publishState, publisher, 
-        summary);
+      PublishState publishState, String summary) {
+    LivingStory story = livingStoryDataService.save(id, url, title, publishState, summary);
     Caches.clearLivingStories();
     Caches.clearStartPageBundle();
     return story;

@@ -21,10 +21,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -102,23 +99,6 @@ public class StartPage implements EntryPoint {
     Anchor storyName = new Anchor(story.getTitle(), getStoryUrl(story));
     storyName.addStyleName("startPageStoryName");
     
-    InlineHTML dash = new InlineHTML("- ");
-    dash.addStyleName("startPagePublisherName");
-    
-    Anchor publisherName = new Anchor(story.getPublisher().toString(),
-        true, getStoryUrl(story));
-    publisherName.setStylePrimaryName("startPagePublisherName");
-
-    FlowPanel headerTitle = new FlowPanel();
-    headerTitle.add(storyName);
-    headerTitle.add(new InlineLabel(" "));
-    FlowPanel publisherFlowPanel = new FlowPanel();
-    publisherFlowPanel.setStylePrimaryName("nowrap");
-    DOM.setStyleAttribute(publisherFlowPanel.getElement(), "display", "inline");
-    publisherFlowPanel.add(dash);
-    publisherFlowPanel.add(publisherName);
-    headerTitle.add(publisherFlowPanel);
-    
     Label updateCount = getUpdateRecencyLabel(
         DateUtil.laterDate(updates.get(0).getTimestamp(), story.getLastChangeTimestamp()));
     updateCount.setWordWrap(false);
@@ -129,7 +109,7 @@ public class StartPage implements EntryPoint {
     DOM.setStyleAttribute(header.getElement(), "marginBottom", "10px");
     header.setHorizontalAlignment(HorizontalPanel.ALIGN_LEFT);
     
-    header.add(headerTitle);
+    header.add(storyName);
     header.add(updateCount);
     header.setCellHorizontalAlignment(updateCount, HorizontalPanel.ALIGN_RIGHT);
     panel.add(header);

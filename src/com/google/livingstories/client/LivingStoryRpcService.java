@@ -38,8 +38,8 @@ public interface LivingStoryRpcService extends RemoteService {
 
   LivingStory getLivingStoryByUrl(String url);
   
-  LivingStory saveLivingStory(long id, String url, String title, Publisher publisher, 
-      PublishState publishState, String summary);
+  LivingStory saveLivingStory(long id, String url, String title, PublishState publishState, 
+      String summary);
   
   void deleteLivingStory(long id);
   
