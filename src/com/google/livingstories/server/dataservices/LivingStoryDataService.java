@@ -18,7 +18,6 @@ package com.google.livingstories.server.dataservices;
 
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.Publisher;
 
 import java.util.List;
 
@@ -35,14 +34,13 @@ public interface LivingStoryDataService {
    * @param urlName short name for the story used in the URL which acts as a unique identifier.
    * @param title full title of the story
    * @param publishState whether this story should be shown to the user or if it's still draft
-   * @param publisher identification of the organization publishing this story
    * @param summary The HTML summary of the story. All revisions of the summary should be saved.
    * The given summary will be added as the latest revision for the story.
    * @throws IllegalArgumentException thrown if the id is null (i.e. a new story is being created)
    * but another story already exists in the database with the provided urlName
    */
   LivingStory save(Long id, String urlName, String title, PublishState publishState,
-      Publisher publisher, String summary) throws IllegalArgumentException;
+      String summary) throws IllegalArgumentException;
   
   /**
    * Delete a living story from the database.
@@ -70,19 +68,6 @@ public interface LivingStoryDataService {
    * be returned.
    */
   LivingStory retrieveByUrlName(String urlName, boolean latestRevisionsOnly);
-  
-  /**
-   * Return all living stories for a given publisher that match the given publish state.
-   * @param publisher publisher whose stories to return. If null, all stories matching the other
-   * criteria will be returned.
-   * @param publishState whether the returned stories should be 'published' or 'draft'. If null,
-   * all stories by the publisher will be returned.
-   * @param latestRevisionsOnly if true, only the last few revisions (upto a maximum of 5) of the
-   * summary will be returned with the living story. If false, all the revisions of the summary will
-   * be returned.
-   */
-  List<LivingStory> retrieveByPublisher(Publisher publisher, PublishState publishState,
-      boolean latestRevisionsOnly);
   
   /**
    * Fetch all the living stories from the datastore in a given publish state.

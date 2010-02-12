@@ -55,10 +55,6 @@
               <td><ui:msg description="label for a field">Title:</ui:msg></td>
               <td><g:TextBox ui:field="titleTextBox"/></td>
             </tr>
-            <tr>
-              <td><ui:msg description="label for a field">Publisher:</ui:msg></td>
-              <td><ls:EnumDropdown ui:field="publisherSelector"/></td>
-            </tr>
           </table>
           <ls:RichTextEditor ui:field="summaryEditor"/>
           <div>

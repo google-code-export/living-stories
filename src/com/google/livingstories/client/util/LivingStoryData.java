@@ -54,10 +54,6 @@ public class LivingStoryData {
     return getLivingStoryData().getStringValue("STORY_URL");
   }
   
-  public static String getLivingStoryPublisher() {
-    return getLivingStoryData().getStringValue("PUBLISHER");
-  }
-  
   public static String getSummary() {
     return getLivingStoryData().getStringValue("SUMMARY");
   }
@@ -129,6 +125,10 @@ public class LivingStoryData {
       ret = "key=" + ret;
     }
     return ret;
+  }
+  
+  public static String getLogoLocation() {
+    return getLivingStoryData().getStringValue("LOGO_LOCATION");
   }
   
   private static final class LivingStoryObject extends JavaScriptObject {
