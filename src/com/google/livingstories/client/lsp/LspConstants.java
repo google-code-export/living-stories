@@ -143,6 +143,15 @@ public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   String recentEventsListTitle();
 
   /**
+   * Translated "Related".
+   * 
+   * @return translated "Related"
+   */
+  @DefaultStringValue("Related")
+  @Key("related")
+  String related();
+
+  /**
    * Translated "Set as default view".
    * 
    * @return translated "Set as default view"

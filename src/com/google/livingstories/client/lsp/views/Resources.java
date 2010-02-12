@@ -26,15 +26,25 @@ import com.google.gwt.resources.client.CssResource;
 public interface Resources extends ClientBundle {
   public static final Resources INSTANCE = GWT.create(Resources.class);
   
-  @Source("LivingStoryPage.css")
+  @Source({"Constants.css", "LivingStoryPage.css"})
   public Styles css();
   
   public interface Styles extends CssResource {
+    // Constants
+    String primaryLinkColor();
+    String secondaryLinkColor();
+    String primaryTextColor();
+    String fadedTextColor();
+    String secondaryTextColor();
+
+    // Classes
     String clickable();
     String read();
     String error();
     String atomHeader();
     String linkedItemSpacing();
     String substituteHeaderSpacing();
+    String linkedAtomsPanel();
+    String hidden();
   }
 }
