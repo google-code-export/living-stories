@@ -271,8 +271,6 @@ public class BaseContentEntity
   }
   
   
-  /*** Methods in BaseAtomEntity ***/
-  
   public Long getId() {
     return id;
   }
@@ -419,7 +417,6 @@ public class BaseContentEntity
     this.sourceAtomId = sourceAtomId;
   }
 
-  /*** Methods in EventUpdateEntity ***/
   public Date getEventStartDate() {
     return startDate;
   }
@@ -451,8 +448,6 @@ public class BaseContentEntity
   public void setEventSummary(String eventSummary) {
     this.eventSummary = new Text(eventSummary);
   }
-  
-  /*** Methods in PlayerEntity ***/
   
   public String getName() {
     return name;
@@ -486,8 +481,6 @@ public class BaseContentEntity
     this.photoAtomId = photoAtomId;
   }
   
-  /*** Methods in StoryPlayerEntity ***/
-  
   public Long getParentPlayerAtomId() {
     return parentPlayerAtomId;
   }
@@ -495,8 +488,6 @@ public class BaseContentEntity
   public void setParentPlayerAtomId(Long parentPlayerAtomId) {
     this.parentPlayerAtomId = parentPlayerAtomId;
   }
-  
-  /*** Methods in AssetEntity ***/
   
   public AssetType getAssetType() {
     return assetType;
@@ -522,8 +513,6 @@ public class BaseContentEntity
     this.previewUrl = previewUrl;
   }
 
-  
-  /*** Methods in NarrativeEntity ***/
   
   public String getHeadline() {
     return headline;
