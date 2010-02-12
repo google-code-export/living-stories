@@ -116,9 +116,6 @@
             </tr>
           </table>
         </div>
-
-        <!-- Footer -->
-        <call:Footer/>
       </div>
     </body>
   </html>

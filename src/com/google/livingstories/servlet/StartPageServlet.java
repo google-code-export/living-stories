@@ -69,6 +69,7 @@ public class StartPageServlet extends HttpServlet {
       }
     }
     
+    ExternalServiceKeyChain externalProperties = new ExternalServiceKeyChain(getServletContext());
     String currentUrl = req.getRequestURI();
     StartPageHtml.write(
         resp.getWriter(),
@@ -79,6 +80,7 @@ public class StartPageServlet extends HttpServlet {
         userLoginService.createLogoutUrl(currentUrl),
         lastVisitTimes,
         loggedInUser == null ? null : userDataService.getDefaultStoryView(loggedInUser),
-        new ExternalServiceKeyChain(getServletContext()).getAnalyticsAccountId());
+        externalProperties.getLogoFileLocation(),
+        externalProperties.getAnalyticsAccountId());
   }
 }
