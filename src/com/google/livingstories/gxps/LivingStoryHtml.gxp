@@ -1,0 +1,124 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<gxp:template name="com.google.livingstories.gxps.LivingStoryHtml"
+              xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:call="http://google.com/2001/gxp/call"
+              xmlns:expr="http://google.com/2001/gxp/expressions">
+  <gxp:import class="com.google.livingstories.client.FilterSpec"/>
+  <gxp:import class="com.google.livingstories.client.LivingStory"/>
+  <gxp:import class="com.google.livingstories.server.util.LivingStoryIterator"/>
+  <gxp:import class="com.google.livingstories.server.util.SummaryDiffUtil"/>
+  <gxp:import class="java.util.Date"/>
+  <gxp:import class="java.util.List"/>
+
+  <gxp:param name="currentUrl" type="String"/>
+  <gxp:param name="livingStory" type="LivingStory"/>
+  <gxp:param name="userName" type="String" />
+  <gxp:param name="loginUrl" type="String" />
+  <gxp:param name="logoutUrl" type="String" />
+  <gxp:param name="subscriptionUrl" type="String" />
+  <gxp:param name="lastVisitDate" type="Date"/>
+  <gxp:param name="subscriptionStatus" type="boolean"/>
+  <gxp:param name="defaultStoryView" type="FilterSpec"/>
+  <gxp:param name="friendConnectSiteId" type="String"/>
+  <gxp:param name="mapsKey" type="String"/>
+  <gxp:param name="analyticsAccountId" type="String"/>
+  <gxp:param name="otherStories" type="List{LivingStory}"/>
+  
+  <html>
+    <head>
+      <title><gxp:eval expr="livingStory.getTitle()"/></title>
+
+      <link id='rssLink' rel="alternate" type="application/rss+xml"
+            expr:href='"/feeds/" + livingStory.getUrl()'/>
+
+<!--  title attribute is set client-side, equivalent to expr:title='"RSS Feed for " + livingStory.getTitle()' -->
+
+      <script type="text/javascript" src="/LivingStoryPage/LivingStoryPage.nocache.js"></script>
+      
+      <!-- Include the Google Friend Connect javascript library. -->
+      <script type="text/javascript" src="http://www.google.com/friendconnect/script/friendconnect.js"></script>
+
+      <script type="text/javascript">
+        window.LIVING_STORY = {
+          ID: <gxp:eval expr='livingStory.getId()'/>,
+          TITLE: <gxp:eval expr='livingStory.getTitle()'/>,
+          STORY_URL: <gxp:eval expr='livingStory.getUrl()'/>,
+          PUBLISHER: <gxp:eval expr='livingStory.getPublisher().toString()'/>,
+          SUMMARY: <gxp:eval expr='SummaryDiffUtil.getDiffedSummary(livingStory, lastVisitDate)'/>,
+          LAST_VISIT_DATE: <gxp:eval expr='lastVisitDate == null ? null : lastVisitDate.toString()'/>,
+          SUBSCRIPTION_STATUS: <gxp:eval expr='subscriptionStatus'/>,
+          SUBSCRIBE_URL: <gxp:eval expr='subscriptionUrl'/>,
+          DEFAULT_PAGE: <gxp:eval expr='defaultStoryView == null ? null : defaultStoryView.getFilterParams()'/>,
+          USER_NAME: <gxp:eval expr='userName'/>,
+          LOGIN_URL: <gxp:eval expr='loginUrl'/>,
+          LOGOUT_URL: <gxp:eval expr='logoutUrl'/>,
+          FRIEND_CONNECT_SITE_ID: <gxp:eval expr='friendConnectSiteId'/>,
+          MAPS_KEY: <gxp:eval expr='mapsKey'/>,
+        };
+      </script>
+
+      <link rel="stylesheet" href="/LivingStoryPage/gwt/standard/standard.css"/>
+      <link rel="stylesheet" href="/Timeline.css"/>
+      <link rel="stylesheet" href="/LivingStory.css"/>
+      
+      <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
+      
+    </head>
+    <body>
+      <!-- OPTIONAL: include this if you want history support -->
+      <iframe src="javascript:''" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0"></iframe>
+      <div class="page" id="storyBody"></div>
+
+      <div class="page">
+        <!-- Other stories by same publisher -->
+        <div style="margin: 5px; border-top: 1px solid #999; padding: 5px 0px;">
+          <table cellspacing="0" cellpadding="0" border="0" align="center">
+            <tr>
+              <td id="readOtherStories" style="color: #777; vertical-align: top;"/>
+              <!--  content of the above td is set client-side, equivalent to:
+                Read other Living Stories by <gxp:eval expr='livingStory.getPublisher().toString()'/>:
+              -->
+              <td style="text-align: left; vertical-align: top;">
+                <gxp:abbr name='itr' type='LivingStoryIterator'
+                          expr='new LivingStoryIterator(otherStories.iterator(), livingStory, 4)'>
+                  <gxp:loop var='story' type='LivingStory' iterator='itr'>
+                    <gxp:if cond='story != null'>
+                      <gxp:nomsg>&nbsp;&nbsp;&nbsp;</gxp:nomsg>
+                      <a expr:href='story.getUrl()' style="text-decoration: underline;" ><gxp:eval expr='story.getTitle().trim().replaceAll(" ", "&nbsp;")'/></a>
+                      <!-- Show 2 story titles per line. -->
+                      <gxp:if cond='itr.getCount() % 2 == 0'>
+                        <br/>
+                      </gxp:if>
+                    </gxp:if>
+                  </gxp:loop>
+                </gxp:abbr>                  
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Footer -->
+        <call:Footer/>
+      </div>
+    </body>
+  </html>
+</gxp:template>

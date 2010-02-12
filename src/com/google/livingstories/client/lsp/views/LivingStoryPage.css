@@ -1,0 +1,40 @@
+.clickable {
+  cursor: pointer;
+  color: primaryLinkColor;
+}
+
+.read {
+  color: #333;
+}
+
+.read .clickable, .read a, .read a:hover, .read a:visited {
+  color: secondaryLinkColor;
+}
+
+.error {
+  color: red;
+}
+
+.atomHeader {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.linkedItemSpacing {
+  margin-bottom: 0.9em;
+}
+
+.substituteHeaderSpacing {
+  margin-top: 0.9em;
+}
+
+.linkedAtomsPanel {
+  float: right;
+  padding-left: 16px;
+  width: 210px;
+}
+
+.hidden {
+  display: none;
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<!DOCTYPE gxp:template SYSTEM "http://gxp.googlecode.com/svn/trunk/resources/xhtml.ent">
+
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<gxp:template name="com.google.livingstories.gxps.Footer"
+              xmlns="http://www.w3.org/1999/xhtml"
+              xmlns:gxp="http://google.com/2001/gxp"
+              xmlns:call="http://google.com/2001/gxp/call"
+              xmlns:expr="http://google.com/2001/gxp/expressions">
+  <gxp:import class="java.util.Calendar"/>
+  
+  <gxp:nomsg>
+    <div style="text-align: center; margin: 5px; border-top: 1px solid #999; padding: 5px 0px;">
+      <span style="color: #777;">© <gxp:eval expr='Calendar.getInstance().get(Calendar.YEAR)'/> Google - </span>
+      <a href="http://labs.google.com/labsterms.html" style="text-decoration: underline;" target="_blank">
+        Google Labs Terms of Use
+      </a>
+      <span style="color: #777;"> - </span>
+      <a href="http://www.google.com/support/News/bin/answer.py?answer=167087" style="text-decoration: underline;" target="_blank">
+        Frequently Asked Questions
+      </a>
+      <span style="color: #777;"> - </span>
+      <a href="http://www.google.com/support/News/bin/request.py?contact_type=living_story" style="text-decoration: underline;" target="_blank">
+        Send Feedback
+      </a>
+      <span style="color: #777;"> - </span>
+      <a href="http://www.google.com/support/News/bin/answer.py?answer=167198" style="text-decoration: underline;" target="_blank">
+        About Living Stories
+      </a>
+      <span style="color: #777;"> - </span>
+      <a href="http://groups.google.com/group/living-stories-discussion" style="text-decoration: underline;" target="_blank">
+        Publisher Discussion Forum
+      </a>
+    </div>
+  </gxp:nomsg>
+</gxp:template>
