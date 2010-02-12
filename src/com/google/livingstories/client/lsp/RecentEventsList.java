@@ -88,7 +88,8 @@ public class RecentEventsList extends Composite {
       Link update = new Link(event.getEventUpdate()) {
         @Override
         protected void onClick(ClickEvent e) {
-          AnalyticsUtil.trackVerticalTimelineClick(LivingStoryData.getLspUrl(), event.getId());
+          AnalyticsUtil.trackVerticalTimelineClick(
+              LivingStoryData.getLivingStoryUrl(), event.getId());
           LivingStoryControls.goToAtom(event.getId());
         }
       };

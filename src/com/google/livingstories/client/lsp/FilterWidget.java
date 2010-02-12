@@ -255,7 +255,7 @@ public class FilterWidget extends Composite {
         newFilter.opinion = opinion;
         HistoryManager.newTokenWithEvent(HistoryPages.OVERVIEW,
             newFilter.getFilterParams(), null);
-        AnalyticsUtil.trackFilterClick(LivingStoryData.getLspUrl(), filterName);
+        AnalyticsUtil.trackFilterClick(LivingStoryData.getLivingStoryUrl(), filterName);
       }
     }
   }
@@ -305,7 +305,7 @@ public class FilterWidget extends Composite {
         newFilter.importantOnly = importantOnly;
         HistoryManager.newTokenWithEvent(HistoryPages.OVERVIEW,
             newFilter.getFilterParams(), null);
-        AnalyticsUtil.trackFilterClick(LivingStoryData.getLspUrl(), 
+        AnalyticsUtil.trackFilterClick(LivingStoryData.getLivingStoryUrl(), 
             importantOnly ? "Most important" : "All importance");
       }
     }
@@ -344,7 +344,7 @@ public class FilterWidget extends Composite {
         newFilter.oldestFirst = oldestFirst;
         HistoryManager.newTokenWithEvent(HistoryPages.OVERVIEW,
             newFilter.getFilterParams(), null);
-        AnalyticsUtil.trackFilterClick(LivingStoryData.getLspUrl(), 
+        AnalyticsUtil.trackFilterClick(LivingStoryData.getLivingStoryUrl(), 
             oldestFirst ? "Oldest first" : "Newest first");
       }
     }

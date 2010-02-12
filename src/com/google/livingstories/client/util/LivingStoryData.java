@@ -24,7 +24,7 @@ import java.util.Date;
  * Utility class to easily get living story data values from the page via JSNI
  * The getters all check that LIVING_STORY exists so we don't throw exceptions,
  * since these methods may be called by things like EventBlockWidget,
- * which are also used outside the context of an LSP
+ * which are also used outside the context of the living story page
  * (in the contentmanager previews, for example).
  */
 public class LivingStoryData {
@@ -37,24 +37,24 @@ public class LivingStoryData {
     return $wnd.LIVING_STORY;
   }-*/;
   
-  public static Long getLspId() {
-    long lspId = getLivingStoryData().getIntValue("ID");
-    return lspId < 0 ? null : lspId;
+  public static Long getLivingStoryId() {
+    long livingStoryId = getLivingStoryData().getIntValue("ID");
+    return livingStoryId < 0 ? null : livingStoryId;
   }
   
-  public static void setLspId(Long lspId) {
-    getLivingStoryData().setValue("ID", lspId == null ? -1 : lspId.intValue());
+  public static void setLivingStoryId(Long livingStoryId) {
+    getLivingStoryData().setValue("ID", livingStoryId == null ? -1 : livingStoryId.intValue());
   }
   
-  public static String getLspTitle() {
+  public static String getLivingStoryTitle() {
     return getLivingStoryData().getStringValue("TITLE");
   }
   
-  public static String getLspUrl() {
+  public static String getLivingStoryUrl() {
     return getLivingStoryData().getStringValue("STORY_URL");
   }
   
-  public static String getLspPublisher() {
+  public static String getLivingStoryPublisher() {
     return getLivingStoryData().getStringValue("PUBLISHER");
   }
   

@@ -68,7 +68,8 @@ import javax.jdo.annotations.PrimaryKey;
  * This class represents a piece of content for a living story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSerializableLspId {
+public class BaseAtomEntityImpl
+    implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
   private static final Pattern EXTERNAL_LINK_PATTERN =
       Pattern.compile("<a\\b[^>]+?\\bhref=\"(?!javascript:)[^>]+?>",
           Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -261,12 +262,12 @@ public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSe
   private BaseAtomEntityImpl() {}
   
   public BaseAtomEntityImpl(Date timestamp, AtomType atomType,
-      String content, Importance importance, Long lspId) {
+      String content, Importance importance, Long livingStoryId) {
     this.timestamp = timestamp;
     this.atomType = atomType;
     this.content = new Text(content);
     this.importance = importance;
-    this.livingStoryId = lspId;
+    this.livingStoryId = livingStoryId;
   }
   
   
@@ -308,14 +309,11 @@ public class BaseAtomEntityImpl implements Serializable, JSONSerializable, HasSe
     this.importance = importance;
   }
 
+  @Override
   public Long getLivingStoryId() {
     return livingStoryId;
   }
 
-  public Long getLspId() {
-    return getLivingStoryId();
-  }
-  
   public void setLivingStoryId(Long livingStoryId) {
     this.livingStoryId = livingStoryId;
   }

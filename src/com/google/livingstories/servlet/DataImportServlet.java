@@ -25,7 +25,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.server.AngleEntity;
 import com.google.livingstories.server.BaseAtomEntityImpl;
-import com.google.livingstories.server.HasSerializableLspId;
+import com.google.livingstories.server.HasSerializableLivingStoryId;
 import com.google.livingstories.server.JSONSerializable;
 import com.google.livingstories.server.LivingStoryEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
@@ -81,8 +81,8 @@ public class DataImportServlet extends HttpServlet {
       Pattern.compile("(showSourcePopup\\()[\"'].+?[\"'],\\s*(\\d+)");
   private static final Pattern atomIdPattern = Pattern.compile("(atomid=\")(\\d+)");
   
-  public static List<Class<? extends HasSerializableLspId>> EXPORTED_ENTITY_CLASSES = 
-    ImmutableList.<Class<? extends HasSerializableLspId>>of(
+  public static List<Class<? extends HasSerializableLivingStoryId>> EXPORTED_ENTITY_CLASSES = 
+    ImmutableList.<Class<? extends HasSerializableLivingStoryId>>of(
         LivingStoryEntity.class,
         AngleEntity.class,
         BaseAtomEntityImpl.class);
@@ -117,7 +117,7 @@ public class DataImportServlet extends HttpServlet {
   private static Map<Integer, List<JSONSerializable>> shardedEntities;
   private static List<Function<Void, Boolean>> workQueue;
 
-  private static Map<String, LivingStoryEntity> lspMap;
+  private static Map<String, LivingStoryEntity> livingStoryMap;
   private static Map<String, AngleEntity> angleMap;
   private static Map<String, BaseAtomEntityImpl> contentMap;
 
@@ -194,21 +194,21 @@ public class DataImportServlet extends HttpServlet {
       shardedEntities.put(i, Lists.<JSONSerializable>newArrayList());
     }
     
-    lspMap = Maps.newHashMap();
+    livingStoryMap = Maps.newHashMap();
     angleMap = Maps.newHashMap();
     contentMap = Maps.newHashMap();
 
     workQueue = Lists.newArrayList();
     workQueue.add(new DeleteAllDataFunction());
     workQueue.add(new CreateEntitiesFunction<LivingStoryEntity>(
-        LivingStoryEntity.class, lspMap));
+        LivingStoryEntity.class, livingStoryMap));
     workQueue.add(new CreateEntitiesFunction<AngleEntity>(AngleEntity.class, angleMap));
     workQueue.add(new CreateEntitiesFunction<BaseAtomEntityImpl>(
         BaseAtomEntityImpl.class, contentMap));
     workQueue.add(new MapIdsFunction());
     workQueue.add(new MapAtomIdsFunction());
     workQueue.add(new MapAtomInlineIdsFunction());
-    workQueue.add(new MapLspInlineIdsFunction());
+    workQueue.add(new MapLivingStoryInlineIdsFunction());
     workQueue.add(new ClosePMsFuction());
     workQueue.add(new RemoveUnusedContributorsFunction());
   }
@@ -230,7 +230,7 @@ public class DataImportServlet extends HttpServlet {
     shardedEntities = null;
     inputData = null;
     workQueue = null;
-    lspMap = null;
+    livingStoryMap = null;
     angleMap = null;
     contentMap = null;
   }
@@ -298,7 +298,7 @@ public class DataImportServlet extends HttpServlet {
         try {
           json = inputData.getJSONArray(entityClass.getSimpleName());  
         } catch (JSONException allowable) {
-          // if the export was for LSP-specific data, some entity classes won't be mentioned.
+          // if the export was for story-specific data, some entity classes won't be mentioned.
           return false;
         }
         for (int i = startValue; i < json.length(); i++) {
@@ -344,7 +344,7 @@ public class DataImportServlet extends HttpServlet {
       message = "Mapping IDs";
 
       for (AngleEntity angle : angleMap.values()) {
-        angle.setLspId(lspMap.get(angle.getLspId().toString()).getId());
+        angle.setLivingStoryId(livingStoryMap.get(angle.getLivingStoryId().toString()).getId());
       }
       return false;
     }
@@ -368,9 +368,9 @@ public class DataImportServlet extends HttpServlet {
         BaseAtomEntityImpl content = iter.next();
         // Living Story ids
         if (content.getLivingStoryId() != null) {
-          LivingStoryEntity lsp = lspMap.get(content.getLivingStoryId().toString());
-          if (lsp != null) {
-            content.setLivingStoryId(lsp.getId());
+          LivingStoryEntity livingStory = livingStoryMap.get(content.getLivingStoryId().toString());
+          if (livingStory != null) {
+            content.setLivingStoryId(livingStory.getId());
           }
         }
         
@@ -463,14 +463,14 @@ public class DataImportServlet extends HttpServlet {
   }
 
   /**
-   * Maps atom ids in inline links in the lsp summary to the right values. 
+   * Maps atom ids in inline links in the story summary to the right values. 
    */
-  private class MapLspInlineIdsFunction implements Function<Void, Boolean> {
+  private class MapLivingStoryInlineIdsFunction implements Function<Void, Boolean> {
     public Boolean apply(Void ignore) {
-      message = "Mapping lsp inline IDs";
+      message = "Mapping living story inline IDs";
 
-      for (LivingStoryEntity lsp : lspMap.values()) {
-        for (LivingStoryEntity.Summary revision : lsp.getAllSummaryRevisions()) {
+      for (LivingStoryEntity livingStory : livingStoryMap.values()) {
+        for (LivingStoryEntity.Summary revision : livingStory.getAllSummaryRevisions()) {
           revision.setContent(matchAll(revision.getContent()));
         }
       }

@@ -82,96 +82,99 @@ public class Caches {
   /** Living story cache methods */
 
   public static List<LivingStory> getLivingStories() {
-    return get(getLspCacheKey());
+    return get(getLivingStoryCacheKey());
   }
 
-  public static synchronized void setLivingStories(List<LivingStory> lsps) {
-    put(getLspCacheKey(), lsps);
+  public static synchronized void setLivingStories(List<LivingStory> livingStorys) {
+    put(getLivingStoryCacheKey(), livingStorys);
   }
 
   public static void clearLivingStories() {
-    remove(getLspCacheKey());
+    remove(getLivingStoryCacheKey());
   }
 
-  private static String getLspCacheKey() {
+  private static String getLivingStoryCacheKey() {
     return "allLivingStories";
   }
 
 
-  /** Atoms for lsp cache methods **/
+  /** Atoms for livingStory cache methods **/
 
-  public static List<BaseAtom> getLspAtoms(Long lspId, boolean onlyPublished) {
-    return get(getLspAtomsCacheKey(lspId, onlyPublished));
+  public static List<BaseAtom> getLivingStoryAtoms(Long livingStoryId, boolean onlyPublished) {
+    return get(getLivingStoryAtomsCacheKey(livingStoryId, onlyPublished));
   }
 
-  public static void setLspAtoms(Long lspId, boolean onlyPublished, List<BaseAtom> lspAtoms) {
-    put(getLspAtomsCacheKey(lspId, onlyPublished), lspAtoms);
+  public static void setLivingStoryAtoms(
+      Long livingStoryId, boolean onlyPublished, List<BaseAtom> livingStoryAtoms) {
+    put(getLivingStoryAtomsCacheKey(livingStoryId, onlyPublished), livingStoryAtoms);
   }
 
-  public static void clearLspAtoms(Long lspId) {
-    remove(getLspAtomsCacheKey(lspId, true));
-    remove(getLspAtomsCacheKey(lspId, false));
-    remove(getDisplayAtomBundleCacheKey(lspId));
-    remove(getContributorsForLspCacheKey(lspId));
-    // also, in case any non-LSP-specific information was changed here; e.g., authorship
+  public static void clearLivingStoryAtoms(Long livingStoryId) {
+    remove(getLivingStoryAtomsCacheKey(livingStoryId, true));
+    remove(getLivingStoryAtomsCacheKey(livingStoryId, false));
+    remove(getDisplayAtomBundleCacheKey(livingStoryId));
+    remove(getContributorsForLivingStoryCacheKey(livingStoryId));
+    // also, in case any non-living-story-specific information was changed here; e.g., authorship
     remove(getDisplayAtomBundleCacheKey(null));
   }
 
-  private static String getLspAtomsCacheKey(Long lspId, boolean onlyPublished) {
-    return "lspAtoms:" + String.valueOf(lspId) + ":" + String.valueOf(onlyPublished);
+  private static String getLivingStoryAtomsCacheKey(Long livingStoryId, boolean onlyPublished) {
+    return "livingStoryAtoms:" + livingStoryId + ":" + onlyPublished;
   }
 
 
   /** Theme cache methods **/
 
-  public static List<Theme> getLspThemes(Long lspId) {
-    return get(getLspThemesCacheKey(lspId));
+  public static List<Theme> getLivingStoryThemes(Long livingStoryId) {
+    return get(getLivingStoryThemesCacheKey(livingStoryId));
   }
 
-  public static void setLspThemes(Long lspId, List<Theme> lspThemes) {
-    put(getLspThemesCacheKey(lspId), lspThemes);
+  public static void setLivingStoryThemes(Long livingStoryId, List<Theme> livingStoryThemes) {
+    put(getLivingStoryThemesCacheKey(livingStoryId), livingStoryThemes);
   }
 
-  public static void clearLspThemes(Long lspId) {
-    remove(getLspThemesCacheKey(lspId));
+  public static void clearLivingStoryThemes(Long livingStoryId) {
+    remove(getLivingStoryThemesCacheKey(livingStoryId));
   }
 
-  private static String getLspThemesCacheKey(Long lspId) {
-    return "angles:" + String.valueOf(lspId);
+  private static String getLivingStoryThemesCacheKey(Long livingStoryId) {
+    return "angles:" + String.valueOf(livingStoryId);
   }
 
-  public static Map<Long, AtomTypesBundle> getLspThemeInfo(Long lspId) {
-    return get(getLspThemeInfoCacheKey(lspId));
+  public static Map<Long, AtomTypesBundle> getLivingStoryThemeInfo(Long livingStoryId) {
+    return get(getLivingStoryThemeInfoCacheKey(livingStoryId));
   }
   
-  public static void setLspThemeInfo(Long lspId, Map<Long, AtomTypesBundle> themeInfo) {
-    put(getLspThemeInfoCacheKey(lspId), themeInfo);
+  public static void setLivingStoryThemeInfo(
+      Long livingStoryId, Map<Long, AtomTypesBundle> themeInfo) {
+    put(getLivingStoryThemeInfoCacheKey(livingStoryId), themeInfo);
   }
   
-  public static void clearLspThemeInfo(Long lspId) {
-    remove(getLspThemeInfoCacheKey(lspId));
+  public static void clearLivingStoryThemeInfo(Long livingStoryId) {
+    remove(getLivingStoryThemeInfoCacheKey(livingStoryId));
   }
 
-  private static String getLspThemeInfoCacheKey(Long lspId) {
-    return "angleinfo:" + String.valueOf(lspId);
+  private static String getLivingStoryThemeInfoCacheKey(Long livingStoryId) {
+    return "angleinfo:" + String.valueOf(livingStoryId);
   }
   
   /** Contributor cache methods **/
   
-  public static Map<Long, PlayerAtom> getContributorsForLsp(Long lspId) {
-    return get(getContributorsForLspCacheKey(lspId));
+  public static Map<Long, PlayerAtom> getContributorsForLivingStory(Long livingStoryId) {
+    return get(getContributorsForLivingStoryCacheKey(livingStoryId));
   }
   
-  public static void setContributorsForLsp(Long lspId, Map<Long, PlayerAtom> contributors) {
-    put(getContributorsForLspCacheKey(lspId), contributors);
+  public static void setContributorsForLivingStory(
+      Long livingStoryId, Map<Long, PlayerAtom> contributors) {
+    put(getContributorsForLivingStoryCacheKey(livingStoryId), contributors);
   }
   
-  public static void clearContributorsForLsp(Long lspId) {
-    remove(getContributorsForLspCacheKey(lspId));
+  public static void clearContributorsForLivingStory(Long livingStoryId) {
+    remove(getContributorsForLivingStoryCacheKey(livingStoryId));
   }
   
-  private static String getContributorsForLspCacheKey(Long lspId) {
-    return "contributors:" + lspId;
+  private static String getContributorsForLivingStoryCacheKey(Long livingStoryId) {
+    return "contributors:" + livingStoryId;
   }
   
   /** Display Atom Bundle cache methods **/
@@ -199,8 +202,8 @@ public class Caches {
     put(cacheKey, cache);
   }
 
-  public static void clearDisplayAtomBundles(Long lspId) {
-    remove(getDisplayAtomBundleCacheKey(lspId));
+  public static void clearDisplayAtomBundles(Long livingStoryId) {
+    remove(getDisplayAtomBundleCacheKey(livingStoryId));
   }
 
   private static String getDisplayAtomBundleCacheKey(Long livingStoryId) {

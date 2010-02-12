@@ -65,8 +65,8 @@ public class UserRpcImpl extends RemoteServiceServlet implements UserRpcService 
   
   /**
    * Sets the user's subscription status for a living story page.
-   * Assumes that the user is logged in, and that a UserLspEntity exists
-   * for this user/lsp pair.
+   * Assumes that the user is logged in, and that a UserLivingStoryEntity exists
+   * for this user/living-story pair.
    */
   @Override
   public void setSubscribedToEmails(Long livingStoryId, boolean subscribe) {
@@ -80,8 +80,8 @@ public class UserRpcImpl extends RemoteServiceServlet implements UserRpcService 
   
   /**
    * Sets the user's default page view for a living story page.
-   * Assumes that the user is logged in, and that a UserLspEntity exists
-   * for this user/lsp pair.
+   * Assumes that the user is logged in, and that a UserLivingStoryEntity exists
+   * for this user/living-story pair.
    */
   @Override
   public void setDefaultStoryView(FilterSpec defaultStoryView) {

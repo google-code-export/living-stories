@@ -65,7 +65,7 @@ public class LivingStoryPage extends Composite {
   public LivingStoryPage() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    logo.setUrl(Publisher.fromString(LivingStoryData.getLspPublisher()).getLogoPath());
+    logo.setUrl(Publisher.fromString(LivingStoryData.getLivingStoryPublisher()).getLogoPath());
     
     exportMethods();
   }

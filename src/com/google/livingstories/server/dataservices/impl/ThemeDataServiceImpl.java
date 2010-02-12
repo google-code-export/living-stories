@@ -102,8 +102,8 @@ public class ThemeDataServiceImpl implements ThemeDataService {
   public synchronized void deleteThemesForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Query query = pm.newQuery(AngleEntity.class);
-    query.setFilter("lspId == lspIdParam");
-    query.declareParameters("java.lang.Long lspIdParam");
+    query.setFilter("livingStoryId == livingStoryIdParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam");
 
     try {
       @SuppressWarnings("unchecked")
@@ -131,8 +131,8 @@ public class ThemeDataServiceImpl implements ThemeDataService {
   public synchronized List<Theme> retrieveByLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Query query = pm.newQuery(AngleEntity.class);
-    query.setFilter("lspId == lspIdParam");
-    query.declareParameters("java.lang.Long lspIdParam");
+    query.setFilter("livingStoryId == livingStoryIdParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam");
 
     try {
       @SuppressWarnings("unchecked")

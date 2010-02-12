@@ -47,7 +47,7 @@ public class LivingStoryManagementLinks extends ManagementLinks {
     super();
 
     setSubscribeLinkVisibility();
-    rssFeed.setHref("/feeds/" + LivingStoryData.getLspUrl());
+    rssFeed.setHref("/feeds/" + LivingStoryData.getLivingStoryUrl());
   }
 
   @Override
@@ -62,7 +62,7 @@ public class LivingStoryManagementLinks extends ManagementLinks {
   }
   
   public void setSubscribed(final boolean subscribed) {
-    userInfoService.setSubscribedToEmails(LivingStoryData.getLspId(), subscribed,
+    userInfoService.setSubscribedToEmails(LivingStoryData.getLivingStoryId(), subscribed,
         new AsyncCallback<Void>() {
       public void onFailure(Throwable t) {
         // Ignore the error for now, user can just click again.

@@ -22,7 +22,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.NarrativeAtom;
-import com.google.livingstories.client.atomlist.AtomListElement;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.util.GlobalUtil;
 
@@ -34,8 +33,7 @@ import java.util.Map;
  * The stream view for a narrative entity.  Displays the content of the narrative
  * as well as linked content.
  */
-public class NarrativeStreamView extends ContainerStreamView<NarrativeAtom>
-    implements AtomListElement {
+public class NarrativeStreamView extends ContainerStreamView<NarrativeAtom> {
   public NarrativeStreamView(NarrativeAtom narrative,
       Map<AtomType, List<BaseAtom>> linkedAtomsByType) {
     super(narrative, linkedAtomsByType);

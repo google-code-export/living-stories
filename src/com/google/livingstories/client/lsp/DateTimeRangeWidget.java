@@ -16,7 +16,6 @@
 
 package com.google.livingstories.client.lsp;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -34,8 +33,6 @@ public class DateTimeRangeWidget extends Composite {
   private Label dateLabel;
   private Label timeLabel;
 
-  private static final LspMessages msgs = GWT.create(LspMessages.class);
-  
   public DateTimeRangeWidget(Date startDateTime, Date endDateTime) {
     super();
     boolean multiDay = datesFallOnDifferentDays(startDateTime, endDateTime);
@@ -44,7 +41,7 @@ public class DateTimeRangeWidget extends Composite {
     String dateString = DateUtil.formatDate(startDateTime);
     if (multiDay) {
       // endDateTime will be non-null
-      dateString = msgs.dateRange(dateString, DateUtil.formatDate(endDateTime));
+      dateString = LspMessageHolder.msgs.dateRange(dateString, DateUtil.formatDate(endDateTime));
     }
     dateLabel = new Label(dateString);
     dateLabel.setStylePrimaryName("dateLabel");
@@ -56,7 +53,7 @@ public class DateTimeRangeWidget extends Composite {
       String timeString = DateUtil.formatTime(startDateTime);
       
       if (endDateTime != null && !startDateTime.equals(endDateTime)) {
-        timeString = msgs.timeRange(timeString, DateUtil.formatTime(endDateTime));
+        timeString = LspMessageHolder.msgs.timeRange(timeString, DateUtil.formatTime(endDateTime));
       }
 
       timeLabel = new Label(timeString);

@@ -81,14 +81,14 @@ public class OverviewPage extends Page {
   public OverviewPage() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    title.setText(LivingStoryData.getLspTitle());
-    updateCount.load(LivingStoryData.getLspId(), LivingStoryData.getLastVisitDate());
+    title.setText(LivingStoryData.getLivingStoryTitle());
+    updateCount.load(LivingStoryData.getLivingStoryId(), LivingStoryData.getLastVisitDate());
     
     summary.add(new ContentRenderer(LivingStoryData.getSummary(), true, true));
     
     recentEvents.load();
     
-    livingStoryService.getThemeInfoForLsp(LivingStoryData.getLspId(),
+    livingStoryService.getThemeInfoForLivingStory(LivingStoryData.getLivingStoryId(),
         new AsyncCallback<Map<Long, AtomTypesBundle>>() {
           @Override
           public void onFailure(Throwable caught) {}
@@ -115,7 +115,7 @@ public class OverviewPage extends Page {
       if (simpleReversal) {
         atomList.doSimpleReversal(filter.oldestFirst);
       } else {
-        atomService.getDisplayAtomBundle(LivingStoryData.getLspId(), filter, focusedAtomId,
+        atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filter, focusedAtomId,
             null, new AtomCallback(focusedAtomId));
         atomList.clear();
         atomList.setIsImageList(filter.atomType == AtomType.ASSET
@@ -195,7 +195,7 @@ public class OverviewPage extends Page {
         atomList.goToAtom(focusedAtomId);
       }
       finishLoading();
-      comments.loadCommentsBox("LSP:" + LivingStoryData.getLspId());
+      comments.loadCommentsBox("LSP:" + LivingStoryData.getLivingStoryId());
       rightPanel.setVisible(true);
     }
   }
@@ -219,7 +219,7 @@ public class OverviewPage extends Page {
   private void highlightEvent(long atomId, boolean setHistoryToken) {
     boolean finished = atomList.goToAtom(atomId);
     if (!finished) {
-      atomService.getDisplayAtomBundle(LivingStoryData.getLspId(), filterList.getFilter(),
+      atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
           atomId, atomList.getNextDateInSequence(), new AtomCallback(atomId));
     }
     
@@ -233,7 +233,7 @@ public class OverviewPage extends Page {
   }
   
   public void getMoreAtoms() {
-    atomService.getDisplayAtomBundle(LivingStoryData.getLspId(), filterList.getFilter(),
+    atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
         null, atomList.getNextDateInSequence(), new AtomCallback());
     atomList.beginLoading();
   }
@@ -261,7 +261,8 @@ public class OverviewPage extends Page {
           .call(instance);
     }
     $wnd.getCurrentFilterSpec = function() {
-      return instance.@com.google.livingstories.client.lsp.views.OverviewPage::getCurrentFilterSpec()
+      return instance.
+          @com.google.livingstories.client.lsp.views.OverviewPage::getCurrentFilterSpec()
           .call(instance);
     }
   }-*/;

@@ -17,7 +17,7 @@
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
     xmlns:g="urn:import:com.google.gwt.user.client.ui"
-    xmlns:lsp="urn:import:com.google.livingstories.client.ui"
+    xmlns:ls="urn:import:com.google.livingstories.client.ui"
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
@@ -32,7 +32,7 @@
     
   <g:HorizontalPanel spacing="10">
     <g:VerticalPanel>
-      <lsp:CoordinatedLspSelector ui:field="lspSelector" visibleItemCount="15"/>
+      <ls:CoordinatedLivingStorySelector ui:field="livingStorySelector" visibleItemCount="15"/>
       <g:Button ui:field="createButton"><ui:msg description="Button label">Create</ui:msg></g:Button>
     </g:VerticalPanel>
     <g:DeckPanel ui:field="contentPanel">
@@ -42,7 +42,7 @@
       <g:HTMLPanel>
         <div>
           <div>
-            <ui:msg description="label for a field">Id:</ui:msg> <g:InlineLabel ui:field="lspIdLabel"/>
+            <ui:msg description="label for a field">Id:</ui:msg> <g:InlineLabel ui:field="livingStoryIdLabel"/>
           </div>
           <table>
             <tr>
@@ -57,10 +57,10 @@
             </tr>
             <tr>
               <td><ui:msg description="label for a field">Publisher:</ui:msg></td>
-              <td><lsp:EnumDropdown ui:field="publisherSelector"/></td>
+              <td><ls:EnumDropdown ui:field="publisherSelector"/></td>
             </tr>
           </table>
-          <lsp:RichTextEditor ui:field="summaryEditor"/>
+          <ls:RichTextEditor ui:field="summaryEditor"/>
           <div>
             <ui:msg description="label for a field">Publish Status:</ui:msg> <g:InlineLabel ui:field="publishStateLabel"/>
           </div>

@@ -33,13 +33,13 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Class to model the data stored for a particular LSP for a particular user.
- * Currently, this data consists of only the time that the user last visited the LSP.
+ * Class to model the data stored for a particular Living Story for a particular user.
+ * Currently, this data consists of only the time that the user last visited the Living Story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class UserLspEntity implements Serializable, JSONSerializable {
+public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   
-  // This primary key is needed for the persistence to work. The lspId can't be used as
+  // This primary key is needed for the persistence to work. The livingStoryId can't be used as
   // the primary key for this class because a Long primary key can only be auto-generated,
   // not manually set.
   @PrimaryKey
@@ -47,7 +47,7 @@ public class UserLspEntity implements Serializable, JSONSerializable {
   private Key id;
   
   @Persistent
-  private Long lspId;
+  private Long livingStoryId;
   
   @Persistent
   private boolean subscribedToEmails = false;
@@ -58,8 +58,8 @@ public class UserLspEntity implements Serializable, JSONSerializable {
   @Persistent
   private Integer visitCount;
   
-  public UserLspEntity(Long lspId, Date lastVisitedTime) {
-    this.lspId = lspId;
+  public UserLivingStoryEntity(Long livingStoryId, Date lastVisitedTime) {
+    this.livingStoryId = livingStoryId;
     this.lastVisitedTime = lastVisitedTime;
     this.visitCount = 1;
   }
@@ -68,12 +68,12 @@ public class UserLspEntity implements Serializable, JSONSerializable {
     return id;
   }
   
-  public Long getLspId() {
-    return lspId;
+  public Long getLivingStoryId() {
+    return livingStoryId;
   }
   
-  public void setLspId(Long lspId) {
-    this.lspId = lspId;
+  public void setLivingStoryId(Long livingStoryId) {
+    this.livingStoryId = livingStoryId;
   }
 
   public boolean isSubscribedToEmails() {
@@ -122,7 +122,7 @@ public class UserLspEntity implements Serializable, JSONSerializable {
     JSONObject object = new JSONObject();
     try {
       object.put("id", id);
-      object.put("lspId", lspId);
+      object.put("livingStoryId", livingStoryId);
       object.put("lastVisitedTime", SimpleDateFormat.getInstance().format(lastVisitedTime));
       object.put("visitCount", visitCount);
       object.put("subscribedToEmails", subscribedToEmails);
@@ -132,10 +132,12 @@ public class UserLspEntity implements Serializable, JSONSerializable {
     return object;
   }
   
-  public static UserLspEntity fromJSON(JSONObject json) {
+  public static UserLivingStoryEntity fromJSON(JSONObject json) {
     try {
-      UserLspEntity entity = new UserLspEntity(json.getLong("lspId"),
+      UserLivingStoryEntity entity = new UserLivingStoryEntity(json.getLong("livingStoryId"),
           SimpleDateFormat.getInstance().parse(json.getString("lastVisitedTime")));
+      // Note: if the JSON that you're importing uses a different naming convention for
+      // the living story id, convert it before processing here.
       if (json.has("visitCount")) {
         entity.setVisitCount(json.getInt("visitCount"));
       }

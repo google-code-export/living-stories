@@ -82,10 +82,10 @@ public class SubscribePopup extends PopupPanel {
       unsubscribe.setVisible(true);
     }
     
-    String lspTitle = LivingStoryData.getLspTitle();
-    title0.setInnerText(lspTitle);
-    title1.setInnerText(lspTitle);
-    title2.setInnerText(lspTitle);
+    String storyTitle = LivingStoryData.getLivingStoryTitle();
+    title0.setInnerText(storyTitle);
+    title1.setInnerText(storyTitle);
+    title2.setInnerText(storyTitle);
     
     username.setInnerText(
         LivingStoryData.getUsername() == null ? "" : LivingStoryData.getUsername());

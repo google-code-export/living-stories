@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Widget that loads a list of atoms based on an lsp id, and has a built-in
+ * Widget that loads a list of atoms based on an living story id, and has a built-in
  * filtering mechanism.
  * The underlying storage for the atoms is a LinkedHashMap. To get incrementally-added items
  * to appear at the top of the list, rather than at the bottom, the order in which items are
@@ -103,10 +103,10 @@ public class AtomListBox extends Composite {
     return type == null || atom.getAtomType().equals(type) || isSelected(atom);
   }
   
-  public void loadItemsForLsp(Long lspId) {
+  public void loadItemsForLivingStory(Long livingStoryId) {
     itemList.setSelectedIndex(-1);
     loadedAtomsMap.clear();
-    atomService.getAtomsForLsp(lspId, false, new AsyncCallback<List<BaseAtom>>() {
+    atomService.getAtomsForLivingStory(livingStoryId, false, new AsyncCallback<List<BaseAtom>>() {
       @Override
       public void onFailure(Throwable caught) {
         itemList.clear();
