@@ -40,6 +40,4 @@ public interface UserRpcServiceAsync {
   void getDefaultStoryView(AsyncCallback<FilterSpec> callback);
 
   void setDefaultStoryView(FilterSpec defaultStoryView, AsyncCallback<Void> callback);
-
-  void isWhitelisted(AsyncCallback<Boolean> callback);
 }
