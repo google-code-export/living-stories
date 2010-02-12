@@ -23,8 +23,6 @@ import java.util.Date;
 
 /**
  * Utility methods to manipulate time.
- *
- * @author nehasingh@google.com
  */
 public class TimeUtil {
   
@@ -33,7 +31,7 @@ public class TimeUtil {
    * right now.
    * This method returns an approximate user-friendly duration. Eg. If 2 months, 12 days and 4 hours
    * have passed, the method will return "2 months ago".
-   * TODO(ipw-eng): the results of this method need to be internationalized
+   * TODO: the results of this method need to be internationalized
    */
   public static String getElapsedTimeString(Date updateCreationTime) {
     Period period = new Period(updateCreationTime.getTime(), new Date().getTime(),
