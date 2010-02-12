@@ -85,8 +85,8 @@ public class Caches {
     return get(getLivingStoryCacheKey());
   }
 
-  public static synchronized void setLivingStories(List<LivingStory> livingStorys) {
-    put(getLivingStoryCacheKey(), livingStorys);
+  public static synchronized void setLivingStories(List<LivingStory> livingStories) {
+    put(getLivingStoryCacheKey(), livingStories);
   }
 
   public static void clearLivingStories() {
