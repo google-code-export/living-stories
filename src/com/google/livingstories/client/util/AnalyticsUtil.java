@@ -25,7 +25,7 @@ public class AnalyticsUtil {
   }
   
   public static void trackThemeClick(String url, String theme) {
-    trackEvent(url, "angleClick", theme);
+    trackEvent(url, "themeClick", theme);
   }
   
   public static void trackFilterClick(String url, String filterName) {

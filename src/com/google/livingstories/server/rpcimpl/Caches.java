@@ -138,7 +138,7 @@ public class Caches {
   }
 
   private static String getLivingStoryThemesCacheKey(Long livingStoryId) {
-    return "angles:" + String.valueOf(livingStoryId);
+    return "themes:" + String.valueOf(livingStoryId);
   }
 
   public static Map<Long, AtomTypesBundle> getLivingStoryThemeInfo(Long livingStoryId) {
@@ -155,7 +155,7 @@ public class Caches {
   }
 
   private static String getLivingStoryThemeInfoCacheKey(Long livingStoryId) {
-    return "angleinfo:" + String.valueOf(livingStoryId);
+    return "themeinfo:" + String.valueOf(livingStoryId);
   }
   
   /** Contributor cache methods **/

@@ -17,7 +17,7 @@
 package com.google.livingstories.server.dataservices.impl;
 
 import com.google.livingstories.client.Theme;
-import com.google.livingstories.server.AngleEntity;
+import com.google.livingstories.server.ThemeEntity;
 import com.google.livingstories.server.dataservices.ThemeDataService;
 
 import java.util.ArrayList;
@@ -64,11 +64,11 @@ public class ThemeDataServiceImpl implements ThemeDataService {
     Transaction tx = null;
     
     try {
-      AngleEntity entity = null;
+      ThemeEntity entity = null;
       if (id == null) {
-        entity = new AngleEntity(name, livingStoryId);
+        entity = new ThemeEntity(name, livingStoryId);
       } else {
-        entity = pm.getObjectById(AngleEntity.class, id);
+        entity = pm.getObjectById(ThemeEntity.class, id);
         entity.setName(name);
       }
       tx = pm.currentTransaction();
@@ -91,8 +91,8 @@ public class ThemeDataServiceImpl implements ThemeDataService {
     // Then delete the entity from the database
     PersistenceManager pm = PMF.get().getPersistenceManager();
     try {
-      AngleEntity angleEntity = pm.getObjectById(AngleEntity.class, id);
-      pm.deletePersistent(angleEntity);
+      ThemeEntity themeEntity = pm.getObjectById(ThemeEntity.class, id);
+      pm.deletePersistent(themeEntity);
     } finally {
       pm.close();
     }
@@ -101,13 +101,13 @@ public class ThemeDataServiceImpl implements ThemeDataService {
   @Override
   public synchronized void deleteThemesForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(AngleEntity.class);
+    Query query = pm.newQuery(ThemeEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam");
     query.declareParameters("java.lang.Long livingStoryIdParam");
 
     try {
       @SuppressWarnings("unchecked")
-      List<AngleEntity> entities = (List<AngleEntity>) query.execute(livingStoryId);
+      List<ThemeEntity> entities = (List<ThemeEntity>) query.execute(livingStoryId);
       pm.deletePersistentAll(entities);
     } finally {
       query.closeAll();
@@ -119,7 +119,7 @@ public class ThemeDataServiceImpl implements ThemeDataService {
   public synchronized Theme retrieveById(Long id) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     try {
-      return pm.getObjectById(AngleEntity.class, id).toClientObject();
+      return pm.getObjectById(ThemeEntity.class, id).toClientObject();
     } catch (JDOObjectNotFoundException notFound) {
       return null;
     } finally {
@@ -130,15 +130,15 @@ public class ThemeDataServiceImpl implements ThemeDataService {
   @Override
   public synchronized List<Theme> retrieveByLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(AngleEntity.class);
+    Query query = pm.newQuery(ThemeEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam");
     query.declareParameters("java.lang.Long livingStoryIdParam");
 
     try {
       @SuppressWarnings("unchecked")
-      List<AngleEntity> entities = (List<AngleEntity>) query.execute(livingStoryId);
+      List<ThemeEntity> entities = (List<ThemeEntity>) query.execute(livingStoryId);
       List<Theme> results = new ArrayList<Theme>();
-      for (AngleEntity entity : entities) {
+      for (ThemeEntity entity : entities) {
         results.add(entity.toClientObject());
       }
       return results;

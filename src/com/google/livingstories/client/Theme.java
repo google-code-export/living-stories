@@ -19,7 +19,7 @@ package com.google.livingstories.client;
 import java.io.Serializable;
 
 /**
- * This is the client version of a {@link com.google.livingstories.server.AngleEntity}.
+ * This is the client version of a {@link com.google.livingstories.server.ThemeEntity}.
  * The {@link ContentRpcService} converts Themes to
  * and from this class which is used by the client.
  */

@@ -16,10 +16,10 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.livingstories.server.AngleEntity;
 import com.google.livingstories.server.BaseAtomEntityImpl;
 import com.google.livingstories.server.JSONSerializable;
 import com.google.livingstories.server.LivingStoryEntity;
+import com.google.livingstories.server.ThemeEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 
 import org.json.JSONArray;
@@ -51,7 +51,7 @@ public class DataExportServlet extends HttpServlet {
       
       // Write the json for living story entities and theme entities first
       addJSON(result, LivingStoryEntity.class, pm);
-      addJSON(result, AngleEntity.class, pm);
+      addJSON(result, ThemeEntity.class, pm);
       
       // Then write the json for content entities without living stories followed by content
       // entities with living stories
