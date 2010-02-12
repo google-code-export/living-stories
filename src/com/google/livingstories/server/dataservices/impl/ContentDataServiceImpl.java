@@ -21,7 +21,7 @@ import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.server.BaseAtomEntityImpl;
+import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.dataservices.ContentDataService;
 
 import java.util.ArrayList;
@@ -44,13 +44,13 @@ public class ContentDataServiceImpl implements ContentDataService {
   public synchronized BaseAtom save(BaseAtom baseContent) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Transaction tx = null;
-    BaseAtomEntityImpl contentEntity;
+    BaseContentEntity contentEntity;
 
     try {
       if (baseContent.getId() == null) {
-        contentEntity = BaseAtomEntityImpl.fromClientObject(baseContent);
+        contentEntity = BaseContentEntity.fromClientObject(baseContent);
       } else {
-        contentEntity = pm.getObjectById(BaseAtomEntityImpl.class, baseContent.getId());
+        contentEntity = pm.getObjectById(BaseContentEntity.class, baseContent.getId());
         contentEntity.copyFields(baseContent);
       }
       tx = pm.currentTransaction();
@@ -71,11 +71,11 @@ public class ContentDataServiceImpl implements ContentDataService {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
-      BaseAtomEntityImpl contentEntity = pm.getObjectById(BaseAtomEntityImpl.class, id);
+      BaseContentEntity contentEntity = pm.getObjectById(BaseContentEntity.class, id);
       // First remove the object being deleted from the linked fields of other objects
       updateAtomReferencesHelper(pm, "linkedAtomIds", id,
-          new Function<BaseAtomEntityImpl, Void>() {
-            public Void apply(BaseAtomEntityImpl atom) { 
+          new Function<BaseContentEntity, Void>() {
+            public Void apply(BaseContentEntity atom) { 
               atom.removeLinkedAtomId(id); 
               return null;
             }
@@ -83,8 +83,8 @@ public class ContentDataServiceImpl implements ContentDataService {
       // If deleting a player, remove it from contributorIds of other objects that may contain it
       if (contentEntity.getAtomType() == AtomType.PLAYER) {
         updateAtomReferencesHelper(pm, "contributorIds", id,
-            new Function<BaseAtomEntityImpl, Void>() {
-              public Void apply(BaseAtomEntityImpl atom) {
+            new Function<BaseContentEntity, Void>() {
+              public Void apply(BaseContentEntity atom) {
                 atom.removeContributorId(id); 
                 return null;
               }
@@ -104,14 +104,14 @@ public class ContentDataServiceImpl implements ContentDataService {
    * @param id the id of the to-be-deleted atom
    */
   private void updateAtomReferencesHelper(PersistenceManager pm, String relevantField, Long id,
-      Function<BaseAtomEntityImpl, Void> removeFunc) {
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+      Function<BaseContentEntity, Void> removeFunc) {
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter(relevantField + " == atomIdParam");
     query.declareParameters("java.lang.Long atomIdParam");
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(id);
-      for (BaseAtomEntityImpl atom : results) {
+      List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(id);
+      for (BaseContentEntity atom : results) {
         removeFunc.apply(atom);
       }
       pm.makePersistentAll(results);
@@ -123,13 +123,13 @@ public class ContentDataServiceImpl implements ContentDataService {
   @Override
   public synchronized void deleteContentForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam");
     query.declareParameters("java.lang.Long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
+      List<BaseContentEntity> entities = (List<BaseContentEntity>) query.execute(livingStoryId);
       pm.deletePersistentAll(entities);
     } finally {
       query.closeAll();
@@ -140,7 +140,7 @@ public class ContentDataServiceImpl implements ContentDataService {
   @Override
   public synchronized void removeTheme(Long themeId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     // Checks to see if the collection has angleIdParam in angleIds somewhere, not
     // strictly for equality:
     query.setFilter("angleIds == angleIdParam");
@@ -148,8 +148,8 @@ public class ContentDataServiceImpl implements ContentDataService {
     
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(themeId);
-      for (BaseAtomEntityImpl contentEntity : results) {
+      List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(themeId);
+      for (BaseContentEntity contentEntity : results) {
         contentEntity.removeThemeId(themeId);
       }
       pm.makePersistentAll(results);
@@ -166,7 +166,7 @@ public class ContentDataServiceImpl implements ContentDataService {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     try {
-      BaseAtom content = pm.getObjectById(BaseAtomEntityImpl.class, id).toClientObject();
+      BaseAtom content = pm.getObjectById(BaseContentEntity.class, id).toClientObject();
       if (populateLinkedEntities) {
         content.setLinkedAtoms(retrieveByIds(content.getLinkedAtomIds()));
       }
@@ -187,7 +187,7 @@ public class ContentDataServiceImpl implements ContentDataService {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     List<Object> oids = new ArrayList<Object>(ids.size());
     for (Long id : ids) {
-      oids.add(pm.newObjectIdInstance(BaseAtomEntityImpl.class, id));
+      oids.add(pm.newObjectIdInstance(BaseContentEntity.class, id));
     }
     
     try {
@@ -195,7 +195,7 @@ public class ContentDataServiceImpl implements ContentDataService {
       Collection contentEntities = pm.getObjectsById(oids);
       List<BaseAtom> results = new ArrayList<BaseAtom>(contentEntities.size());
       for (Object contentEntity : contentEntities) {
-        results.add(((BaseAtomEntityImpl)contentEntity).toClientObject());
+        results.add(((BaseContentEntity)contentEntity).toClientObject());
       }
       return results;
     } finally {
@@ -207,7 +207,7 @@ public class ContentDataServiceImpl implements ContentDataService {
   public synchronized List<BaseAtom> retrieveByLivingStory(Long livingStoryId, 
       PublishState publishState) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam"
         + (publishState == null ? "" : " && publishState == '" + publishState.name() + "'"));
     query.setOrdering("timestamp desc");
@@ -218,7 +218,7 @@ public class ContentDataServiceImpl implements ContentDataService {
   @Override
   public synchronized List<BaseAtom> retrieveEntitiesContributedBy(Long contributorId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("contributorIds == entityIdParam"
         + " && publishState == '" + PublishState.PUBLISHED.name() + "'");
     query.setOrdering("timestamp desc");
@@ -229,7 +229,7 @@ public class ContentDataServiceImpl implements ContentDataService {
   @Override
   public synchronized List<BaseAtom> retrieveEntitiesThatLinkTo(Long entityId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("linkedAtomIds == entityIdParam"
         + " && publishState == '" + PublishState.PUBLISHED.name() + "'");
     query.setOrdering("timestamp desc");
@@ -241,9 +241,9 @@ public class ContentDataServiceImpl implements ContentDataService {
     try {
       List<BaseAtom> contentList = new ArrayList<BaseAtom>();
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> contentEntities = (List<BaseAtomEntityImpl>) query.execute(
+      List<BaseContentEntity> contentEntities = (List<BaseContentEntity>) query.execute(
           param);
-      for (BaseAtomEntityImpl contentEntity : contentEntities) {
+      for (BaseContentEntity contentEntity : contentEntities) {
         BaseAtom content = contentEntity.toClientObject();
         contentList.add(content);
       }
@@ -276,17 +276,17 @@ public class ContentDataServiceImpl implements ContentDataService {
   
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter(queryFilters.toString());
     query.declareParameters("java.util.Date afterDateParam, java.util.Date beforeDateParam");
     query.setOrdering("timestamp desc");
 
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> contentEntities = (List<BaseAtomEntityImpl>) query.execute(afterDate,
+      List<BaseContentEntity> contentEntities = (List<BaseContentEntity>) query.execute(afterDate,
           beforeDate);
       List<BaseAtom> contentList = new ArrayList<BaseAtom>();
-      for (BaseAtomEntityImpl contentEntity : contentEntities) {
+      for (BaseContentEntity contentEntity : contentEntities) {
         BaseAtom content = contentEntity.toClientObject();
         contentList.add(content);
       }
@@ -304,7 +304,7 @@ public class ContentDataServiceImpl implements ContentDataService {
       throw new IllegalArgumentException("Arguments cannot be null.");
     }
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& publishState == '" + PublishState.PUBLISHED.name() + "' " +
         "&& atomType == '" + entityType.name() + "' " +

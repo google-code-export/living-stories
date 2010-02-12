@@ -39,7 +39,7 @@ import com.google.livingstories.client.contentmanager.SearchTerms;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.JavaNodeAdapter;
-import com.google.livingstories.server.BaseAtomEntityImpl;
+import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.LivingStoryEntity;
 import com.google.livingstories.server.UserLivingStoryEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
@@ -66,8 +66,8 @@ import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Implementation of the RPC service that is used for reading and writing {@link BaseAtomEntityImpl}
- * objects to the AppEngine datastore. This service converts the {@link BaseAtomEntityImpl} data
+ * Implementation of the RPC service that is used for reading and writing {@link BaseContentEntity}
+ * objects to the AppEngine datastore. This service converts the {@link BaseContentEntity} data
  * objects to {@link BaseAtom} for the client use.
  */
 public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcService {
@@ -105,18 +105,18 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Transaction tx = null;
-    BaseAtomEntityImpl atomEntity;
+    BaseContentEntity atomEntity;
     PublishState oldPublishState = null;
     
     Set<Long> newLinkedAtomSuggestions = null;
     
     try {
       if (clientAtom.getId() != null) {
-        atomEntity = pm.getObjectById(BaseAtomEntityImpl.class, clientAtom.getId());
+        atomEntity = pm.getObjectById(BaseContentEntity.class, clientAtom.getId());
         oldPublishState = atomEntity.getPublishState();
         atomEntity.copyFields(clientAtom);
       } else {
-        atomEntity = BaseAtomEntityImpl.fromClientObject(clientAtom);
+        atomEntity = BaseContentEntity.fromClientObject(clientAtom);
       }
       
       if (runAutoLink) {
@@ -140,12 +140,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
           && !linkedAtomIds.isEmpty()) {
         List<Object> oids = new ArrayList<Object>(linkedAtomIds.size());
         for (Long id : linkedAtomIds) {
-          oids.add(pm.newObjectIdInstance(BaseAtomEntityImpl.class, id));
+          oids.add(pm.newObjectIdInstance(BaseContentEntity.class, id));
         }
 
         @SuppressWarnings("unchecked")
-        Collection<BaseAtomEntityImpl> linkedAtoms = pm.getObjectsById(oids);
-        for (BaseAtomEntityImpl linkedAtom : linkedAtoms) {
+        Collection<BaseContentEntity> linkedAtoms = pm.getObjectsById(oids);
+        for (BaseContentEntity linkedAtom : linkedAtoms) {
           if (linkedAtom.getAtomType() == AtomType.NARRATIVE) {
             linkedAtom.setIsStandalone(false);
           }
@@ -189,20 +189,20 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   private List<PlayerAtom> getPlayers(Long livingStoryId) {
-    List<BaseAtomEntityImpl> playerEntities =
+    List<BaseContentEntity> playerEntities =
         getPublishedAtomsByType(livingStoryId, AtomType.PLAYER);
     List<PlayerAtom> playerAtoms = Lists.newArrayList();
-    for (BaseAtomEntityImpl playerEntity : playerEntities) {
+    for (BaseContentEntity playerEntity : playerEntities) {
       playerAtoms.add((PlayerAtom)(playerEntity.toClientObject()));
     }
     return playerAtoms;
   }
   
   private List<BackgroundAtom> getConcepts(Long livingStoryId) {
-    List<BaseAtomEntityImpl> backgroundEntities = 
+    List<BaseContentEntity> backgroundEntities = 
         getPublishedAtomsByType(livingStoryId, AtomType.BACKGROUND);
     List<BackgroundAtom> backgroundAtoms = Lists.newArrayList();
-    for (BaseAtomEntityImpl backgroundEntity : backgroundEntities) {
+    for (BaseContentEntity backgroundEntity : backgroundEntities) {
       if (!GlobalUtil.isContentEmpty(backgroundEntity.getName())) {
         backgroundAtoms.add((BackgroundAtom)(backgroundEntity.toClientObject()));
       }
@@ -210,10 +210,10 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     return backgroundAtoms;
   }
   
-  private List<BaseAtomEntityImpl> getPublishedAtomsByType(Long livingStoryId, AtomType atomType) {
+  private List<BaseContentEntity> getPublishedAtomsByType(Long livingStoryId, AtomType atomType) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
-    Query query = pm.newQuery(BaseAtomEntityImpl.class); 
+    Query query = pm.newQuery(BaseContentEntity.class); 
     query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED " +
         "&& atomType == '" + atomType.name() + "'");
@@ -221,7 +221,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
+      List<BaseContentEntity> entities = (List<BaseContentEntity>) query.execute(livingStoryId);
       pm.retrieveAll(entities);
       return entities;
     } finally {
@@ -312,7 +312,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     }
  
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam"
         + (onlyPublished ? "&& publishState == '" + PublishState.PUBLISHED.name() + "'" : ""));
     query.setOrdering("timestamp desc");
@@ -322,8 +322,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       List<BaseAtom> clientAtoms = new ArrayList<BaseAtom>();
       
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
-      for (BaseAtomEntityImpl result : results) {
+      List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(livingStoryId);
+      for (BaseContentEntity result : results) {
         BaseAtom atom = result.toClientObject();
         clientAtoms.add(atom);
       }
@@ -522,7 +522,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     try {
-      BaseAtom atom = pm.getObjectById(BaseAtomEntityImpl.class, id).toClientObject();
+      BaseAtom atom = pm.getObjectById(BaseContentEntity.class, id).toClientObject();
       if (getLinkedAtoms) {
         atom.setLinkedAtoms(getAtoms(atom.getLinkedAtomIds()));
       }
@@ -544,14 +544,14 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     PersistenceManager pm = PMF.get().getPersistenceManager();
     List<Object> oids = new ArrayList<Object>(ids.size());
     for (Long id : ids) {
-      oids.add(pm.newObjectIdInstance(BaseAtomEntityImpl.class, id));
+      oids.add(pm.newObjectIdInstance(BaseContentEntity.class, id));
     }
     
     try {
       Collection results = pm.getObjectsById(oids);
       List<BaseAtom> atoms = new ArrayList<BaseAtom>(results.size());
       for (Object result : results) {
-        atoms.add(((BaseAtomEntityImpl)result).toClientObject());
+        atoms.add(((BaseContentEntity)result).toClientObject());
       }
       return atoms;
     } finally {
@@ -577,7 +577,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     String atomIdClause =
       byContribution ? "contributorIds == atomIdParam" : "linkedAtomIds == atomIdParam";
     query.setFilter(atomIdClause
@@ -589,8 +589,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       List<BaseAtom> relevantAtoms = new ArrayList<BaseAtom>();
       
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> atomEntities = (List<BaseAtomEntityImpl>) query.execute(atomId);
-      for (BaseAtomEntityImpl atomEntity : atomEntities) {
+      List<BaseContentEntity> atomEntities = (List<BaseContentEntity>) query.execute(atomId);
+      for (BaseContentEntity atomEntity : atomEntities) {
         BaseAtom atom = atomEntity.toClientObject();
         if (cutoff == null || !atom.getDateSortKey().after(cutoff)) {
           relevantAtoms.add(atom);
@@ -631,7 +631,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   public List<BaseAtom> executeSearch(SearchTerms searchTerms) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     
     StringBuilder queryFilters = new StringBuilder(
         "livingStoryId == " + String.valueOf(searchTerms.livingStoryId)
@@ -672,9 +672,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       List<BaseAtom> clientAtoms = new ArrayList<BaseAtom>();
       
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results =
-          (List<BaseAtomEntityImpl>) query.execute(searchTerms.beforeDate, searchTerms.afterDate);
-      for (BaseAtomEntityImpl result : results) {
+      List<BaseContentEntity> results =
+          (List<BaseContentEntity>) query.execute(searchTerms.beforeDate, searchTerms.afterDate);
+      for (BaseContentEntity result : results) {
         BaseAtom atom = result.toClientObject();
         clientAtoms.add(atom);
       }
@@ -692,11 +692,11 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
-      BaseAtomEntityImpl atomEntity = pm.getObjectById(BaseAtomEntityImpl.class, id);
+      BaseContentEntity atomEntity = pm.getObjectById(BaseContentEntity.class, id);
 
       updateAtomReferencesHelper(pm, "linkedAtomIds", id,
-          new Function<BaseAtomEntityImpl, Void>() {
-            public Void apply(BaseAtomEntityImpl atom) { 
+          new Function<BaseContentEntity, Void>() {
+            public Void apply(BaseContentEntity atom) { 
               atom.removeLinkedAtomId(id); return null;
             }
           });
@@ -704,8 +704,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       // If deleting a contributor as well, update relevant contributor ids too.
       if (atomEntity.getAtomType() == AtomType.PLAYER) {
         updateAtomReferencesHelper(pm, "contributorIds", id,
-            new Function<BaseAtomEntityImpl, Void>() {
-              public Void apply(BaseAtomEntityImpl atom) {
+            new Function<BaseContentEntity, Void>() {
+              public Void apply(BaseContentEntity atom) {
                 atom.removeContributorId(id); return null;
               }
             });
@@ -732,14 +732,14 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
    * @param id the id of the to-be-deleted atom
    */
   private void updateAtomReferencesHelper(PersistenceManager pm, String relevantField, Long id,
-      Function<BaseAtomEntityImpl, Void> removeFunc) {
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+      Function<BaseContentEntity, Void> removeFunc) {
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter(relevantField + " == atomIdParam");
     query.declareParameters("java.lang.Long atomIdParam");
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(id);
-      for (BaseAtomEntityImpl atom : results) {
+      List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(id);
+      for (BaseContentEntity atom : results) {
         removeFunc.apply(atom);
       }
       pm.makePersistentAll(results);
@@ -753,7 +753,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         + "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED "
         + (timeParam == null ? "" : "&& timestamp > timeParam ");
     
-    Query eventsQuery = pm.newQuery(BaseAtomEntityImpl.class);
+    Query eventsQuery = pm.newQuery(BaseContentEntity.class);
     eventsQuery.setFilter(commonQueryFilter +
         "&& atomType == com.google.livingstories.client.AtomType.EVENT");
     eventsQuery.setOrdering("timestamp desc");
@@ -763,7 +763,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     eventsQuery.declareParameters("Long livingStoryIdParam" 
         + (timeParam == null ? "" : ", java.util.Date timeParam"));
     
-    Query narrativesQuery = pm.newQuery(BaseAtomEntityImpl.class);
+    Query narrativesQuery = pm.newQuery(BaseContentEntity.class);
     narrativesQuery.setFilter(commonQueryFilter +
         "&& atomType == com.google.livingstories.client.AtomType.NARRATIVE " +
         "&& isStandalone == true");
@@ -808,9 +808,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       List<BaseAtom> updates = new ArrayList<BaseAtom>();
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
-        List<BaseAtomEntityImpl> results = 
-            (List<BaseAtomEntityImpl>) query.execute(livingStoryId, time);
-        for (BaseAtomEntityImpl result : results) {
+        List<BaseContentEntity> results = 
+            (List<BaseContentEntity>) query.execute(livingStoryId, time);
+        for (BaseContentEntity result : results) {
           BaseAtom atom = result.toClientObject();
           updates.add(atom);
         }
@@ -837,8 +837,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       // from those 6 because there is no way to do one appengine query for that
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
-        List<BaseAtomEntityImpl> results = (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
-        for (BaseAtomEntityImpl result : results) {
+        List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(livingStoryId);
+        for (BaseContentEntity result : results) {
           BaseAtom atom = result.toClientObject();
           updates.add(atom);
         }
@@ -858,7 +858,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   public List<EventAtom> getImportantEventsForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& atomType == com.google.livingstories.client.AtomType.EVENT " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
@@ -867,10 +867,10 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = 
-          (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
+      List<BaseContentEntity> results = 
+          (List<BaseContentEntity>) query.execute(livingStoryId);
       List<EventAtom> events = new ArrayList<EventAtom>();
-      for (BaseAtomEntityImpl result : results) {
+      for (BaseContentEntity result : results) {
         EventAtom event = (EventAtom) result.toClientObject();
         events.add(event);
       }
@@ -891,7 +891,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   public List<PlayerAtom> getImportantPlayersForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& atomType == com.google.livingstories.client.AtomType.PLAYER " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
@@ -901,9 +901,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     List<PlayerAtom> players = Lists.newArrayList();
     try {
       @SuppressWarnings("unchecked")
-      List<BaseAtomEntityImpl> results = 
-          (List<BaseAtomEntityImpl>) query.execute(livingStoryId);
-      for (BaseAtomEntityImpl result : results) {
+      List<BaseContentEntity> results = 
+          (List<BaseContentEntity>) query.execute(livingStoryId);
+      for (BaseContentEntity result : results) {
         players.add((PlayerAtom) result.toClientObject());
       }
     } finally {

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This is the client version of a {@link com.google.livingstories.server.BaseAtomEntityImpl}.
+ * This is the client version of a {@link com.google.livingstories.server.BaseContentEntity}.
  * The {@link ContentRpcService} converts AtomEntities to
  * and from this class which is used by the client.
  * 
