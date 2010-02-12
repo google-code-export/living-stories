@@ -16,7 +16,7 @@
 
 package com.google.livingstories.client.util;
 
-import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ public class GlobalUtil {
     return sb.toString();
   }
   
-  public static void addIfNotNull(ComplexPanel panel, Widget newWidget) {
+  public static void addIfNotNull(Panel panel, Widget newWidget) {
     if (newWidget != null) {
       panel.add(newWidget);
     }

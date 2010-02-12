@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.lsp.AtomRenderer;
-import com.google.livingstories.client.lsp.DateTimeRangeWidget;
+import com.google.livingstories.client.lsp.views.DateTimeRangeWidget;
 
 import java.util.Set;
 
@@ -82,7 +82,8 @@ public class SimpleAtomListElement implements AtomListElement {
       row.add(focusPanel);
     }
     
-    dateTimeWidget = new DateTimeRangeWidget(atom.getTimestamp(), null);
+    dateTimeWidget = new DateTimeRangeWidget();
+    dateTimeWidget.setDateTime(atom.getTimestamp(), null);
     DOM.setStyleAttribute(dateTimeWidget.getElement(), "float", "right");
     DOM.setStyleAttribute(dateTimeWidget.getElement(), "paddingTop", "5px");
     row.add(dateTimeWidget);
@@ -103,12 +104,6 @@ public class SimpleAtomListElement implements AtomListElement {
   
   @Override
   public boolean setExpansion(boolean expand) {
-    // Do nothing
-    return false;
-  }
-
-  @Override
-  public boolean setExpansion(boolean expand, boolean skipExtraActions) {
     // Do nothing
     return false;
   }

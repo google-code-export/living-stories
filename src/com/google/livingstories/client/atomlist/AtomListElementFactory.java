@@ -18,6 +18,7 @@ package com.google.livingstories.client.atomlist;
 
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.lsp.views.atoms.StreamViewFactory;
 
 import java.util.Map;
 
@@ -38,10 +39,8 @@ public class AtomListElementFactory {
    */
   public static AtomListElement createAtomListElement(BaseAtom atom, 
       Map<Long, BaseAtom> idToAtomMap, AtomClickHandler handler, boolean noHistoryOnToggle) {
-    if (atom.getAtomType() == AtomType.EVENT) {
-      return new EventAtomListElement(atom, idToAtomMap, noHistoryOnToggle);
-    } else if (atom.getAtomType() == AtomType.NARRATIVE) {
-      return new NarrativeAtomListElement(atom, idToAtomMap, noHistoryOnToggle);
+    if (atom.getAtomType() == AtomType.EVENT || atom.getAtomType() == AtomType.NARRATIVE) {
+      return StreamViewFactory.createView(atom, idToAtomMap);
     } else {
       return new SimpleAtomListElement(atom, handler);
     }

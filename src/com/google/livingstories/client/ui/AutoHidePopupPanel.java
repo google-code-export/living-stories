@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -42,6 +43,8 @@ public class AutoHidePopupPanel extends PopupPanel {
 
   private ObjectElementScrubber scrubber = GWT.create(ObjectElementScrubber.class);
   private boolean scrubbed;
+  
+  private boolean skipHide = false;
   
   public AutoHidePopupPanel() {
     this(true);
@@ -79,7 +82,11 @@ public class AutoHidePopupPanel extends PopupPanel {
   }
   
   @Override
-  public void hide() {
+  public void hide(boolean autoClosed) {
+    if (skipHide) {
+      skipHide = false;
+      return;
+    }
     if (getWidget() != null) {
       // clear the "data" attribute of all HTML objects within the widget, so that no playback
       // persists.
@@ -91,7 +98,7 @@ public class AutoHidePopupPanel extends PopupPanel {
         // a popup is reused that shouldn't be, and we want to catch this on _all_ browsers.
       }
     }
-    super.hide();
+    super.hide(autoClosed);
   }
   
   public void setWholePopupIsLink(boolean wholePopupIsLink) {
@@ -100,8 +107,18 @@ public class AutoHidePopupPanel extends PopupPanel {
   
   @Override
   protected void onPreviewNativeEvent(NativePreviewEvent event) {
+    super.onPreviewNativeEvent(event);
     Event nativeEvent = Event.as(event.getNativeEvent());
-    if (nativeEvent.getTypeInt() == Event.ONCLICK) {
+    if (nativeEvent.getTypeInt() == Event.ONMOUSEDOWN) {
+      // This is a hack to make the popup panel not hide when the user drags
+      // the window scrollbar thumb.
+      // Since we are unable to override relevant methods to achieve this effect,
+      // we just tell the hide() method to skip the next call it sees.
+      if (nativeEvent.getClientX() > Window.getClientWidth()
+          || nativeEvent.getClientY() > Window.getClientHeight()) {
+        skipHide = true;
+      }
+    } else if (nativeEvent.getTypeInt() == Event.ONCLICK) {
       Element source = Element.as(nativeEvent.getEventTarget());
       if (source.getClassName().contains(NON_HIDING_CLASS)) {
         return;

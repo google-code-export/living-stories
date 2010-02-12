@@ -41,10 +41,9 @@ public class ShareLinkWidget extends Composite {
   private Long atomId;
   private ShareLinkWidgetPopup shareLinkWidgetPopup;
 
-  public ShareLinkWidget(final Long atomId, String linkStyle) {
+  public ShareLinkWidget(final Long atomId) {
     this.atomId = atomId;
     initWidget(uiBinder.createAndBindUi(this));
-    label.setStylePrimaryName(linkStyle);
     shareLinkWidgetPopup = new ShareLinkWidgetPopup();
   }
 

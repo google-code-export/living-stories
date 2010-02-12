@@ -69,7 +69,7 @@ p {
 }
 
 .gwt-DisclosurePanel .content {
-  margin-top: 0.9em;
+  margin: 0.9em 0;
   /* overrides the above */
 }
 
