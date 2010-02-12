@@ -37,8 +37,6 @@
         <td align='right'>
           <g:InlineLabel ui:field='username'/>
           <g:InlineLabel ui:field='usernameSeparator' visible='false'>|</g:InlineLabel>   <!--  separator -->
-          <lsp:FeedbackWidget/>
-          |    <!--  separator -->
           <g:Anchor ui:field='logIn' visible='false'><ui:msg description='link text'>Log in</ui:msg></g:Anchor>
           <g:Anchor ui:field='logOut' visible='false'><ui:msg description='link text'>Log out</ui:msg></g:Anchor>
         </td>  

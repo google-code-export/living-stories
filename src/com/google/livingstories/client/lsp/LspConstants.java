@@ -53,15 +53,6 @@ public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   String defaultView();
 
   /**
-   * Translated "Feedback".
-   * 
-   * @return translated "Feedback"
-   */
-  @DefaultStringValue("Feedback")
-  @Key("feedback")
-  String feedback();
-
-  /**
    * Translated "Most important only".
    * 
    * @return translated "Most important only"
