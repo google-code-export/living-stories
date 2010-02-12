@@ -126,8 +126,8 @@ public class LspDispatcher extends HttpServlet {
     }
   }
   
-  private String getSubscriptionUrl(Long livingStoryId, String livingStoryUrl) {
-    return userLoginService.createLoginUrl("/subscribe?lspId=" + livingStoryId + "&amp;lspUrl="
-        + livingStoryUrl);
+  private String getSubscriptionUrl(Long livingStoryId, String lspUrl) {
+    return userLoginService.createLoginUrl("/subscribe?livingStoryId=" + livingStoryId
+        + "&amp;lspUrl=" + lspUrl);
   }
 }

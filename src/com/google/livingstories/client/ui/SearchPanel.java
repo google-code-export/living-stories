@@ -174,7 +174,7 @@ public class SearchPanel extends Composite {
 
   public SearchTerms getSearchTerms() {
     SearchTerms searchTerms = new SearchTerms();
-    searchTerms.livingStoryId = LivingStoryData.getLspId();
+    searchTerms.livingStoryId = LivingStoryData.getLivingStoryId();
     searchTerms.atomType = atomType.getSelectedConstant();
     searchTerms.assetType = assetType.getSelectedConstant();
     if (!afterDate.getValue().isEmpty()) {

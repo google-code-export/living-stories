@@ -78,7 +78,8 @@ public class ClientCaches {
   public static void getImportantEvents(AsyncCallback<List<EventAtom>> callback) {
     if (importantEventsCache == null) {
       importantEventsCache = new Request<List<EventAtom>>(callback);
-      atomService.getImportantEventsForLsp(LivingStoryData.getLspId(), importantEventsCache);
+      atomService.getImportantEventsForLivingStory(LivingStoryData.getLivingStoryId(),
+          importantEventsCache);
     } else {
       importantEventsCache.getResult(callback);
     }
@@ -89,7 +90,8 @@ public class ClientCaches {
   public static void getImportantPlayers(AsyncCallback<List<PlayerAtom>> callback) {
     if (importantPlayersCache == null) {
       importantPlayersCache = new Request<List<PlayerAtom>>(callback);
-      atomService.getImportantPlayersForLsp(LivingStoryData.getLspId(), importantPlayersCache);
+      atomService.getImportantPlayersForLivingStory(LivingStoryData.getLivingStoryId(),
+          importantPlayersCache);
     } else {
       importantPlayersCache.getResult(callback);
     }
@@ -100,7 +102,8 @@ public class ClientCaches {
   public static void getContributors(AsyncCallback<Map<Long, PlayerAtom>> callback) {
     if (contributorsCache == null) {
       contributorsCache = new Request<Map<Long, PlayerAtom>>(callback);
-      atomService.getContributorsByIdForLsp(LivingStoryData.getLspId(), contributorsCache);
+      atomService.getContributorsByIdForLivingStory(LivingStoryData.getLivingStoryId(),
+          contributorsCache);
     } else {
       contributorsCache.getResult(callback);
     }

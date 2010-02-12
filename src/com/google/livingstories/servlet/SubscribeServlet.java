@@ -38,9 +38,9 @@ public class SubscribeServlet extends HttpServlet {
       return;
     }
     
-    String lspId = req.getParameter("lspId");
-    if (lspId != null) {
-      userService.setSubscribedToEmails(Long.valueOf(lspId), true);
+    String livingStoryId = req.getParameter("livingStoryId");
+    if (livingStoryId != null) {
+      userService.setSubscribedToEmails(Long.valueOf(livingStoryId), true);
     }
 
     String lspUrl = req.getParameter("lspUrl");

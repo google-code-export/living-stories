@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.Composite;
  * Interface for panes in the content manager.
  */
 public abstract class ManagerPane extends Composite {
-  public void onLspsChanged() {}
+  public void onLivingStoriesChanged() {}
   public void onAtomsChanged() {}
   public void onShow() {}
 }

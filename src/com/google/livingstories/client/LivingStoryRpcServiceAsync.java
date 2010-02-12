@@ -42,9 +42,10 @@ public interface LivingStoryRpcServiceAsync {
   
   void deleteLivingStory(long id, AsyncCallback<Void> callback);
  
-  void getThemesForLsp(long livingStoryId, AsyncCallback<List<Theme>> callback);
+  void getThemesForLivingStory(long livingStoryId, AsyncCallback<List<Theme>> callback);
 
-  void getThemeInfoForLsp(long livingStoryId, AsyncCallback<Map<Long, AtomTypesBundle>> callback);
+  void getThemeInfoForLivingStory(long livingStoryId,
+      AsyncCallback<Map<Long, AtomTypesBundle>> callback);
   
   void getThemeById(long id, AsyncCallback<Theme> callback);
   

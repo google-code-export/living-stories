@@ -124,8 +124,8 @@ public class ContentDataServiceImpl implements ContentDataService {
   public synchronized void deleteContentForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Query query = pm.newQuery(BaseAtomEntityImpl.class);
-    query.setFilter("livingStoryId == lspIdParam");
-    query.declareParameters("java.lang.Long lspIdParam");
+    query.setFilter("livingStoryId == livingStoryIdParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
@@ -305,11 +305,11 @@ public class ContentDataServiceImpl implements ContentDataService {
     }
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Query query = pm.newQuery(BaseAtomEntityImpl.class);
-    query.setFilter("livingStoryId == lspIdParam " +
+    query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& publishState == '" + PublishState.PUBLISHED.name() + "' " +
         "&& atomType == '" + entityType.name() + "' " +
         "&& timestamp > timeParam");
-    query.declareParameters("java.lang.Long lspIdParam, java.util.Date timeParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam, java.util.Date timeParam");
     query.setResult("count(id)");
     
     try {

@@ -581,7 +581,7 @@ public abstract class ComplexAtomListElement implements AtomListElement {
           summaryWidget.expand();
         }
         navLinksOrShare.showWidget(1);
-        AnalyticsUtil.trackOpenEventAction(LivingStoryData.getLspUrl(), atom.getId());
+        AnalyticsUtil.trackOpenEventAction(LivingStoryData.getLivingStoryUrl(), atom.getId());
       }
     });
     disclosurePanel.addCloseHandler(new CloseHandler<PartialDisclosurePanel>() {

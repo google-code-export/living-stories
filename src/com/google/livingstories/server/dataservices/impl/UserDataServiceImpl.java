@@ -22,7 +22,7 @@ import com.google.livingstories.client.FilterSpec;
 import com.google.livingstories.client.Publisher;
 import com.google.livingstories.server.AdminUserEntity;
 import com.google.livingstories.server.UserEntity;
-import com.google.livingstories.server.UserLspEntity;
+import com.google.livingstories.server.UserLivingStoryEntity;
 import com.google.livingstories.server.dataservices.UserDataService;
 
 import java.util.Date;
@@ -41,7 +41,7 @@ public class UserDataServiceImpl implements UserDataService {
 
   @Override
   public synchronized Date getLastVisitTimeForStory(String userId, Long livingStoryId) {
-    UserLspEntity entity = retrieveUserLspEntity(userId, livingStoryId);
+    UserLivingStoryEntity entity = retrieveUserLivingStoryEntity(userId, livingStoryId);
     return entity == null ? null : entity.getLastVisitedTime();
   }
   
@@ -50,10 +50,10 @@ public class UserDataServiceImpl implements UserDataService {
     UserEntity userEntity = retrieveUserEntity(userId);
     Map<Long, Date> visitTimesMap = new HashMap<Long, Date>();
     if (userEntity != null) {
-      List<UserLspEntity> storyDataList = userEntity.getLspDataList();
+      List<UserLivingStoryEntity> storyDataList = userEntity.getLivingStoryDataList();
       if (storyDataList != null) {
-        for (UserLspEntity userLspEntity : storyDataList) {
-          visitTimesMap.put(userLspEntity.getLspId(), userLspEntity.getLastVisitedTime());
+        for (UserLivingStoryEntity entity : storyDataList) {
+          visitTimesMap.put(entity.getLivingStoryId(), entity.getLastVisitedTime());
         }
       }
     }
@@ -62,13 +62,13 @@ public class UserDataServiceImpl implements UserDataService {
 
   @Override
   public synchronized boolean isUserSubscribedToEmails(String userId, Long livingStoryId) {
-    UserLspEntity entity = retrieveUserLspEntity(userId, livingStoryId);
+    UserLivingStoryEntity entity = retrieveUserLivingStoryEntity(userId, livingStoryId);
     return entity == null ? false : entity.isSubscribedToEmails();
   }
   
   @Override
   public synchronized int getVisitCountForStory(String userId, Long livingStoryId) {
-    UserLspEntity entity = retrieveUserLspEntity(userId, livingStoryId);
+    UserLivingStoryEntity entity = retrieveUserLivingStoryEntity(userId, livingStoryId);
     return entity == null ? 0 : entity.getVisitCount();
   }
 
@@ -90,22 +90,24 @@ public class UserDataServiceImpl implements UserDataService {
       userEntity = createNewUserEntity(userId);
     }
 
-    UserLspEntity userLspEntity = userEntity.getUserDataPerLsp(livingStoryId);
-    if (userLspEntity == null) {
-      // This means the user has not visited this LSP before. A new row needs to be added.
-      createNewUserLspEntity(userId, livingStoryId, false);
+    UserLivingStoryEntity userLivingStoryEntity =
+        userEntity.getUserDataPerLivingStory(livingStoryId);
+    if (userLivingStoryEntity == null) {
+      // This means the user has not visited this living story before. A new row needs to be added.
+      createNewUserLivingStoryEntity(userId, livingStoryId, false);
     } else {
-      // This means the user has visited this LSP before and the timestamp needs to be
+      // This means the user has visited this living story before and the timestamp needs to be
       // updated in place.
       PersistenceManager pm = PMF.get().getPersistenceManager();
       
       try { 
         // This object needs to be queried using its primary key from the same
         // PeristentManager object as the one that is going to persist it
-        userLspEntity = pm.getObjectById(UserLspEntity.class, userLspEntity.getId());
-        userLspEntity.setLastVisitedTime(new Date());
-        userLspEntity.incrementVisitCount();
-        pm.makePersistent(userLspEntity);
+        userLivingStoryEntity = pm.getObjectById(
+            UserLivingStoryEntity.class, userLivingStoryEntity.getId());
+        userLivingStoryEntity.setLastVisitedTime(new Date());
+        userLivingStoryEntity.incrementVisitCount();
+        pm.makePersistent(userLivingStoryEntity);
       } finally {
         pm.close();
       }
@@ -120,20 +122,22 @@ public class UserDataServiceImpl implements UserDataService {
       userEntity = createNewUserEntity(userId);
     }
 
-    UserLspEntity userLspEntity = userEntity.getUserDataPerLsp(livingStoryId);
-    if (userLspEntity == null) {
-      // This means the user has not visited this LSP before. A new row needs to be added.
-      createNewUserLspEntity(userId, livingStoryId, subscribe);
+    UserLivingStoryEntity userLivingStoryEntity =
+        userEntity.getUserDataPerLivingStory(livingStoryId);
+    if (userLivingStoryEntity == null) {
+      // This means the user has not visited this living story before. A new row needs to be added.
+      createNewUserLivingStoryEntity(userId, livingStoryId, subscribe);
     } else {
-      // This means the user has visited this LSP before and only the subscription needs to be 
-      // updated.
+      // This means the user has visited this living story before and only the subscription needs
+      // to be updated.
       PersistenceManager pm = PMF.get().getPersistenceManager();
       try { 
         // This object needs to be queried using its primary key from the same
         // PersistentManager object as the one that is going to persist it
-        userLspEntity = pm.getObjectById(UserLspEntity.class, userLspEntity.getId());
-        userLspEntity.setSubscribedToEmails(subscribe);
-        pm.makePersistent(userLspEntity);
+        userLivingStoryEntity = pm.getObjectById(
+            UserLivingStoryEntity.class, userLivingStoryEntity.getId());
+        userLivingStoryEntity.setSubscribedToEmails(subscribe);
+        pm.makePersistent(userLivingStoryEntity);
       } finally {
         pm.close();
       }
@@ -161,13 +165,14 @@ public class UserDataServiceImpl implements UserDataService {
   @Override
   public synchronized void deleteVisitTimesForStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(UserLspEntity.class);
-    query.setFilter("lspId == lspIdParam");
-    query.declareParameters("java.lang.Long lspIdParam");
+    Query query = pm.newQuery(UserLivingStoryEntity.class);
+    query.setFilter("livingStoryId == livingStoryIdParam");
+    query.declareParameters("java.lang.Long livingStoryIdParam");
     
     try {
       @SuppressWarnings("unchecked")
-      List<UserLspEntity> userEntities = (List<UserLspEntity>) query.execute(livingStoryId);
+      List<UserLivingStoryEntity> userEntities =
+          (List<UserLivingStoryEntity>) query.execute(livingStoryId);
       pm.deletePersistentAll(userEntities);
     } finally {
       query.closeAll();
@@ -214,9 +219,10 @@ public class UserDataServiceImpl implements UserDataService {
     }
   }
   
-  private UserLspEntity retrieveUserLspEntity(String userEmail, Long livingStoryId) {
+  private UserLivingStoryEntity retrieveUserLivingStoryEntity(
+      String userEmail, Long livingStoryId) {
     UserEntity userEntity = retrieveUserEntity(userEmail);
-    return userEntity == null ? null : userEntity.getUserDataPerLsp(livingStoryId);
+    return userEntity == null ? null : userEntity.getUserDataPerLivingStory(livingStoryId);
   }
   
   /**
@@ -228,7 +234,7 @@ public class UserDataServiceImpl implements UserDataService {
   }
   
   /**
-   * Create a new {@link UserEntity} data object for a user and the given lsp, and
+   * Create a new {@link UserEntity} data object for a user and the given living story, and
    * persist it to the database. 
    */
   private UserEntity createNewUserEntity(String userEmail) {
@@ -244,18 +250,19 @@ public class UserDataServiceImpl implements UserDataService {
   }
   
   /**
-   * Save information for an existing user, but a new LSP.
+   * Save information for an existing user, but a new living story.
    */
-  private UserLspEntity createNewUserLspEntity(String userEmail, Long lspId, 
-      boolean subscribedToEmails) {
+  private UserLivingStoryEntity createNewUserLivingStoryEntity(String userEmail,
+      Long livingStoryId, boolean subscribedToEmails) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     try { 
       UserEntity userInfo = pm.getObjectById(UserEntity.class, createKey(userEmail));
-      UserLspEntity userLspEntity = userInfo.addNewLspTimestamp(lspId);
-      userLspEntity.setSubscribedToEmails(subscribedToEmails);
+      UserLivingStoryEntity userLivingStoryEntity =
+          userInfo.addNewLivingStoryTimestamp(livingStoryId);
+      userLivingStoryEntity.setSubscribedToEmails(subscribedToEmails);
       pm.makePersistent(userInfo);
-      return userLspEntity;
+      return userLivingStoryEntity;
     } finally {
       pm.close();
     }

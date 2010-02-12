@@ -159,8 +159,8 @@ public class WhitelistManager extends ManagerPane {
   }
     
   /**
-   * Create a list box for displaying all the themes for the selected LSP so that the user
-   * can select one to edit.
+   * Create a list box for displaying all the users that are whitelisted so that the admin
+   * can select one to edit or remove.
    */
   private Widget createUserListBox() {
     whitelistedUsersListBox = new ItemList<WhitelistedUser>() {
