@@ -82,8 +82,7 @@ import com.google.livingstories.client.QuoteAtom;
 import com.google.livingstories.client.ReactionAtom;
 import com.google.livingstories.client.StoryPlayerAtom;
 import com.google.livingstories.client.Theme;
-import com.google.livingstories.client.atomlist.AtomListElement;
-import com.google.livingstories.client.atomlist.AtomListElementFactory;
+import com.google.livingstories.client.lsp.views.atoms.StreamViewFactory;
 import com.google.livingstories.client.ui.AtomListBox;
 import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
 import com.google.livingstories.client.ui.EnumDropdown;
@@ -1835,9 +1834,7 @@ public class AtomManager extends ManagerPane {
     if (atom.getDisplayString().equals("New Atom")) {
       previewPanel.clear();
     } else {
-      AtomListElement atomListElement = AtomListElementFactory.createAtomListElement(
-          atom, atomListBox.getLoadedAtomsMap(), null, true);
-      previewPanel.setWidget(atomListElement.render(false));
+      previewPanel.setWidget(StreamViewFactory.createView(atom, atomListBox.getLoadedAtomsMap()));
     }
   }
   

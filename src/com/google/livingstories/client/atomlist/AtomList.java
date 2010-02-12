@@ -20,9 +20,9 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.lsp.LspMessageHolder;
+import com.google.livingstories.client.lsp.views.atoms.StreamViewFactory;
 import com.google.livingstories.client.ui.WindowScroll;
 import com.google.livingstories.client.util.LivingStoryControls;
 
@@ -42,7 +42,7 @@ import java.util.Map.Entry;
  * reverse-chronological order. The atoms know how to render their content and their day and time.
  */
 public class AtomList extends Composite {
-  private Map<BaseAtom, AtomListRow> currentAtomToRowMap;
+  private Map<BaseAtom, AtomListElement> currentAtomToElementMap;
   private Set<Long> atomIdsInPanel;
   private Map<Long, BaseAtom> idToAtomMap;
   
@@ -51,19 +51,14 @@ public class AtomList extends Composite {
   
   private static final String NO_ITEMS_TEXT = LspMessageHolder.consts.atomListNoItemsText();
   
-  private boolean includeAtomName;
-  private AtomClickHandler handler;
-  private boolean noHistoryOnToggle;
-  
+  private AtomClickHandler clickHandler;
   private boolean chronological = false;
   
-  private AtomList(boolean includeAtomName, AtomClickHandler handler, boolean noHistoryOnToggle) {
+  private AtomList(AtomClickHandler handler) {
     super();
-    this.includeAtomName = includeAtomName;
-    this.handler = handler;
-    this.noHistoryOnToggle = noHistoryOnToggle;
+    this.clickHandler = handler;
     atomIdsInPanel = new HashSet<Long>();
-    currentAtomToRowMap = new TreeMap<BaseAtom, AtomListRow>(new Comparator<BaseAtom>() {
+    currentAtomToElementMap = new TreeMap<BaseAtom, AtomListElement>(new Comparator<BaseAtom>() {
       public int compare(BaseAtom a1, BaseAtom a2) {
         int ret = a1.getDateSortKey().compareTo(a2.getDateSortKey());
         return ret == 0 ? ((int) Math.signum(a1.getId() - a2.getId())) : ret;
@@ -83,27 +78,14 @@ public class AtomList extends Composite {
     initWidget(container);
   }
   
-  public static AtomList create(boolean includeAtomName) {
-    return new AtomList(includeAtomName, null, false);
+  public static AtomList create() {
+    return new AtomList(null);
   }
   
-  public static AtomList createWithHandler(boolean includeAtomName, AtomClickHandler handler) {
-    return new AtomList(includeAtomName, handler, false);
+  public static AtomList createClickable(AtomClickHandler handler) {
+    return new AtomList(handler);
   }
   
-  public static AtomList createNoHistoryOnToggle(boolean includeAtomName) {
-    return new AtomList(includeAtomName, null, true);
-  }
-  
-  /**
-   * Sets the atom click handler object, separately from the construction-time handler.
-   * Should only be called on an AtomList that is presently empty
-   */
-  public void setAtomClickHandler(AtomClickHandler handler) {
-    assert currentAtomToRowMap.isEmpty();
-    this.handler = handler;
-  }
-
   /**
    * @param atoms atoms to create the AtomList for
    * @param idToAtomMap Map from atom ids to the atom objects that should contain entries for 
@@ -127,7 +109,7 @@ public class AtomList extends Composite {
       addAtom(atom);
     }
 
-    if (currentAtomToRowMap.isEmpty()) {
+    if (currentAtomToElementMap.isEmpty()) {
       statusLabel.setText(NO_ITEMS_TEXT);
     } else {
       statusLabel.setText("");
@@ -144,15 +126,15 @@ public class AtomList extends Composite {
         
     int insertionPosition = 0;
     for (BaseAtom atom : getAtomList()) {
-      AtomListRow row = currentAtomToRowMap.get(atom);
+      AtomListElement element = currentAtomToElementMap.get(atom);
       if (!atomIdsInPanel.contains(atom.getId())) {
         // the appropriate widget is not in the contentPanel. Add it!
-        contentPanel.insert(row.elementWidget, insertionPosition);
+        contentPanel.insert(element, insertionPosition);
         atomIdsInPanel.add(atom.getId());
       }
       
-      setTimeVisibility(row.atomListElement, previousElement);
-      previousElement = row.atomListElement;
+      setTimeVisibility(element, previousElement);
+      previousElement = element;
       insertionPosition++;
     }
   }
@@ -162,10 +144,12 @@ public class AtomList extends Composite {
    * Doesn't alter atomIdsInPanel.
    */
   public void addAtom(BaseAtom atom) {
-    if (!currentAtomToRowMap.containsKey(atom)) {
-      AtomListElement element = AtomListElementFactory.createAtomListElement(
-          atom, idToAtomMap, handler, noHistoryOnToggle);
-      currentAtomToRowMap.put(atom, new AtomListRow(element, element.render(includeAtomName)));
+    if (!currentAtomToElementMap.containsKey(atom)) {
+      AtomListElement element = StreamViewFactory.createView(atom, idToAtomMap);
+      if (clickHandler != null) {
+        element = new ClickableAtomListElement(element, clickHandler);
+      }
+      currentAtomToElementMap.put(atom, element);
     }
   }
   
@@ -173,10 +157,10 @@ public class AtomList extends Composite {
    * Removes an atom from the list if it is currently present.
    */
   public void removeAtom(Long atomId) {
-    for (Entry<BaseAtom, AtomListRow> entry : currentAtomToRowMap.entrySet()) {
+    for (Entry<BaseAtom, AtomListElement> entry : currentAtomToElementMap.entrySet()) {
       if (entry.getKey().getId() == atomId) {
-        contentPanel.remove(entry.getValue().elementWidget);
-        currentAtomToRowMap.remove(entry.getKey());
+        contentPanel.remove(entry.getValue());
+        currentAtomToElementMap.remove(entry.getKey());
         atomIdsInPanel.remove(entry.getKey().getId());
         break;
       }
@@ -184,16 +168,16 @@ public class AtomList extends Composite {
   }
   
   public Set<BaseAtom> getAtomSet() {
-    return currentAtomToRowMap.keySet();
+    return currentAtomToElementMap.keySet();
   }
   
   public int getAtomCount() {
-    return currentAtomToRowMap.size();
+    return currentAtomToElementMap.size();
   }
   
   public List<BaseAtom> getAtomList() {
     // This would be simpler if GWT emulated TreeMap.descendingKeySet().
-    List<BaseAtom> ret = new ArrayList<BaseAtom>(currentAtomToRowMap.keySet());
+    List<BaseAtom> ret = new ArrayList<BaseAtom>(currentAtomToElementMap.keySet());
     if (!chronological) {
       Collections.reverse(ret);
     }
@@ -202,7 +186,7 @@ public class AtomList extends Composite {
   
   public void clear() {
     contentPanel.clear();
-    currentAtomToRowMap.clear();
+    currentAtomToElementMap.clear();
     atomIdsInPanel.clear();
   }
   
@@ -212,11 +196,11 @@ public class AtomList extends Composite {
     }
     this.chronological = chronological;
     contentPanel.clear();
-    for (AtomListRow row : currentAtomToRowMap.values()) {
+    for (AtomListElement row : currentAtomToElementMap.values()) {
       if (chronological) {
-        contentPanel.add(row.elementWidget);
+        contentPanel.add(row);
       } else {
-        contentPanel.insert(row.elementWidget, 0);
+        contentPanel.insert(row, 0);
       }
     }
   }
@@ -239,16 +223,15 @@ public class AtomList extends Composite {
      *   due to contractions elsewhere in the list, we save the relevant AtomListRow in the
      *   loop, but actually act on this knowledge only after the loop is done. */
     int countFound = 0;
-    AtomListRow singleRowToScrollTo = null;
+    AtomListElement singleRowToScrollTo = null;
 
-    for (Entry<BaseAtom, AtomListRow> entry : currentAtomToRowMap.entrySet()) {
-      AtomListRow row = entry.getValue();
-      AtomListElement listElement = row.atomListElement;
+    for (Entry<BaseAtom, AtomListElement> entry : currentAtomToElementMap.entrySet()) {
+      AtomListElement listElement = entry.getValue();
 
       if (atomIds.contains(entry.getKey().getId())) {
         listElement.setExpansion(true);
         if (atomIds.size() == 1) {
-          singleRowToScrollTo = row;
+          singleRowToScrollTo = listElement;
         }
         countFound++;
       } else {
@@ -257,7 +240,7 @@ public class AtomList extends Composite {
     }
     
     if (singleRowToScrollTo != null) {
-      WindowScroll.scrollTo(singleRowToScrollTo.elementWidget.getAbsoluteTop(),
+      WindowScroll.scrollTo(singleRowToScrollTo.getAbsoluteTop(),
           new Command() {
             @Override
             public void execute() {
@@ -276,16 +259,6 @@ public class AtomList extends Composite {
       currentElement.setTimeVisible(true);
     } else {
       currentElement.setTimeVisible(false);
-    }
-  }
-  
-  private class AtomListRow {
-    public AtomListElement atomListElement;
-    public Widget elementWidget;
-    
-    public AtomListRow(AtomListElement atomListElement, Widget elementWidget) {
-      this.atomListElement = atomListElement;
-      this.elementWidget = elementWidget;
     }
   }
 }

@@ -30,11 +30,10 @@
       float:left;
     }
   </ui:style>
-  <g:HTMLPanel>
-    <div class="{res.css.substituteHeaderSpacing}">
-      <g:SimplePanel ui:field="image" styleName="{style.previewImage}"/>
-      <g:Label ui:field="name" styleName="{res.css.clickable} {style.name}"/>
-      <g:SimplePanel ui:field="description"/>
-    </div>
-  </g:HTMLPanel>
+  <g:FlowPanel>
+    <g:Label ui:field="header" styleName="{res.css.substituteHeaderSpacing}"/>
+    <g:SimplePanel ui:field="image" styleName="{style.previewImage}"/>
+    <g:Label ui:field="name" styleName="{res.css.clickable} {style.name}"/>
+    <g:SimplePanel ui:field="description"/>
+  </g:FlowPanel>
 </ui:UiBinder>

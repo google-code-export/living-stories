@@ -22,12 +22,11 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.QuoteAtom;
 import com.google.livingstories.client.lsp.ContentRenderer;
-
-import java.util.Set;
 
 /**
  * Renders a quote with a blockquote icon.
@@ -37,9 +36,10 @@ public class QuoteAtomView extends Composite {
   interface QuoteAtomViewUiBinder extends UiBinder<Widget, QuoteAtomView> {
   }
 
+  @UiField Label header;
   @UiField SimplePanel content;
 
-  public QuoteAtomView(QuoteAtom atom, Set<Long> containingContributorIds) {
+  public QuoteAtomView(QuoteAtom atom) {
     initWidget(uiBinder.createAndBindUi(this));    
 
     // if the rendered HTML content leads with a double-quote character, we replace the underlying
@@ -60,6 +60,11 @@ public class QuoteAtomView extends Composite {
       }
     }
     content.add(new ContentRenderer(detachedHTML.getElement().getInnerHTML(), false));
+  }
+
+  public QuoteAtomView hideHeader() {
+    header.setVisible(false);
+    return this;
   }
 
   // gets the first non-all-whitespace text node in the DOM tree rooted at node,

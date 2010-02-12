@@ -43,8 +43,7 @@ public class StreamViewFactory {
         linkedAtomsByType = processAtom(atom, idToAtomMap);
         return new NarrativeStreamView((NarrativeAtom) atom, linkedAtomsByType);
       default:
-        throw new IllegalArgumentException("Atom type " + atom.getAtomType()
-            + " does not have a stream view defined.");
+        return new BaseStreamView(atom);
     }
   }
   

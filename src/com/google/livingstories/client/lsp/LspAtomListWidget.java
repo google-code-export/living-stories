@@ -25,6 +25,8 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetType;
+import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.DisplayAtomBundle;
 import com.google.livingstories.client.atomlist.AtomClickHandler;
@@ -59,7 +61,6 @@ public class LspAtomListWidget extends Composite {
   private Label moreLink;
   private Image loadingImage;
   private Label problemLabel;
-  private ImageClickHandler imageClickHandler = new ImageClickHandler();
   
   private static String VIEW_MORE = LspMessageHolder.consts.viewMore();
   private static String PROBLEM_TEXT = LspMessageHolder.consts.viewMoreProblem();
@@ -70,7 +71,7 @@ public class LspAtomListWidget extends Composite {
     panel = new VerticalPanel();
     panel.addStyleName("atomList");
     
-    atomList = createAtomList();
+    atomList = AtomList.create();
 
     moreLink = new Label(VIEW_MORE);
     moreLink.setStylePrimaryName("primaryLink");
@@ -96,10 +97,6 @@ public class LspAtomListWidget extends Composite {
     initWidget(panel);
   }
   
-  protected AtomList createAtomList() {
-    return AtomList.create(false);
-  }
-  
   protected void addMoreLinkHandler(HasClickHandlers moreLink) {
     moreLink.addClickHandler(new ClickHandler() {
       @Override
@@ -112,32 +109,6 @@ public class LspAtomListWidget extends Composite {
   public void clear() {
     atomList.clear();
     this.idToAtomMap = new HashMap<Long, BaseAtom>();
-  }
-  
-  public void setIsImageList(boolean isImageList) {
-    atomList.setAtomClickHandler(isImageList ? imageClickHandler : null);
-  }
-  
-  private class ImageClickHandler implements AtomClickHandler {
-    @Override
-    public void onClick(BaseAtom clickedAtom) {
-      int clickedIndex = -1, i = 0;
-      List<BaseAtom> imagesAsBase = atomList.getAtomList();
-      List<AssetAtom> images = new ArrayList<AssetAtom>(imagesAsBase.size());
-      for (BaseAtom atom : imagesAsBase) {
-        if (!GlobalUtil.isContentEmpty(atom.getContent())) {
-          images.add((AssetAtom) atom);
-          if (atom.equals(clickedAtom)) {
-            clickedIndex = i;
-          }
-          i++;
-        }
-      }
-      
-      if (clickedIndex != -1) {
-        new Slideshow(images).show(clickedIndex);
-      }
-    }
   }
   
   public void beginLoading() {
@@ -162,6 +133,24 @@ public class LspAtomListWidget extends Composite {
       idToAtomMap.put(atom.getId(), atom);
     }
 
+    // Get all the image atoms in the core atoms list.  If it has a full view,
+    // Then add it to the 'slideshowImages' list and set that list as the related
+    // assets list on each of its members.  This allows us to pop up to slideshow
+    // view for images in the atom stream.
+    List<AssetAtom> slideshowImages = new ArrayList<AssetAtom>();
+    for (BaseAtom coreAtom : coreAtoms) {
+      if (coreAtom.getAtomType() == AtomType.ASSET) {
+        AssetAtom asset = (AssetAtom) coreAtom;
+        if (asset.getAssetType() == AssetType.IMAGE
+            && !GlobalUtil.isContentEmpty(asset.getContent())) {
+          slideshowImages.add(asset);
+        }
+      }
+    }
+    for (AssetAtom image : slideshowImages) {
+      image.setRelatedAssets(slideshowImages);
+    }
+    
     atomList.adjustTimeOrdering(bundle.getAdjustedFilterSpec().oldestFirst);
 
     atomList.appendAtoms(coreAtoms, idToAtomMap);

@@ -21,10 +21,11 @@
 
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
-  <g:FocusPanel ui:field="panel" styleName="{res.css.substituteHeaderSpacing}">
-    <g:HTMLPanel>
+  <g:FocusPanel ui:field="panel">
+    <g:FlowPanel>
+      <g:Label ui:field="header" styleName="{res.css.substituteHeaderSpacing}"/>
       <g:SimplePanel ui:field="preview"/>
       <g:HTML ui:field="caption"/>
-    </g:HTMLPanel>
+    </g:FlowPanel>
   </g:FocusPanel>
 </ui:UiBinder>

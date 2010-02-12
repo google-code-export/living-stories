@@ -27,7 +27,7 @@
     }
   </ui:style>
   <g:HTMLPanel>
-    <g:Label ui:field="atomType" styleName="{res.css.atomHeader}"/>
+    <g:Label ui:field="header" styleName="{res.css.atomHeader}"/>
     <table cellpadding="0" cellspacing="0">
       <tr>
         <td valign="top">
