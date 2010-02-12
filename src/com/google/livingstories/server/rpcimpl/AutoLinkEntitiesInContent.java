@@ -24,7 +24,7 @@ import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BackgroundAtom;
 import com.google.livingstories.client.PlayerAtom;
 import com.google.livingstories.client.PlayerType;
-import com.google.livingstories.server.BaseAtomEntityImpl;
+import com.google.livingstories.server.BaseContentEntity;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +50,7 @@ public class AutoLinkEntitiesInContent {
    * player. Also adds these players to the base atom as new linked atoms.
    * Also looks for matches of the names of concepts and creates a link if one doesn't exist. 
    */
-  public static Set<Long> createLinks(BaseAtomEntityImpl atomEntity, 
+  public static Set<Long> createLinks(BaseContentEntity atomEntity, 
       List<PlayerAtom> playerAtoms, List<BackgroundAtom> concepts) {
     Set<Long> suggestedAdditionIds = Sets.newHashSet();
     AtomType atomType = atomEntity.getAtomType();

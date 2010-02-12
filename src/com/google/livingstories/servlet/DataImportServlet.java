@@ -24,7 +24,7 @@ import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.server.AngleEntity;
-import com.google.livingstories.server.BaseAtomEntityImpl;
+import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.HasSerializableLivingStoryId;
 import com.google.livingstories.server.JSONSerializable;
 import com.google.livingstories.server.LivingStoryEntity;
@@ -85,14 +85,14 @@ public class DataImportServlet extends HttpServlet {
     ImmutableList.<Class<? extends HasSerializableLivingStoryId>>of(
         LivingStoryEntity.class,
         AngleEntity.class,
-        BaseAtomEntityImpl.class);
+        BaseContentEntity.class);
 
 
   private static final Map<Class<?>, Function<JSONObject, String>> identifierFunctionMap =
       new ImmutableMapBuilder<Class<?>, Function<JSONObject, String>>()
           .put(LivingStoryEntity.class, createIdentifierFunction("id"))
           .put(AngleEntity.class, createIdentifierFunction("id"))
-          .put(BaseAtomEntityImpl.class, createIdentifierFunction("id"))
+          .put(BaseContentEntity.class, createIdentifierFunction("id"))
           .getMap();
 
   private static Function<JSONObject, String> createIdentifierFunction(final String parameterName) {
@@ -119,7 +119,7 @@ public class DataImportServlet extends HttpServlet {
 
   private static Map<String, LivingStoryEntity> livingStoryMap;
   private static Map<String, AngleEntity> angleMap;
-  private static Map<String, BaseAtomEntityImpl> contentMap;
+  private static Map<String, BaseContentEntity> contentMap;
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -203,8 +203,8 @@ public class DataImportServlet extends HttpServlet {
     workQueue.add(new CreateEntitiesFunction<LivingStoryEntity>(
         LivingStoryEntity.class, livingStoryMap));
     workQueue.add(new CreateEntitiesFunction<AngleEntity>(AngleEntity.class, angleMap));
-    workQueue.add(new CreateEntitiesFunction<BaseAtomEntityImpl>(
-        BaseAtomEntityImpl.class, contentMap));
+    workQueue.add(new CreateEntitiesFunction<BaseContentEntity>(
+        BaseContentEntity.class, contentMap));
     workQueue.add(new MapIdsFunction());
     workQueue.add(new MapAtomIdsFunction());
     workQueue.add(new MapAtomInlineIdsFunction());
@@ -354,7 +354,7 @@ public class DataImportServlet extends HttpServlet {
    * Maps the old atom ids to the new ones
    */
   private class MapAtomIdsFunction implements Function<Void, Boolean> {
-    private Iterator<BaseAtomEntityImpl> iter = null;
+    private Iterator<BaseContentEntity> iter = null;
     
     @Override
     public Boolean apply(Void arg0) {
@@ -363,9 +363,9 @@ public class DataImportServlet extends HttpServlet {
       if (iter == null) {
         iter = contentMap.values().iterator();
       }
-      // Map all the ids in the BaseAtomEntityImpl objects to the new ones
+      // Map all the ids in the BaseContentEntity objects to the new ones
       while (iter.hasNext()) {
-        BaseAtomEntityImpl content = iter.next();
+        BaseContentEntity content = iter.next();
         // Living Story ids
         if (content.getLivingStoryId() != null) {
           LivingStoryEntity livingStory = livingStoryMap.get(content.getLivingStoryId().toString());
@@ -387,7 +387,7 @@ public class DataImportServlet extends HttpServlet {
         // Contributor ids
         Set<Long> contributorIds = Sets.newHashSet();
         for (Long contributorId : content.getContributorIds()) {
-          BaseAtomEntityImpl user = contentMap.get(contributorId.toString());
+          BaseContentEntity user = contentMap.get(contributorId.toString());
           if (user != null) {
             contributorIds.add(user.getId());
           }
@@ -397,7 +397,7 @@ public class DataImportServlet extends HttpServlet {
         // Linked Atom ids
         Set<Long> linkedAtomIds = Sets.newHashSet();
         for (Long linkedAtomId : content.getLinkedAtomIds()) {
-          BaseAtomEntityImpl atom = contentMap.get(linkedAtomId.toString());
+          BaseContentEntity atom = contentMap.get(linkedAtomId.toString());
           if (atom != null) {
             linkedAtomIds.add(atom.getId());
           }
@@ -406,7 +406,7 @@ public class DataImportServlet extends HttpServlet {
         
         // Photo Atom id
         if (content.getAtomType() == AtomType.PLAYER && content.getPhotoAtomId() != null) {
-          BaseAtomEntityImpl atom = contentMap.get(content.getPhotoAtomId().toString());
+          BaseContentEntity atom = contentMap.get(content.getPhotoAtomId().toString());
           if (atom != null) {
             content.setPhotoAtomId(atom.getId());
           } else {
@@ -416,7 +416,7 @@ public class DataImportServlet extends HttpServlet {
         
         // Parent player atom id
         if (content.getAtomType() == AtomType.PLAYER && content.getParentPlayerAtomId() != null) {
-          BaseAtomEntityImpl atom = contentMap.get(content.getParentPlayerAtomId().toString());
+          BaseContentEntity atom = contentMap.get(content.getParentPlayerAtomId().toString());
           if (atom == null) {
             content.setParentPlayerAtomId(null);
           } else {
@@ -436,7 +436,7 @@ public class DataImportServlet extends HttpServlet {
    * Maps atom ids in inline links in the rich content atom fields to the right values. 
    */
   private class MapAtomInlineIdsFunction implements Function<Void, Boolean> {
-    private Iterator<BaseAtomEntityImpl> iter = null;
+    private Iterator<BaseContentEntity> iter = null;
     
     public Boolean apply(Void ignore) {
       message = "Mapping atom inline IDs";
@@ -445,7 +445,7 @@ public class DataImportServlet extends HttpServlet {
         iter = contentMap.values().iterator();
       }
       while (iter.hasNext()) {
-        BaseAtomEntityImpl atom = iter.next();
+        BaseContentEntity atom = iter.next();
         atom.setContent(matchAll(atom.getContent()));
         if (atom.getAtomType() == AtomType.ASSET) {
           atom.setCaption(matchAll(atom.getCaption()));
@@ -531,7 +531,7 @@ public class DataImportServlet extends HttpServlet {
    * the new entities won't be visible to the task.
    */
   private class RemoveUnusedContributorsFunction implements Function<Void, Boolean> {
-    private List<BaseAtomEntityImpl> allUnassignedAtoms = Lists.newArrayList();
+    private List<BaseContentEntity> allUnassignedAtoms = Lists.newArrayList();
     private Set<Long> allUsedUnassignedIds = Sets.newHashSet();
     
     public Boolean apply(Void ignore) {
@@ -541,8 +541,8 @@ public class DataImportServlet extends HttpServlet {
 
       try {
         // Get all atoms
-        Extent<BaseAtomEntityImpl> atomEntities = pm.getExtent(BaseAtomEntityImpl.class);
-        for (BaseAtomEntityImpl atom : atomEntities) {
+        Extent<BaseContentEntity> atomEntities = pm.getExtent(BaseContentEntity.class);
+        for (BaseContentEntity atom : atomEntities) {
           // Put the unassigned atoms in a list
           if (atom.getLivingStoryId() == null) {
             allUnassignedAtoms.add(atom);
@@ -564,7 +564,7 @@ public class DataImportServlet extends HttpServlet {
         }
   
         // Delete all unassigned atoms that weren't in the used set
-        for (BaseAtomEntityImpl unassignedAtom : allUnassignedAtoms) {
+        for (BaseContentEntity unassignedAtom : allUnassignedAtoms) {
           if (!allUsedUnassignedIds.contains(unassignedAtom.getId())) {
             pm.deletePersistent(unassignedAtom);
           }

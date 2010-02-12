@@ -17,7 +17,7 @@
 package com.google.livingstories.servlet;
 
 import com.google.livingstories.server.AngleEntity;
-import com.google.livingstories.server.BaseAtomEntityImpl;
+import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.JSONSerializable;
 import com.google.livingstories.server.LivingStoryEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
@@ -58,7 +58,7 @@ public class DataExportServlet extends HttpServlet {
       JSONArray contentJson = new JSONArray();
       processContentEntities(contentJson, pm, true);
       processContentEntities(contentJson, pm, false);
-      result.put(BaseAtomEntityImpl.class.getSimpleName(), contentJson);
+      result.put(BaseContentEntity.class.getSimpleName(), contentJson);
       
       resp.setContentType("application/json");
       resp.getOutputStream().write(result.toString().getBytes());
@@ -89,16 +89,16 @@ public class DataExportServlet extends HttpServlet {
   
   private void processContentEntities(JSONArray json, PersistenceManager pm,
       boolean nullLivingStory) {
-    Query query = pm.newQuery(BaseAtomEntityImpl.class);
+    Query query = pm.newQuery(BaseContentEntity.class);
     if (nullLivingStory) {
       query.setFilter("livingStoryId == null");
     } else {
       query.setFilter("livingStoryId != null");
     }
     @SuppressWarnings("unchecked")
-    List<BaseAtomEntityImpl> entities = (List<BaseAtomEntityImpl>) query.execute();
+    List<BaseContentEntity> entities = (List<BaseContentEntity>) query.execute();
     try {
-      for (BaseAtomEntityImpl entity : entities) {
+      for (BaseContentEntity entity : entities) {
         json.put(entity.toJSON());
       }
     } finally {

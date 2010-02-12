@@ -68,7 +68,7 @@ import javax.jdo.annotations.PrimaryKey;
  * This class represents a piece of content for a living story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class BaseAtomEntityImpl
+public class BaseContentEntity
     implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
   private static final Pattern EXTERNAL_LINK_PATTERN =
       Pattern.compile("<a\\b[^>]+?\\bhref=\"(?!javascript:)[^>]+?>",
@@ -259,9 +259,9 @@ public class BaseAtomEntityImpl
   @Persistent
   private Text narrativeSummary;
 
-  private BaseAtomEntityImpl() {}
+  private BaseContentEntity() {}
   
-  public BaseAtomEntityImpl(Date timestamp, AtomType atomType,
+  public BaseContentEntity(Date timestamp, AtomType atomType,
       String content, Importance importance, Long livingStoryId) {
     this.timestamp = timestamp;
     this.atomType = atomType;
@@ -726,8 +726,8 @@ public class BaseAtomEntityImpl
     }
   }
 
-  public static BaseAtomEntityImpl fromClientObject(BaseAtom clientAtom) {
-    BaseAtomEntityImpl atomEntity = new BaseAtomEntityImpl();
+  public static BaseContentEntity fromClientObject(BaseAtom clientAtom) {
+    BaseContentEntity atomEntity = new BaseContentEntity();
     atomEntity.copyFields(clientAtom);
     return atomEntity;
   }
@@ -809,13 +809,13 @@ public class BaseAtomEntityImpl
     return object;
   }
   
-  public static BaseAtomEntityImpl fromJSON(JSONObject json) {
+  public static BaseContentEntity fromJSON(JSONObject json) {
     DateFormat dateFormatter = SimpleDateFormat.getInstance();
     
     try {
       AtomType atomType = AtomType.valueOf(json.getString("atomType"));
       Long livingStoryId = json.has("livingStoryId") ? json.getLong("livingStoryId") : null;
-      BaseAtomEntityImpl entity = new BaseAtomEntityImpl(
+      BaseContentEntity entity = new BaseContentEntity(
           dateFormatter.parse(json.getString("timestamp")), atomType, json.getString("content"),
           Importance.valueOf(json.getString("importance")), livingStoryId);
       
