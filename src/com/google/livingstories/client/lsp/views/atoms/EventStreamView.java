@@ -20,7 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AtomType;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.EventAtom;
-import com.google.livingstories.client.atomlist.AtomListElement;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.util.GlobalUtil;
 
@@ -32,7 +31,7 @@ import java.util.Map;
  * The stream view for an event entity.  Displays the content of the event
  * as well as linked content.
  */
-public class EventStreamView extends ContainerStreamView<EventAtom> implements AtomListElement {
+public class EventStreamView extends ContainerStreamView<EventAtom> {
   public EventStreamView(EventAtom event, Map<AtomType, List<BaseAtom>> linkedAtomsByType) {
     super(event, linkedAtomsByType);
   }
