@@ -51,7 +51,7 @@ public class StreamViewFactory {
   }
   
   /**
-   * Processes an contentItem by setting its read state and returning a map of content items that
+   * Processes a content item by setting its read state and returning a map of content items that
    * are linked to it.
    */
   private static Map<ContentItemType, List<BaseContentItem>> processContentItem(

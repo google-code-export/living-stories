@@ -181,8 +181,8 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
       for (Long themeId : contentItem.getThemeIds()) {
         ContentItemTypesBundle themeBundle = result.get(themeId);
         if (themeBundle == null) {
-          logger.warning("contentItem " + contentItem.getId() + " refers to themeId " + themeId + ", but this"
-              + "theme does not appear to be in the story.");
+          logger.warning("contentItem " + contentItem.getId() + " refers to themeId " + themeId
+              + ", but this theme does not appear to be in the story.");
         } else {
           addContentItemToTypesBundle(contentItem, themeBundle);
         }
@@ -195,8 +195,8 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
 
   /**
    * Adds information on contentItem to bundle.
-   * @return false if this is an contentItem that should be ignored completely. Handy to the caller,
-   * which can then avoid adding the contentItem to other, theme-specific types bundles.
+   * @return false if this is a content item that should be ignored completely. Handy to the caller,
+   * which can then avoid adding contentItem to other, theme-specific types bundles.
    */
   private boolean addContentItemToTypesBundle(BaseContentItem contentItem,
       ContentItemTypesBundle bundle) {
@@ -252,13 +252,15 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
     StartPageBundle bundle = Caches.getStartPageBundle();
     if (bundle == null) {
       List<LivingStory> unsortedLivingStories = getAllLivingStories(true);
-      Map<Long, List<BaseContentItem>> storyIdToUpdateMap = new HashMap<Long, List<BaseContentItem>>();
+      Map<Long, List<BaseContentItem>> storyIdToUpdateMap =
+          new HashMap<Long, List<BaseContentItem>>();
       List<LivingStoryAndLastUpdateTime> livingStoriesAndUpdateTimes = 
         new ArrayList<LivingStoryAndLastUpdateTime>();
       // For each living story, get the last 3 updates - the updates are sorted in reverse
       // chronological order
       for (LivingStory livingStory : unsortedLivingStories) {
-        List<BaseContentItem> updates = contentRpcService.getUpdatesForStartPage(livingStory.getId());
+        List<BaseContentItem> updates =
+            contentRpcService.getUpdatesForStartPage(livingStory.getId());
         storyIdToUpdateMap.put(livingStory.getId(), updates);
         livingStoriesAndUpdateTimes.add(
             new LivingStoryAndLastUpdateTime(livingStory,

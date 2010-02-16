@@ -130,7 +130,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       tx.commit();
       
       // If this was an event or a narrative and had a linked narrative, then the 'standalone'
-      // field on the narrative contentItem needs to be updated to 'false'.
+      // field on the narrative content item needs to be updated to 'false'.
       // Note: this doesn't handle the case of unlinking a previously linked narrative content item.
       // That would require checking the linked content items of every single other event
       // content item to make sure it's not linked to from anywhere else, which would be an
@@ -163,7 +163,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       pm.close();
     }
     
-    // Send email alerts if an event contentItem was changed from 'Draft' to 'Published'
+    // Send email alerts if an event content item was changed from 'Draft' to 'Published'
     if (contentEntity.getContentItemType() == ContentItemType.EVENT
         && contentEntity.getPublishState() == PublishState.PUBLISHED
         && oldPublishState != null && oldPublishState == PublishState.DRAFT) {
@@ -211,7 +211,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     return backgroundContentItems;
   }
   
-  private List<BaseContentEntity> getPublishedContentEntitiesByType(Long livingStoryId, ContentItemType contentItemType) {
+  private List<BaseContentEntity> getPublishedContentEntitiesByType(Long livingStoryId,
+      ContentItemType contentItemType) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     Query query = pm.newQuery(BaseContentEntity.class); 
@@ -397,9 +398,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     }
     sortContentItemList(relevantContentItems, localFilterSpec);
 
-    // Need to get the focused contentItem from the map instead of using the object directly.
-    // This is because we use indexOf() to find the location of the focused contentItem in the list,
-    // and the original contentItem isn't the same object instance.
+    // Need to get the focused content item from the map instead of using the object directly.
+    // This is because we use indexOf() to find the location of the focused content item in the
+    // list and the original contentItem isn't the same object instance.
     List<BaseContentItem> coreContentItems = getSublist(relevantContentItems,
         focusedContentItem == null ? null : idToContentItemMap.get(focusedContentItemId), cutoff);
     Set<Long> linkedContentItemIds = Sets.newHashSet();
@@ -434,8 +435,10 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     Date nextDateInSequence = getNextDateInSequence(coreContentItems, relevantContentItems);
 
-    result = new DisplayContentItemBundle(coreContentItems, linkedContentItems, nextDateInSequence, localFilterSpec);
-    Caches.setDisplayContentItemBundle(livingStoryId, filterSpec, focusedContentItemId, cutoff, result);
+    result = new DisplayContentItemBundle(coreContentItems, linkedContentItems, nextDateInSequence,
+        localFilterSpec);
+    Caches.setDisplayContentItemBundle(livingStoryId, filterSpec, focusedContentItemId, cutoff,
+        result);
     return result;
   }
 
@@ -575,7 +578,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     } else {
       filterSpec.playerId = contentItemId;
     }
-    DisplayContentItemBundle result = Caches.getDisplayContentItemBundle(null, filterSpec, null, cutoff);
+    DisplayContentItemBundle result =
+        Caches.getDisplayContentItemBundle(null, filterSpec, null, cutoff);
     if (result != null) {
       return result;
     }
@@ -619,7 +623,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   /**
-   * Performs an contentItem query given a set of search filter terms.
+   * Performs a content entity query given a set of search filter terms.
    * 
    * For all search combinations to be successful, we require the existence
    * of several indexes:
@@ -656,17 +660,19 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       queryFilters.append(" && importance == '" + searchTerms.importance.name() + "'");
     }
     
-    // Optional filter: contentItem type
+    // Optional filter: contentItemType
     if (searchTerms.contentItemType != null) {
       queryFilters.append( "&& contentItemType == '" + searchTerms.contentItemType.name() + "'");
     }
     
-    // Optional filter: contentItem subtype
+    // Optional filter: content item subtype
     if (searchTerms.contentItemType == ContentItemType.PLAYER && searchTerms.playerType != null) {
       queryFilters.append(" && playerType == '" + searchTerms.playerType.name() + "'");
-    } else if (searchTerms.contentItemType == ContentItemType.ASSET && searchTerms.assetType != null) {
+    } else if (searchTerms.contentItemType == ContentItemType.ASSET
+        && searchTerms.assetType != null) {
       queryFilters.append(" && assetType == '" + searchTerms.assetType.name() + "'");
-    } else if (searchTerms.contentItemType == ContentItemType.NARRATIVE && searchTerms.narrativeType != null) {
+    } else if (searchTerms.contentItemType == ContentItemType.NARRATIVE
+        && searchTerms.narrativeType != null) {
       queryFilters.append(" && narrativeType == '" + searchTerms.narrativeType.name() + "'");
     }
     

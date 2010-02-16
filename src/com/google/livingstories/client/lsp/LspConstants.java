@@ -2,7 +2,7 @@ package com.google.livingstories.client.lsp;
 
 /**
  * Interface to represent the constants contained in resource bundle:
- * 	'/home/hiller/src-mercurial/living-stories/src/com/google/livingstories/client/lsp/LspConstants.properties'.
+ * 	'LspConstants.properties'.
  */
 public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   

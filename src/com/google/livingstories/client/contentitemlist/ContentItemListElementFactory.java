@@ -38,7 +38,8 @@ public class ContentItemListElementFactory {
   public static ContentItemListElement createContentItemListElement(BaseContentItem contentItem, 
       Map<Long, BaseContentItem> idToContentItemMap, ContentItemClickHandler handler,
       boolean noHistoryOnToggle) {
-    if (contentItem.getContentItemType() == ContentItemType.EVENT || contentItem.getContentItemType() == ContentItemType.NARRATIVE) {
+    if (contentItem.getContentItemType() == ContentItemType.EVENT
+        || contentItem.getContentItemType() == ContentItemType.NARRATIVE) {
       return StreamViewFactory.createView(contentItem, idToContentItemMap);
     } else {
       return new SimpleContentItemListElement(contentItem, handler);

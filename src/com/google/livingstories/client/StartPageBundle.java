@@ -32,7 +32,8 @@ public class StartPageBundle implements Serializable {
   
   public StartPageBundle() {}
   
-  public StartPageBundle(List<LivingStory> stories, Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
+  public StartPageBundle(List<LivingStory> stories,
+      Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
     this.stories = new ArrayList<LivingStory>(stories);
     this.storyIdToUpdateMap = new HashMap<Long, List<BaseContentItem>>(storyIdToUpdateMap);
   }

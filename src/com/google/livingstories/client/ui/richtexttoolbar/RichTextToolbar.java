@@ -574,7 +574,8 @@ public class RichTextToolbar extends Composite {
       } else if (sender == insertGoToContentItem) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
-        final SingleContentItemSelectionPanel selectionPanel = new SingleContentItemSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel =
+            new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
         contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
@@ -601,7 +602,8 @@ public class RichTextToolbar extends Composite {
       } else if (sender == insertContentItem) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
-        final SingleContentItemSelectionPanel selectionPanel = new SingleContentItemSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel =
+            new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
         contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
@@ -683,7 +685,8 @@ public class RichTextToolbar extends Composite {
       }
     }
 
-    private Widget createButtonPanel(final PopupPanel popup, final ContentItemSelectionHandler handler) {
+    private Widget createButtonPanel(final PopupPanel popup,
+        final ContentItemSelectionHandler handler) {
       Button okButton = new Button("Ok");
       okButton.addClickHandler(new ClickHandler() {
         @Override

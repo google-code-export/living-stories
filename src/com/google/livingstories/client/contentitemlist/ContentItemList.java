@@ -278,7 +278,8 @@ public class ContentItemList extends Composite {
     return countFound == contentItemIds.size();
   }
   
-  private void setTimeVisibility(ContentItemListElement currentElement, ContentItemListElement previousElement) {
+  private void setTimeVisibility(ContentItemListElement currentElement,
+      ContentItemListElement previousElement) {
     if (previousElement != null 
         && previousElement.getDateString().equals(currentElement.getDateString())) {
       previousElement.setTimeVisible(true);

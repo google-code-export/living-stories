@@ -230,9 +230,9 @@ public abstract class LongContainerView<T extends BaseContentItem> extends BaseC
 
   /**
    * A narrative that is linked to an event or another narrative and has to be rendered within it
-   * has to be treated especially, because unlike with other linked content item types, we do want to 
-   * show the content items that have been linked to the narrative. We'll only show the linked content items of 
-   * the type: Multimedia, Quotes and Players.
+   * has to be treated especially, because unlike with other linked content item types, we do want
+   * to show the content items that have been linked to the narrative. We'll only show the linked
+   * content items of the type: Multimedia, Quotes and Players.
    * 
    * TODO: Reuse the ContainerView here somehow, instead of reimplementing
    * a bunch of stuff.
@@ -246,7 +246,8 @@ public abstract class LongContainerView<T extends BaseContentItem> extends BaseC
     
     // Create a map from the different types linked to the narrative to the widgets of content items
     // of those types that will be rendered
-    Map<ContentItemType, List<Widget>> linkedWidgetsMap = new HashMap<ContentItemType, List<Widget>>();
+    Map<ContentItemType, List<Widget>> linkedWidgetsMap =
+        new HashMap<ContentItemType, List<Widget>>();
     for (ContentItemType contentItemType : LINKED_TYPES_SHOWN_FOR_NARRATIVES) {
       linkedWidgetsMap.put(contentItemType, new ArrayList<Widget>());
     }
@@ -284,7 +285,8 @@ public abstract class LongContainerView<T extends BaseContentItem> extends BaseC
       if (!slideshowImages.isEmpty()) {
         AssetContentItem previewImage = slideshowImages.get(0);
         previewImage.setRelatedAssets(slideshowImages);
-        Widget previewPanel = LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
+        Widget previewPanel =
+            LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
         rightPanel.add(previewPanel);
       }
 
@@ -327,7 +329,8 @@ public abstract class LongContainerView<T extends BaseContentItem> extends BaseC
     if (!slideshowImages.isEmpty()) {
       AssetContentItem previewImage = slideshowImages.get(0);
       previewImage.setRelatedAssets(slideshowImages);
-      Widget previewPanel = LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
+      Widget previewPanel =
+          LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
       if (previewImage.getImportance() == Importance.HIGH) {
         importantImages.add(previewPanel);
       } else {
@@ -352,7 +355,8 @@ public abstract class LongContainerView<T extends BaseContentItem> extends BaseC
       // Render everything except images, which we've already done elsewhere.
       if (linkedAssets.getKey() != AssetType.IMAGE) {
         for (AssetContentItem assetContentItem : linkedAssets.getValue()) {
-          Widget view = LinkedViewFactory.createView(assetContentItem, contentItem.getContributorIds());
+          Widget view =
+              LinkedViewFactory.createView(assetContentItem, contentItem.getContributorIds());
           if (assetContentItem.getImportance() == Importance.HIGH) {
             importantAssets.add(view);
           } else {

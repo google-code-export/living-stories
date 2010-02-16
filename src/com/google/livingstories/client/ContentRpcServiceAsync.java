@@ -50,7 +50,8 @@ public interface ContentRpcServiceAsync {
   
   void getUpdateCountSinceTime(Long livingStoryId, Date time, AsyncCallback<Integer> callback);
   
-  void getUpdatesSinceTime(Long livingStoryId, Date time, AsyncCallback<List<BaseContentItem>> callback);
+  void getUpdatesSinceTime(Long livingStoryId, Date time,
+      AsyncCallback<List<BaseContentItem>> callback);
 
   void getDisplayContentItemBundle(Long livingStoryId, FilterSpec filterSpec,
       Long focusedContentItemId, Date cutoff, AsyncCallback<DisplayContentItemBundle> callback);

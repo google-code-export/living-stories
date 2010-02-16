@@ -583,8 +583,10 @@ public class BaseContentEntity
           setPlayerType(playerContentItem.getPlayerType());
           setPhotoContentEntityId(playerContentItem.getPhotoContentItemId());
         } else {
-          StoryPlayerContentItem storyPlayerContentItem = (StoryPlayerContentItem) clientContentItem;
-          setParentPlayerContentEntityId(storyPlayerContentItem.getParentPlayerContentItem().getId());
+          StoryPlayerContentItem storyPlayerContentItem =
+              (StoryPlayerContentItem) clientContentItem;
+          setParentPlayerContentEntityId(
+              storyPlayerContentItem.getParentPlayerContentItem().getId());
         }
         break;
       case ASSET:
@@ -678,7 +680,8 @@ public class BaseContentEntity
           AssetContentItem photoContentItem = null;
           if (getPhotoContentEntityId() != null) {
             try {
-              photoContentItem = (AssetContentItem) new ContentRpcImpl().getContentItem(getPhotoContentEntityId(), false);
+              photoContentItem = (AssetContentItem) new ContentRpcImpl().getContentItem(
+                  getPhotoContentEntityId(), false);
             } catch (JDOException ex) {
               // leave photoContentItem as null;
             }
@@ -686,9 +689,10 @@ public class BaseContentEntity
           return new PlayerContentItem(getId(), getTimestamp(), getContributorIds(), getContent(), 
               getImportance(), getName(), getAliases(), getPlayerType(), photoContentItem);
         } else {
-          return new StoryPlayerContentItem(getId(), getTimestamp(), getContributorIds(), getContent(),
-              getImportance(), livingStoryId,
-              (PlayerContentItem) new ContentRpcImpl().getContentItem(getParentPlayerContentEntityId(), false));
+          return new StoryPlayerContentItem(getId(), getTimestamp(), getContributorIds(),
+              getContent(), getImportance(), livingStoryId,
+              (PlayerContentItem) new ContentRpcImpl().getContentItem(
+                  getParentPlayerContentEntityId(), false));
         }
       case QUOTE:
         return new QuoteContentItem(getId(), getTimestamp(), getContributorIds(),
@@ -749,7 +753,7 @@ public class BaseContentEntity
       object.put("sourceDescription", getSourceDescription());
       object.put("sourceContentEntityId", getSourceContentEntityId());
       
-      // Optional properties depending on contentItem type
+      // Optional properties depending on contentItemType
       switch (getContentItemType()) {
         case EVENT:
           if (startDate != null) {
@@ -806,8 +810,9 @@ public class BaseContentEntity
       ContentItemType contentItemType = ContentItemType.valueOf(json.getString("contentItemType"));
       Long livingStoryId = json.has("livingStoryId") ? json.getLong("livingStoryId") : null;
       BaseContentEntity entity = new BaseContentEntity(
-          dateFormatter.parse(json.getString("timestamp")), contentItemType, json.getString("content"),
-          Importance.valueOf(json.getString("importance")), livingStoryId);
+          dateFormatter.parse(json.getString("timestamp")), contentItemType,
+          json.getString("content"), Importance.valueOf(json.getString("importance")),
+          livingStoryId);
       
       entity.setPublishState(PublishState.valueOf(json.getString("publishState")));
       
@@ -841,7 +846,7 @@ public class BaseContentEntity
         entity.setSourceContentEntityId(json.getLong("sourceContentEntityId"));
       }
       
-      // Optional properties depending on contentItem type
+      // Optional properties depending on contentItemType
       switch (contentItemType) {
         case EVENT:
           if (json.has("startDate")) {

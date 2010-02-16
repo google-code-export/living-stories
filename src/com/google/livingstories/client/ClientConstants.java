@@ -2,7 +2,7 @@ package com.google.livingstories.client;
 
 /**
  * Interface to represent the constants contained in resource bundle:
- * 	'/home/hiller/src-mercurial/living-stories/src/com/google/livingstories/client/ClientConstants.properties'.
+ * 	'ClientConstants.properties'.
  */
 public interface ClientConstants extends com.google.gwt.i18n.client.Constants {
   

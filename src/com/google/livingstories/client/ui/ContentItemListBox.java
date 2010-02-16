@@ -97,7 +97,7 @@ public class ContentItemListBox extends Composite {
   }
   
   /**
-   * Tests whether an contentItem should be included in the displayed list, based on the filter
+   * Tests whether a content item should be included in the displayed list, based on the filter
    * setting.
    */
   protected boolean testContentItem(BaseContentItem contentItem) {
@@ -108,23 +108,24 @@ public class ContentItemListBox extends Composite {
   public void loadItemsForLivingStory(Long livingStoryId) {
     itemList.setSelectedIndex(-1);
     loadedContentItemsMap.clear();
-    contentService.getContentItemsForLivingStory(livingStoryId, false, new AsyncCallback<List<BaseContentItem>>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        itemList.clear();
-        itemList.addItem("Callback failed, please try again");
-      }
-      @Override
-      public void onSuccess(List<BaseContentItem> result) {
-        // Put result on loadedAContentItemsMap in reverse order. Can't use useful
-        // Google Collections stuff for it, so:
-        for (int i = result.size() - 1; i >= 0; i--) {
-          BaseContentItem contentItem = result.get(i);
-          loadedContentItemsMap.put(contentItem.getId(), contentItem);
-        }
-        refresh();
-      }
-    });
+    contentService.getContentItemsForLivingStory(livingStoryId, false,
+        new AsyncCallback<List<BaseContentItem>>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            itemList.clear();
+            itemList.addItem("Callback failed, please try again");
+          }
+          @Override
+          public void onSuccess(List<BaseContentItem> result) {
+            // Put result on loadedAContentItemsMap in reverse order. Can't use useful
+            // Google Collections stuff for it, so:
+            for (int i = result.size() - 1; i >= 0; i--) {
+              BaseContentItem contentItem = result.get(i);
+              loadedContentItemsMap.put(contentItem.getId(), contentItem);
+            }
+            refresh();
+          }
+        });
   }
   
   public void setVisibleItemCount(int count) {
@@ -185,7 +186,7 @@ public class ContentItemListBox extends Composite {
   public void addOrUpdateContentItem(BaseContentItem contentItem) {
     boolean isAdd = !loadedContentItemsMap.containsKey(contentItem.getId());
     loadedContentItemsMap.put(contentItem.getId(), contentItem);
-    // Change the filter if necessary so that the added/updated contentItem
+    // Change the filter if necessary so that the added/updated content item
     // is visible and selectable.
     if (filter.getSelectedConstant() != null
         && !contentItem.getContentItemType().equals(filter.getSelectedConstant())) {

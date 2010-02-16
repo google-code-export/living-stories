@@ -75,7 +75,8 @@ public class EventTimelineCreator {
   /**
    * Actually loads timeline data into the timeline widget.
    */
-  public static void loadTimeline(TimelineWidget<Long> timeline, List<EventContentItem> importantEvents) {
+  public static void loadTimeline(TimelineWidget<Long> timeline,
+      List<EventContentItem> importantEvents) {
     // TODO: implement policies other than "important events only".
     Map<Date, TimelineData<Long>> pointEvents = new LinkedHashMap<Date, TimelineData<Long>>();
     Map<TimelineWidget.Interval, TimelineData<Long>> rangeEvents =

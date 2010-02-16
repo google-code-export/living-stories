@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for scanning the text of an contentItem's main content and replacing the first
+ * Utility class for scanning the text of a content item's main content and replacing the first
  * occurrence of a player's name or alias with an <a href="javascript:showContentItemPopup()"> tag
  * so that appropriate popup links will show on the LSP. It's more efficient to do this at the time
  * of saving the content in the content manager than on-the-fly while rendering on the LSP.
@@ -78,8 +78,8 @@ public class AutoLinkEntitiesInContent {
     
     // For narrative summary: (some need for refactoring here!)
     if (contentItemType == ContentItemType.NARRATIVE) {
-      MatchResult matchResult = match(contentEntityId, contentEntity.getNarrativeSummary(), playerContentItems, 
-          concepts);
+      MatchResult matchResult = match(contentEntityId, contentEntity.getNarrativeSummary(),
+          playerContentItems, concepts);
       if (matchResult.matchesFound) {
         contentEntity.setNarrativeSummary(matchResult.newContent);
       }
@@ -87,10 +87,11 @@ public class AutoLinkEntitiesInContent {
     }
     
     // For asset caption, if applicable: (again, refactoring would be very good...)
-    if (contentItemType == ContentItemType.ASSET && contentEntity.getAssetType() != AssetType.LINK) {
+    if (contentItemType == ContentItemType.ASSET
+        && contentEntity.getAssetType() != AssetType.LINK) {
       // Send an empty concept list here because we are only looking for player names to suggest
-      MatchResult matchResult = match(contentEntityId, contentEntity.getCaption(), playerContentItems, 
-          Lists.<BackgroundContentItem>newArrayList());
+      MatchResult matchResult = match(contentEntityId, contentEntity.getCaption(),
+          playerContentItems, Lists.<BackgroundContentItem>newArrayList());
       // We _don't_ reset the caption, which is just plain text, not HTML.
       suggestedAdditionIds.addAll(matchResult.suggestedPlayerIds);
     }
@@ -126,7 +127,7 @@ public class AutoLinkEntitiesInContent {
       if (content.contains(javascript)) {
         // If a showContentItemPopup() link for a player is already there, we should consistently
         // and repeatedly suggest that the player content item be linked as well. Note that it's no
-        // problem if the suggestion duplicates an contentItem that has already really been linked
+        // problem if the suggestion duplicates a content item that has already really been linked
         // up; the frontend treats this as a sane, expected case.
         suggestedPlayerIds.add(playerId);
       } else {

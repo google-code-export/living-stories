@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Client-side version of a player content entity, which represents a person or an organization, not 
+ * Client-side version of a player content entity, which represents a person or an organization, not
  * specific to a story.
  */
 public class PlayerContentItem extends BaseContentItem {
