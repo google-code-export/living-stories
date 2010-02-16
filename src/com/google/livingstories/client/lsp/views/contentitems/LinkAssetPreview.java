@@ -39,14 +39,19 @@ public class LinkAssetPreview extends Composite {
 
   private static final String LINK_ICON = "/images/link_icon.gif";
 
-  @UiField Label contentItemType;
+  @UiField Label header;
   @UiField SimplePanel iconPanel;
   @UiField SimplePanel content;
 
   public LinkAssetPreview(AssetContentItem contentItem) {
     initWidget(uiBinder.createAndBindUi(this));
-    contentItemType.setText("Resource");   // TODO: i18n issue here
+    header.setText("Resource");
     iconPanel.add(new Image(LINK_ICON));
     content.add(new HTML(contentItem.getContent()));
+  }
+  
+  public LinkAssetPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
 }

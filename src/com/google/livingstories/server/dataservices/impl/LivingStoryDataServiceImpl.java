@@ -18,7 +18,6 @@ package com.google.livingstories.server.dataservices.impl;
 
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.Publisher;
 import com.google.livingstories.server.LivingStoryEntity;
 import com.google.livingstories.server.dataservices.LivingStoryDataService;
 
@@ -38,8 +37,7 @@ public class LivingStoryDataServiceImpl implements LivingStoryDataService {
   
   @Override
   public synchronized LivingStory save(Long id, String urlName, String title, 
-      PublishState publishState, Publisher publisher, String summary) 
-      throws IllegalArgumentException {
+      PublishState publishState, String summary) throws IllegalArgumentException {
     
     // If a new story is being created, first make sure another story with the same URL doesn't
     // already exist.
@@ -58,13 +56,11 @@ public class LivingStoryDataServiceImpl implements LivingStoryDataService {
       LivingStoryEntity entity = null;
       if (id == null) {
         entity = new LivingStoryEntity(urlName, title, publishState, summary);
-        entity.setPublisher(publisher);
       } else {
         entity = pm.getObjectById(LivingStoryEntity.class, id);
         entity.setUrl(urlName);
         entity.setTitle(title);
         entity.setPublishState(publishState);
-        entity.setPublisher(publisher);
         String previousLatestRevision = entity.getSummary();
         if (!previousLatestRevision.equals(summary)) {
           entity.addSummaryRevision(summary);
@@ -136,23 +132,6 @@ public class LivingStoryDataServiceImpl implements LivingStoryDataService {
     }
   }
   
-  @Override
-  public synchronized List<LivingStory> retrieveByPublisher(Publisher publisher, 
-      PublishState publishState, boolean latestRevisionsOnly) {
-    List<LivingStory> allStories = retrieveAll(publishState, latestRevisionsOnly);
-    if (publisher == null) {
-      return allStories;
-    } else {
-      List<LivingStory> results = new ArrayList<LivingStory>();
-      for (LivingStory story : allStories) {
-        if (story.getPublisher().equals(publisher)) {
-          results.add(story);
-        }
-      }
-      return results;
-    }
-  }
-
   @Override
   public synchronized List<LivingStory> retrieveAll(PublishState publishState, 
       boolean latestRevisionsOnly) {

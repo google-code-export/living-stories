@@ -16,7 +16,7 @@
 
 package com.google.livingstories.server;
 
-import com.google.livingstories.client.Publisher;
+import com.google.livingstories.client.Theme;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,46 +30,51 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Store the emails of the app admins so that access to certain data and certain parts of the
- * content manager can be restricted.
+ * This class represents a grouping of content for a living story that fall into the same sub-theme
+ * of the story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class AdminUserEntity implements Serializable, JSONSerializable {
+public class ThemeEntity implements Serializable, JSONSerializable, HasSerializableLivingStoryId {
+
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
   private Long id;
   
   @Persistent
-  private String email;
+  private String name;
   
   @Persistent
-  private Publisher publisher;
-
-  public AdminUserEntity(String email, Publisher publisher) {
-    this.email = email;
-    this.publisher = publisher;
+  private Long livingStoryId;
+  
+  public ThemeEntity(String name, Long livingStoryId) {
+    this.name = name;
+    this.livingStoryId = livingStoryId;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public Long getLivingStoryId() {
+    return livingStoryId;
+  }
+  
   public Long getId() {
     return id;
   }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public Publisher getPublisher() {
-    return publisher;
-  }
-
-  public void setPublisher(Publisher publisher) {
-    this.publisher = publisher;
+  
+  public void setName(String name) {
+    this.name = name;
   }
   
+  public void setLivingStoryId(Long livingStoryId) {
+    this.livingStoryId = livingStoryId;
+  }
+ 
+  public Theme toClientObject() {
+    return new Theme(getId(), getName(), getLivingStoryId());
+  }
+
   @Override
   public String toString() {
     try {
@@ -84,21 +89,21 @@ public class AdminUserEntity implements Serializable, JSONSerializable {
     JSONObject object = new JSONObject();
     try {
       object.put("id", id);
-      object.put("email", email);
-      object.put("publisher", publisher.name());
+      object.put("name", name);
+      object.put("livingStoryId", livingStoryId);
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
     return object;
   }
   
-  public static AdminUserEntity fromJSON(JSONObject json) {
+  public static ThemeEntity fromJSON(JSONObject json) {
     try {
-      return new AdminUserEntity(json.getString("email"), 
-          json.has("publisher") ? Publisher.valueOf(json.getString("publisher")) : null);
+      return new ThemeEntity(json.getString("name"), json.getLong("livingStoryId"));
+      // Note: if the JSON that you're importing uses a different naming convention for
+      // the living story id, convert it before processing here.
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
   }
-  
 }

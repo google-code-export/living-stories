@@ -24,17 +24,21 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.lsp.views.Resources;
 import com.google.livingstories.client.ui.ImagePreview;
+import com.google.livingstories.client.ui.Slideshow;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel.IconPlacement;
+
+import java.util.List;
 
 /**
  * Renders a preview image for an image asset.  Depending on whether or not this
@@ -47,6 +51,7 @@ public class ImageAssetPreview extends Composite {
   }
 
   @UiField FocusPanel panel;
+  @UiField Label header;
   @UiField SimplePanel preview;
   @UiField HTML caption;
   
@@ -81,6 +86,11 @@ public class ImageAssetPreview extends Composite {
   protected void bind() {
     initWidget(uiBinder.createAndBindUi(this));
   }
+
+  public ImageAssetPreview hideHeader() {
+    header.setVisible(false);
+    return this;
+  }
   
   protected Widget createPreviewImage(AssetContentItem contentItem) {
     if (hasContent()) {
@@ -99,7 +109,12 @@ public class ImageAssetPreview extends Composite {
   @UiHandler("panel")
   public void handleClick(ClickEvent e) {
     if (hasContent()) {
-      LivingStoryControls.showLightbox(contentItem.getTitleString(), contentItem);
+      List<AssetContentItem> allImages = contentItem.getRelatedAssets();
+      if (allImages != null && allImages.size() > 1) {
+        new Slideshow(allImages).show(allImages.indexOf(contentItem));
+      } else {
+        LivingStoryControls.showLightbox(contentItem.getTitleString(), contentItem);
+      }
     }
   }
   

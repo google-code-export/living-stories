@@ -45,8 +45,7 @@ public class StreamViewFactory {
         return new NarrativeStreamView((NarrativeContentItem) contentItem,
             linkedContentItemsByType);
       default:
-        throw new IllegalArgumentException("Content item type " + contentItem.getContentItemType()
-            + " does not have a stream view defined.");
+        return new BaseStreamView(contentItem);
     }
   }
   

@@ -43,7 +43,7 @@ public class LinkedViewFactory {
             containerContributorIds);
         break;
       case QUOTE:
-        widget = new QuoteContentItemView((QuoteContentItem) contentItem, containerContributorIds);
+        widget = new QuoteContentItemView((QuoteContentItem) contentItem);
         break;
       case PLAYER:
         widget = new BasePlayerPreview((PlayerContentItem) contentItem);

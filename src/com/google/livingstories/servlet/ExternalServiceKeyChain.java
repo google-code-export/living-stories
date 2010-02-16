@@ -33,12 +33,16 @@ public class ExternalServiceKeyChain {
   private static final String FRIEND_CONNECT_PROP_KEY = "friendConnectSiteId";
   private static final String MAPS_PROP_KEY = "mapsKey";
   private static final String ANALYTICS_ACCOUNT_PROP_KEY= "analyticsAccountId";
+  private static final String LOGO_FILE_NAME = "logoFileName";
+  private static final String PUBLISHER_NAME = "publisherName";
   private static final String FROM_ADDRESS_NAME = "fromAddressName";
   private static final String FROM_ADDRESS_EMAIL = "fromAddressEmail";
   
   private String[] friendConnectArray;
   private String mapsKey;
   private String analyticsAccountId;
+  private String logoFileName;
+  private String publisherName;
   private InternetAddress fromAddress;
   
   
@@ -54,6 +58,8 @@ public class ExternalServiceKeyChain {
       assert friendConnectArray.length % 2 == 0;
       mapsKey = safeGetProperty(properties, MAPS_PROP_KEY);
       analyticsAccountId = safeGetProperty(properties, ANALYTICS_ACCOUNT_PROP_KEY);
+      logoFileName = safeGetProperty(properties, LOGO_FILE_NAME);
+      publisherName = safeGetProperty(properties, PUBLISHER_NAME);
       fromAddress = new InternetAddress(safeGetProperty(properties, FROM_ADDRESS_EMAIL),
           safeGetProperty(properties, FROM_ADDRESS_NAME));
       
@@ -89,6 +95,15 @@ public class ExternalServiceKeyChain {
   
   public String getAnalyticsAccountId() {
     return analyticsAccountId;
+  }
+  
+  public String getLogoFileLocation() {
+    String directoryPrefix = "/images/";
+    return logoFileName.startsWith(directoryPrefix) ? logoFileName : directoryPrefix + logoFileName;
+  }
+  
+  public String getPublisherName() {
+    return publisherName;
   }
   
   public InternetAddress getFromAddress() {

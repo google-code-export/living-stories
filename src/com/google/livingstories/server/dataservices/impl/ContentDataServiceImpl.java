@@ -141,10 +141,10 @@ public class ContentDataServiceImpl implements ContentDataService {
   public synchronized void removeTheme(Long themeId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Query query = pm.newQuery(BaseContentEntity.class);
-    // Checks to see if the collection has angleIdParam in angleIds somewhere, not
+    // Checks to see if the collection has themeIdParam in themeIds somewhere, not
     // strictly for equality:
-    query.setFilter("angleIds == angleIdParam");
-    query.declareParameters("java.lang.Long angleIdParam");
+    query.setFilter("themeIds == themeIdParam");
+    query.declareParameters("java.lang.Long themeIdParam");
     
     try {
       @SuppressWarnings("unchecked")

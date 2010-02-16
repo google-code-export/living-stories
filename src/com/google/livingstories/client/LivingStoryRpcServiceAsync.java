@@ -37,8 +37,8 @@ public interface LivingStoryRpcServiceAsync {
   
   void getLivingStoryByUrl(String url, AsyncCallback<LivingStory> callback);
   
-  void saveLivingStory(long id, String url, String title, Publisher publisher, 
-      PublishState publishState, String summary, AsyncCallback<LivingStory> callback);
+  void saveLivingStory(long id, String url, String title, PublishState publishState, String summary,
+      AsyncCallback<LivingStory> callback);
   
   void deleteLivingStory(long id, AsyncCallback<Void> callback);
  

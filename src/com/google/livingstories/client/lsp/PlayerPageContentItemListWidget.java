@@ -19,7 +19,6 @@ package com.google.livingstories.client.lsp;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.livingstories.client.contentitemlist.ContentItemList;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.ShowMoreEvent;
 
@@ -28,11 +27,6 @@ import com.google.livingstories.client.lsp.event.ShowMoreEvent;
  * Player Page
  */
 public class PlayerPageContentItemListWidget extends LspContentItemListWidget {
-  @Override
-  protected ContentItemList createContentItemList() {
-    return ContentItemList.createNoHistoryOnToggle(true);
-  }
-  
   @Override
   protected void addMoreLinkHandler(HasClickHandlers moreLink) {
     moreLink.addClickHandler(new ClickHandler() {

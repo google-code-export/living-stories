@@ -25,7 +25,9 @@
   ui:generateLocales="default">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
   <g:HTMLPanel>
-    <div class="{res.css.contentItemHeader}"><ui:msg description="Title above a preview of a larger graphic">Graphic</ui:msg></div>
+    <g:Label ui:field="header" styleName="{res.css.contentItemHeader}">
+      <ui:msg description="Title above a preview of a larger graphic">Graphic</ui:msg>
+    </g:Label>
     <g:FocusPanel ui:field="panel">
       <g:HTMLPanel>
         <g:SimplePanel ui:field="preview"/>

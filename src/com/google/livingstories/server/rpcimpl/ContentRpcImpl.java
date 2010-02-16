@@ -79,6 +79,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       Logger.getLogger(ContentRpcImpl.class.getCanonicalName());
   
   private InternetAddress fromAddress = null;
+  private String publisherName = null;
 
   @Override
   public synchronized BaseContentItem createOrChangeContentItem(BaseContentItem contentItem) {
@@ -153,7 +154,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         }
       }
 
-      // TODO(ericzhang): may also want to invalidate linked content entities if they changed
+      // TODO: may also want to invalidate linked atoms if they changed
       // and aren't from the same living story.
       invalidateCache(contentItem.getLivingStoryId());
     } finally {
@@ -249,15 +250,25 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         users.add(entity.getId().getParent().getName());
       }
       if (!users.isEmpty()) {
+       // getServletContext() doesn't return a valid result at construction-time, so
+       // we initialize the external properties lazily.
+       if (fromAddress == null && publisherName == null) {
+          ExternalServiceKeyChain externalKeys = new ExternalServiceKeyChain(getServletContext());
+          publisherName = externalKeys.getPublisherName();
+          fromAddress = externalKeys.getFromAddress();
+        }
+        
         LivingStoryEntity livingStory = pm.getObjectById(LivingStoryEntity.class,
             eventContentItem.getLivingStoryId());
         String baseLspUrl = getBaseServerUrl() + "/lsps/" + livingStory.getUrl();
         
         StringBuilder emailContent = new StringBuilder("<b>");
         emailContent.append(eventContentItem.getEventUpdate()).append("</b>");
-        emailContent.append("<span style=\"color: #777;\">&nbsp;-&nbsp;");
-        emailContent.append(livingStory.getPublisher().toString());
-        emailContent.append("</span>");
+        if (!GlobalUtil.isContentEmpty(publisherName)) {
+          emailContent.append("<span style=\"color: #777;\">&nbsp;-&nbsp;");
+          emailContent.append(publisherName);
+          emailContent.append("</span>");
+        }
         String eventSummary = eventContentItem.getEventSummary();
         String eventDetails = eventContentItem.getContent();
         if (GlobalUtil.isContentEmpty(eventSummary) 
@@ -280,14 +291,10 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
             .append(UserServiceFactory.getUserService().createLoginURL(baseLspUrl))
             .append("\">this page</a>.</span>");
 
-        // getServletContext() doesn't return a valid result at construction-time, so
-        // we initialize fromAddress lazily.
-        if (fromAddress == null) {
-          fromAddress = new ExternalServiceKeyChain(getServletContext()).getFromAddress();
+        if (fromAddress != null) {
+          AlertSender.sendEmail(fromAddress, users,
+              "Update: " + livingStory.getTitle(), emailContent.toString());
         }
-
-        AlertSender.sendEmail(fromAddress, users,
-            "Update: " + livingStory.getTitle(), emailContent.toString());
         
       }
     } finally {

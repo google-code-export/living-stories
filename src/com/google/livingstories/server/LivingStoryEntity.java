@@ -21,7 +21,6 @@ import com.google.appengine.api.datastore.Text;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.Publisher;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,9 +56,6 @@ public class LivingStoryEntity
   
   @Persistent
   private String title;
-  
-  @Persistent
-  private Publisher publisher;
   
   @Persistent
   private PublishState publishState;
@@ -124,11 +120,9 @@ public class LivingStoryEntity
   }
 
 
-  public LivingStoryEntity(String url, String title, Publisher publisher, 
-      PublishState publishState) {
+  public LivingStoryEntity(String url, String title, PublishState publishState) {
     this.url = url;
     this.title = title;
-    this.publisher = publisher;
     this.publishState = publishState;
   }
   
@@ -163,14 +157,6 @@ public class LivingStoryEntity
     this.title = title;
   }
   
-  public Publisher getPublisher() {
-    return publisher;
-  }
-
-  public void setPublisher(Publisher publisher) {
-    this.publisher = publisher;
-  }
-
   public PublishState getPublishState() {
     return publishState == null ? PublishState.PUBLISHED : publishState;
   }
@@ -227,7 +213,7 @@ public class LivingStoryEntity
       Summary summary = summaryRevisions.get(i);
       clientRevisions.add(new LivingStory.Summary(summary.getContent(), summary.getTimestamp()));
     }
-    return new LivingStory(id, url, title, publisher, getPublishState(), clientRevisions);
+    return new LivingStory(id, url, title, getPublishState(), clientRevisions);
   }
   
   @Override
@@ -246,7 +232,6 @@ public class LivingStoryEntity
       object.put("id", id);
       object.put("url", url);
       object.put("title", title);
-      object.put("publisher", publisher == null ? Publisher.NYT.name() : publisher.name());
       object.put("publishState", getPublishState().name());
       JSONArray revisionsJSON = new JSONArray();
       for (Summary revision : summaryRevisions) {
@@ -263,7 +248,6 @@ public class LivingStoryEntity
     try {
       LivingStoryEntity entity = new LivingStoryEntity(
           json.getString("url"), json.getString("title"), 
-          Publisher.valueOf(json.getString("publisher")),
           json.has("publishState") ? 
               PublishState.valueOf(json.getString("publishState")) : PublishState.PUBLISHED);
       JSONArray revisions = json.getJSONArray("summaryRevisions");

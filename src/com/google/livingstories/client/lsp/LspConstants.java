@@ -52,15 +52,6 @@ public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   String defaultView();
 
   /**
-   * Translated "Feedback".
-   * 
-   * @return translated "Feedback"
-   */
-  @DefaultStringValue("Feedback")
-  @Key("feedback")
-  String feedback();
-
-  /**
    * Translated "Most important only".
    * 
    * @return translated "Most important only"
@@ -194,4 +185,13 @@ public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   @DefaultStringValue("Problem receiving new updates. Please try again.")
   @Key("viewMoreProblem")
   String viewMoreProblem();
+  
+  /**
+   * Translated "Read other Living Stories:".
+   * 
+   * @return translated "Read other Living Stories:"
+   */
+  @DefaultStringValue("Read other Living Stories:")
+  @Key("otherStories")
+  String otherStories();
 }

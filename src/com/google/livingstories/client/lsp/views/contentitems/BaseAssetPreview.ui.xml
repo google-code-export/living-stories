@@ -27,7 +27,7 @@
     }
   </ui:style>
   <g:HTMLPanel>
-    <g:Label ui:field="contentItemType" styleName="{res.css.contentItemHeader}"/>
+    <g:Label ui:field="header" styleName="{res.css.contentItemHeader}"/>
     <table cellpadding="0" cellspacing="0">
       <tr>
         <td valign="top">

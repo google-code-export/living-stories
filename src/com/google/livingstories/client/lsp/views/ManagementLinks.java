@@ -28,8 +28,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.util.LivingStoryData;
 
 /**
- * A pane containing links to manage the user's state:
- * Log in/log out, feedback, filing bugs, etc.
+ * A pane containing links to manage the user login.
  *
  * Owner class for StartPageManagementLinks.ui.xml
  */

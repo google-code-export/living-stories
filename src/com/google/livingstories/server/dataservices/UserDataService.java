@@ -17,7 +17,6 @@
 package com.google.livingstories.server.dataservices;
 
 import com.google.livingstories.client.FilterSpec;
-import com.google.livingstories.client.Publisher;
 
 import java.util.Date;
 import java.util.Map;
@@ -97,11 +96,4 @@ public interface UserDataService {
    * times for all users
    */
   void deleteVisitTimesForStory(Long livingStoryId);
-  
-  /**
-   * Return the publisher that an admin user belongs to. There can be admin users that don't belong
-   * to any publisher.
-   * @param adminUserId user id for an admin user
-   */
-  Publisher getPublisherForAdminUser(String adminUserId);
 }
