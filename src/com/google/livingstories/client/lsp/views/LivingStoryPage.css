@@ -1,0 +1,369 @@
+/** Default styles **/
+
+body,table td {
+  font-family: defaultFontFamily;
+  font-size: defaultFontSize;
+  line-height: defaultLineHeight;
+  color: primaryTextColor;
+  background-color: primaryBackgroundColor;
+}
+
+a,a:hover,a:visited {
+  color: primaryLinkColor;
+  text-decoration: none;
+}
+
+p {
+  margin: 0.9em 0;
+}
+
+/** Common classes **/
+
+.clickable {
+  cursor: pointer;
+  color: primaryLinkColor;
+}
+
+.read {
+  color: fadedTextColor;
+}
+
+.read .clickable, .read a, .read a:hover, .read a:visited {
+  color: fadedLinkColor;
+}
+
+.error {
+  color: red;
+}
+
+.contentItemHeader {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.linkedItemSpacing {
+  margin-bottom: 0.9em;
+}
+
+.substituteHeaderSpacing {
+  margin-top: 0.9em;
+}
+
+.linkedContentItemsPanel {
+  float: right;
+  padding-left: 16px;
+  width: 210px;
+}
+
+.hidden {
+  display: none;
+}
+
+/** External GWT classes **/
+
+/** Default anchor style **/
+
+@external gwt-Anchor;
+.gwt-Anchor,a.gwt-Anchor:hover,a.gwt-Anchor:visited {
+  color: primaryLinkColor;
+  text-decoration: none;
+}
+
+/** Default disclosure panel styles **/
+
+@external gwt-DisclosurePanel gwt-header gwt-content;
+.gwt-DisclosurePanel {
+  width: 100%;
+}
+
+.gwt-DisclosurePanel .gwt-header,
+.gwt-DisclosurePanel .gwt-header a,
+.gwt-DisclosurePanel .gwt-header td {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@external gwt-DisclosurePanel-open;
+.gwt-DisclosurePanel-open .gwt-header,
+.gwt-DisclosurePanel-open .gwt-header a,
+.gwt-DisclosurePanel-open .gwt-header td {
+  background-color: secondaryBackgroundColor;
+  padding: 3px;
+}
+
+@external gwt-DisclosurePanel-closed;
+.gwt-DisclosurePanel-closed .gwt-header,
+.gwt-DisclosurePanel-closed .gwt-header a,
+.gwt-DisclosurePanel-closed .gwt-header td {
+  background-color: primaryBackgroundColor;
+}
+
+.gwt-DisclosurePanel .gwt-content {
+  margin: 0.9em 0;
+}
+
+/* to prevent ordinary divs from not having "layout" in IE, we need to do this.
+   Otherwise, the open/close animation gets broken.
+   See http://www.satzansatz.de/cssd/onhavinglayout.html for more detail. */
+.gwt-content {
+  zoom: 1;
+}
+
+.gwt-content p {
+  margin: 0 0 0.9em;
+}
+
+/** Default popup style **/
+
+@external gwt-PopupPanel;
+.gwt-PopupPanel {
+  border-width: 1px 1px 2px 1px;
+  border-color: defaultBorderColor;
+  padding: 2px;
+}
+
+
+/** Legacy styles **/
+/** TODO: de-externalize these so their names can be compiled **/
+
+@external primaryLink;
+.primaryLink,a.primaryLink:hover {
+  color: primaryLinkColor;
+  cursor: pointer;
+}
+
+@external secondaryLink;
+.secondaryLink,a.secondaryLink:hover {
+  color: secondaryLinkColor;
+  cursor: pointer;
+}
+
+@external greyFont grayFont;
+.greyFont,.grayFont {
+  color: secondaryTextColor;
+}
+
+@external nowrap;
+.nowrap {
+  white-space: nowrap;
+}
+
+@external biggerFont;
+.biggerFont {
+  font-size: 16px;
+}
+
+/* Styles for the overview page */
+
+@external page;
+.page {
+  min-width: 600px;
+  max-width: 1000px;
+  _width: expression(document.body.clientWidth <   600 ?   "600px" :  
+    document.body.clientWidth >   1000 ?   "1000px" :   "auto");
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@external atomList;
+.atomList {
+  padding: 0 16px;
+}
+
+@external summaryHighlights;
+.summaryHighlights {
+  background-color: hightlightColor;
+}
+
+@external sectionHeader;
+.sectionHeader {
+  background-color: secondaryBackgroundColor;
+  font-weight: bold;
+  padding: 5px;
+}
+
+@external contributorList;
+.contributorList {
+  margin: 2px 0 3px;
+}
+
+@external buttonListItem;
+.buttonListItem {
+  margin: 0;
+  padding: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px solid defaultBorderColor;
+  color: primaryLinkColor;
+  background-color: none;
+}
+
+@external selectedButtonListItem;
+.selectedButtonListItem {
+  color: black;
+  font-weight: bold;
+  background-color: secondaryBackgroundColor;
+}
+
+@external selectedToolbeltFilter;
+.selectedToolbeltFilter {
+  font-weight: bold;
+}
+
+@external unselectedToolbeltFilter;
+.unselectedToolbeltFilter {
+  color: primaryLinkColor;
+  cursor: pointer;
+}
+
+@external toolbeltSeparator;
+.toolbeltSeparator {
+  padding-bottom: 15px;
+}
+
+/** Content item styles **/
+
+@external superposed;
+.superposed {
+  opacity: 0.7;
+  -moz-opacity: 0.7;
+  filter: alpha(opacity = 70);
+}
+
+@external playerPhoto;
+.playerPhoto {
+  padding: 0 5px 5px 0;
+}
+
+/* Styles for the start page */
+
+@external loginPane;
+.loginPane {
+  position: absolute;
+  right: 0;
+  padding-right: 10px;
+}
+
+.loginPane td {
+  font-size: smaller;
+}
+
+@external startPageStoryName;
+.startPageStoryName,
+a.startPageStoryName:hover,
+a.startPageStoryName:visited {
+  color: primaryLinkColor;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+@external startPagePublisherName;
+.startPagePublisherName,a.startPagePublisherName:hover,a.startPagePublisherName:visited
+  {
+  font-weight: bold;
+  text-decoration: none;
+  color: secondaryTextColor;
+}
+
+@external startPageViewAll;
+.startPageViewAll,a.startPageViewAll:hover,a.startPageViewAll:visited {
+  padding-left: 5px;
+  text-decoration: underline;
+  color: #393;
+}
+
+@external updateText;
+.updateText {
+  padding-left: 10px;
+  color: secondaryTextColor;
+}
+
+/* Miscellaneous Styles */
+
+@external lightboxTitle;
+.lightboxTitle {
+  font-size: 12px;
+}
+
+@external sourceInfoLink;
+.sourceInfoLink {
+  font-size: x-small;
+  display: inline;
+}
+
+/* Styles for the new LSP layout */
+
+@external rightColumnElement;
+.rightColumnElement {
+  padding: 5px;
+  clear: both;
+}
+
+.rightColumnElement p {
+  margin: 0;
+  padding: 0;
+}
+
+@external error;
+.error {
+  color: errorTextColor;
+}
+
+/* Styles for the slideshow image caption */
+
+@external overlay;
+.overlay {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  width: 100%;
+  color: #FFF;
+  z-index: 1;
+  text-align: center;
+}
+
+@external overlayBackground;
+.overlayBackground {
+  background-color: #000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* height will be set programatically */
+  opacity: 0.4;
+  -moz-opacity: 0.4;
+  filter: alpha(opacity = 40);
+  z-index: -1;
+}
+
+@external fixedGlass;
+.fixedGlass {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Styles for filmstrip widget */
+@external filmstrip-current;
+.filmstrip-current {
+  border: selectedBorderColor 2px solid;
+}
+
+/* Styles for SquareImage elements */
+@external squareImage;
+.squareImage {
+  overflow: hidden;
+}
+
+.squareImage img {
+  position: relative;
+}
+
+
+/** Content manager styles **/
+
+@external title;
+.title {
+  font-size: 16px;
+}
