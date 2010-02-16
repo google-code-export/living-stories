@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.server;
-
-import org.json.JSONObject;
+package com.google.livingstories.server.dataservices.entities;
 
 /**
- * Interface that defines a way to get a JSON serialization of an object.
- * This interface is used by the DataExportServlet.
- * 
- * Note that implementers of JSONSerializable for use in the DataExportServlet
- * should also implement a static factory method called 'fromJSON' which takes
- * a JSONObject and instantiates an instance of the given class.
- * This method is called via reflection from the DataImportServlet.
+ * An interface that any Entity assignable to a specific LSP should implement.
  */
-public interface JSONSerializable {
-  JSONObject toJSON();
+public interface HasSerializableLivingStoryId extends JSONSerializable {
+  public Long getLivingStoryId();
 }

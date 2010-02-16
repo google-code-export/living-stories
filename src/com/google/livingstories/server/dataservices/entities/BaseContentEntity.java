@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.server;
+package com.google.livingstories.server.dataservices.entities;
 
 import com.google.appengine.api.datastore.Text;
 import com.google.livingstories.client.AssetContentItem;
