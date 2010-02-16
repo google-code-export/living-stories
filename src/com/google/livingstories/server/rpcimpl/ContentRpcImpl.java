@@ -154,7 +154,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         }
       }
 
-      // TODO: may also want to invalidate linked atoms if they changed
+      // TODO: may also want to invalidate linked content items if they changed
       // and aren't from the same living story.
       invalidateCache(contentItem.getLivingStoryId());
     } finally {

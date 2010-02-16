@@ -44,7 +44,7 @@ import java.util.Map.Entry;
  */
 public class ContentItemList extends Composite {
   private Map<BaseContentItem, ContentItemListElement> currentContentItemToElementMap;
-  private Set<Long> atomIdsInPanel;
+  private Set<Long> contentItemIdsInPanel;
   private Map<Long, BaseContentItem> idToContentItemMap;
   
   private Label statusLabel;
@@ -58,13 +58,14 @@ public class ContentItemList extends Composite {
   private ContentItemList(ContentItemClickHandler handler) {
     super();
     this.clickHandler = handler;
-    atomIdsInPanel = new HashSet<Long>();
-    currentContentItemToElementMap = new TreeMap<BaseContentItem, ContentItemListElement>(new Comparator<BaseContentItem>() {
-      public int compare(BaseContentItem a1, BaseContentItem a2) {
-        int ret = a1.getDateSortKey().compareTo(a2.getDateSortKey());
-        return ret == 0 ? ((int) Math.signum(a1.getId() - a2.getId())) : ret;
-      }
-    });
+    contentItemIdsInPanel = new HashSet<Long>();
+    currentContentItemToElementMap = new TreeMap<BaseContentItem, ContentItemListElement>(
+        new Comparator<BaseContentItem>() {
+          public int compare(BaseContentItem a1, BaseContentItem a2) {
+            int ret = a1.getDateSortKey().compareTo(a2.getDateSortKey());
+            return ret == 0 ? ((int) Math.signum(a1.getId() - a2.getId())) : ret;
+          }
+        });
     statusLabel = new Label("");
     statusLabel.setStylePrimaryName("greyFont");
     
@@ -129,12 +130,12 @@ public class ContentItemList extends Composite {
     ContentItemListElement previousElement = null;
         
     int insertionPosition = 0;
-    for (BaseContentItem atom : getContentItemList()) {
-      ContentItemListElement element = currentContentItemToElementMap.get(atom);
-      if (!atomIdsInPanel.contains(atom.getId())) {
+    for (BaseContentItem contentItem : getContentItemList()) {
+      ContentItemListElement element = currentContentItemToElementMap.get(contentItem);
+      if (!contentItemIdsInPanel.contains(contentItem.getId())) {
         // the appropriate widget is not in the contentPanel. Add it!
         contentPanel.insert(element, insertionPosition);
-        atomIdsInPanel.add(atom.getId());
+        contentItemIdsInPanel.add(contentItem.getId());
       }
       
       setTimeVisibility(element, previousElement);
@@ -147,25 +148,27 @@ public class ContentItemList extends Composite {
    * Adds a new content item to currentContentItemToRowMap, if it's not already there.
    * Doesn't alter contentItemIdsInPanel.
    */
-  public void addContentItem(BaseContentItem atom) {
-    if (!currentContentItemToElementMap.containsKey(atom)) {
-      ContentItemListElement element = StreamViewFactory.createView(atom, idToContentItemMap);
+  public void addContentItem(BaseContentItem contentItem) {
+    if (!currentContentItemToElementMap.containsKey(contentItem)) {
+      ContentItemListElement element =
+          StreamViewFactory.createView(contentItem, idToContentItemMap);
       if (clickHandler != null) {
         element = new ClickableContentItemListElement(element, clickHandler);
       }
-      currentContentItemToElementMap.put(atom, element);
+      currentContentItemToElementMap.put(contentItem, element);
     }
   }
   
   /**
    * Removes a content item from the list if it is currently present.
    */
-  public void removeContentItem(Long atomId) {
-    for (Entry<BaseContentItem, ContentItemListElement> entry : currentContentItemToElementMap.entrySet()) {
-      if (entry.getKey().getId() == atomId) {
+  public void removeContentItem(Long contentItemId) {
+    for (Entry<BaseContentItem, ContentItemListElement> entry
+        : currentContentItemToElementMap.entrySet()) {
+      if (entry.getKey().getId() == contentItemId) {
         contentPanel.remove(entry.getValue());
         currentContentItemToElementMap.remove(entry.getKey());
-        atomIdsInPanel.remove(entry.getKey().getId());
+        contentItemIdsInPanel.remove(entry.getKey().getId());
         break;
       }
     }
@@ -181,7 +184,8 @@ public class ContentItemList extends Composite {
   
   public List<BaseContentItem> getContentItemList() {
     // This would be simpler if GWT emulated TreeMap.descendingKeySet().
-    List<BaseContentItem> ret = new ArrayList<BaseContentItem>(currentContentItemToElementMap.keySet());
+    List<BaseContentItem> ret =
+        new ArrayList<BaseContentItem>(currentContentItemToElementMap.keySet());
     if (!chronological) {
       Collections.reverse(ret);
     }
@@ -191,7 +195,7 @@ public class ContentItemList extends Composite {
   public void clear() {
     contentPanel.clear();
     currentContentItemToElementMap.clear();
-    atomIdsInPanel.clear();
+    contentItemIdsInPanel.clear();
   }
   
   public void adjustTimeOrdering(boolean chronological) {

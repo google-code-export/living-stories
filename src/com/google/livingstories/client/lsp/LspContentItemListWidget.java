@@ -131,10 +131,10 @@ public class LspContentItemListWidget extends Composite {
       idToContentItemMap.put(contentItem.getId(), contentItem);
     }
 
-    // Get all the image atoms in the core atoms list.  If it has a full view,
+    // Get all the images in the core content items list.  If it has a full view,
     // Then add it to the 'slideshowImages' list and set that list as the related
     // assets list on each of its members.  This allows us to pop up to slideshow
-    // view for images in the atom stream.
+    // view for images in the content items stream.
     List<AssetContentItem> slideshowImages = new ArrayList<AssetContentItem>();
     for (BaseContentItem coreContentItem : coreContentItems) {
       if (coreContentItem.getContentItemType() == ContentItemType.ASSET) {

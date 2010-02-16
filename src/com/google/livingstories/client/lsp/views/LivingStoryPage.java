@@ -188,15 +188,11 @@ public class LivingStoryPage extends Composite {
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightboxForContentItem(Ljava/lang/String;I)
           .call(instance, title, contentItemId);
     };
-    // for legacy purposes:
-    $wnd.showLightboxForAtom = $wnd.showLightboxForContentItem;
     $wnd.showContentItemPopup = function(contentItemId, showRelativeTo) {
       instance.
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showContentItemPopup(ILcom/google/gwt/dom/client/Element;)
           .call(instance, contentItemId, showRelativeTo);
     };
-    // for legacy purposes:
-    $wnd.showAtomPopup = $wnd.showContentItemPopup;
     $wnd.showSourcePopup = function(description, contentItemId, showRelativeTo) {
       instance.
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showSourcePopup(Ljava/lang/String;ILcom/google/gwt/dom/client/Element;)
