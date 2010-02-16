@@ -28,10 +28,10 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.PopupImageLoadedEvent;
-import com.google.livingstories.client.lsp.views.atoms.ImagePopupView;
+import com.google.livingstories.client.lsp.views.contentitems.ImagePopupView;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.LivingStoryControls;
 
@@ -49,10 +49,10 @@ public class Slideshow {
   private VerticalPanel contentPanel;
   private SimplePanel imagePanel;
   
-  private List<AssetAtom> allImages;
+  private List<AssetContentItem> allImages;
   private HandlerRegistration popupImageLoadedHandler;
 
-  public Slideshow(List<AssetAtom> images) {
+  public Slideshow(List<AssetContentItem> images) {
     allImages = images;
     
     Image closeButton = new Image(Constants.CLOSE_IMAGE_URL);
@@ -132,7 +132,7 @@ public class Slideshow {
   }
 
   private void displayImage(int index) {
-    final AssetAtom currentImage = allImages.get(index);
+    final AssetContentItem currentImage = allImages.get(index);
     imagePanel.setWidget(new ImagePopupView(currentImage));
     // Reposition the popup/filmstrip to take image size changes, window size changes,
     // and scrolling into account.

@@ -18,8 +18,8 @@ package com.google.livingstories.client.util;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.FilterSpec;
 
 /**
@@ -42,33 +42,33 @@ public class LivingStoryControls {
     $wnd.showGlass(show);
   }-*/;
   
-  public static native void showLightbox(String title, BaseAtom atom) /*-{
-    $wnd.showLightbox(title, atom);
+  public static native void showLightbox(String title, BaseContentItem contentItem) /*-{
+    $wnd.showLightbox(title, contentItem);
   }-*/;
   
   public static native void setEventListFilters(boolean importantOnly,
-      AtomType atomType, AssetType assetType) /*-{
-    $wnd.setEventListFilters(importantOnly, atomType, assetType);
+      ContentItemType contentItemType, AssetType assetType) /*-{
+    $wnd.setEventListFilters(importantOnly, contentItemType, assetType);
   }-*/;
   
   public static native void setFilterZippyState(boolean open) /*-{
     $wnd.setFilterZippyState(open);
   }-*/;
 
-  public static void goToAtom(long atomId) {
-    goToAtomInternal((int)atomId);
+  public static void goToContentItem(long contentItemId) {
+    goToContentItemInternal((int)contentItemId);
   }
   
-  private static native void goToAtomInternal(int atomId) /*-{
-    $wnd.goToAtom(atomId);
+  private static native void goToContentItemInternal(int contentItemId) /*-{
+    $wnd.goToContentItem(contentItemId);
   }-*/;
   
   public static native void repositionAnchoredPanel() /*-{
     $wnd.repositionAnchoredPanel();
   }-*/;
   
-  public static native void getMoreAtoms() /*-{
-    $wnd.getMoreAtoms();
+  public static native void getMoreContentItems() /*-{
+    $wnd.getMoreContentItems();
   }-*/;
   
   public static native FilterSpec getCurrentFilterSpec() /*-{

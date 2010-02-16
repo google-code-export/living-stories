@@ -28,37 +28,40 @@ import java.util.Map;
  * Async version of {@link ContentRpcService}.
  */
 public interface ContentRpcServiceAsync {
-  void createOrChangeAtom(BaseAtom clientAtom, AsyncCallback<BaseAtom> callback);
+  void createOrChangeContentItem(BaseContentItem contentItem,
+      AsyncCallback<BaseContentItem> callback);
   
-  void getAtomsForLivingStory(Long livingStoryId, boolean onlyPublished, 
-      AsyncCallback<List<BaseAtom>> callback);
+  void getContentItemsForLivingStory(Long livingStoryId, boolean onlyPublished, 
+      AsyncCallback<List<BaseContentItem>> callback);
   
-  void getAtom(Long id, boolean getLinkedAtoms, AsyncCallback<BaseAtom> callback);
+  void getContentItem(Long id, boolean getLinkedContentItems,
+      AsyncCallback<BaseContentItem> callback);
   
-  void getAtoms(Collection<Long> ids, AsyncCallback<List<BaseAtom>> callback);
+  void getContentItems(Collection<Long> ids, AsyncCallback<List<BaseContentItem>> callback);
   
-  void getUnassignedPlayers(AsyncCallback<List<PlayerAtom>> callback);
+  void getUnassignedPlayers(AsyncCallback<List<PlayerContentItem>> callback);
 
-  void getRelatedAtoms(Long atomId, boolean byContribution, Date cutoff,
-      AsyncCallback<DisplayAtomBundle> callback);
+  void getRelatedContentItems(Long contentItemId, boolean byContribution, Date cutoff,
+      AsyncCallback<DisplayContentItemBundle> callback);
   
-  void executeSearch(SearchTerms searchTerms, AsyncCallback<List<BaseAtom>> callback);
+  void executeSearch(SearchTerms searchTerms, AsyncCallback<List<BaseContentItem>> callback);
   
-  void deleteAtom(Long id, AsyncCallback<Void> callback);
+  void deleteContentItem(Long id, AsyncCallback<Void> callback);
   
   void getUpdateCountSinceTime(Long livingStoryId, Date time, AsyncCallback<Integer> callback);
   
-  void getUpdatesSinceTime(Long livingStoryId, Date time, AsyncCallback<List<BaseAtom>> callback);
+  void getUpdatesSinceTime(Long livingStoryId, Date time, AsyncCallback<List<BaseContentItem>> callback);
 
-  void getDisplayAtomBundle(Long livingStoryId, FilterSpec filterSpec, Long focusedAtomId,
-      Date cutoff, AsyncCallback<DisplayAtomBundle> callback);
+  void getDisplayContentItemBundle(Long livingStoryId, FilterSpec filterSpec,
+      Long focusedContentItemId, Date cutoff, AsyncCallback<DisplayContentItemBundle> callback);
   
   void getImportantEventsForLivingStory(Long livingStoryId,
-      AsyncCallback<List<EventAtom>> callback);
+      AsyncCallback<List<EventContentItem>> callback);
 
   void getImportantPlayersForLivingStory(Long livingStoryId,
-      AsyncCallback<List<PlayerAtom>> callback);
+      AsyncCallback<List<PlayerContentItem>> callback);
   
   void getContributorsByIdForLivingStory(Long livingStoryId,
-      AsyncCallback<Map<Long, PlayerAtom>> callback);
+      AsyncCallback<Map<Long, PlayerContentItem>> callback);
+
 }

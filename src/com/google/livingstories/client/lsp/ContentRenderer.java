@@ -30,12 +30,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class to render HTML content from the summary or the Atoms. It does 2 things currently:
+ * A class to render HTML content from the summary or within content items. It does 2 things
+ * currently:
  * 1. Breaks up the content into chunks separate by 'Read more' links if the text contains
  * break tags.
- * 2. If the text contains tags for other atoms, converts them to links with appropriate behavior.
- * If the tag contains the id of only 1 atom, its content is displayed in a popup panel. If the tag
- * has multiple ids, the area below the summary is repopulated with the linked atoms.  
+ * 2. If the text contains tags for other content items, converts them to links with appropriate
+ * behavior.
+ * If the tag contains the id of only 1 item, its content is displayed in a popup panel. If the tag
+ * has multiple ids, the area below the summary is repopulated with the linked content items.  
  */
 public class ContentRenderer extends Composite {
   private static final String BREAK_TAG = "<!--lsp:break-->";

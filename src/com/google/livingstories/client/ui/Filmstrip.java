@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.util.SquareImage;
 
 import java.util.List;
@@ -100,10 +100,10 @@ public class Filmstrip extends Composite {
     initWidget(filmstrip);
   }
 
-  public void loadImages(List<AssetAtom> images) {
+  public void loadImages(List<AssetContentItem> images) {
     contentPanel.clear();
     int i = 0;
-    for (AssetAtom image : images) {
+    for (AssetContentItem image : images) {
       final SquareImage imageWidget = new SquareImage(image.getPreviewUrl(), ITEM_SIZE);
       final int imageIndex = i++;
       imageWidget.addClickHandler(new ClickHandler() {

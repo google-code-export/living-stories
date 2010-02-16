@@ -25,9 +25,9 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ClientCaches;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.HistoryManager.HistoryPages;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Widget to create a byline from the contributors to an atom. Each of the names are linked.
+ * Widget to create a byline from the contributors to a content item. Each of the names are linked.
  * Clicking on them takes you to the player page that lists all the contributions of that author.
  * This class also now includes a facility for prepending a widget that should be presented
  * alongside the BylineWidget, in a visually-consistent manner.
@@ -53,11 +53,11 @@ public class BylineWidget extends Composite {
   private int prependedWidgetCount = 0;
   private int contributorCount = 0;
   
-  public BylineWidget(BaseAtom atom) {
-    this(atom, true);
+  public BylineWidget(BaseContentItem contentItem) {
+    this(contentItem, true);
   }
   
-  public BylineWidget(BaseAtom atom, boolean secondaryLinkStyle) {
+  public BylineWidget(BaseContentItem contentItem, boolean secondaryLinkStyle) {
     super();
     
     this.secondaryLinkStyle = secondaryLinkStyle;
@@ -71,8 +71,8 @@ public class BylineWidget extends Composite {
     
     initWidget(container);
   
-    leadin = atom.getBylineLeadin();
-    ClientCaches.getContributorsById(atom.getContributorIds(), new ContributorsCallback());
+    leadin = contentItem.getBylineLeadin();
+    ClientCaches.getContributorsById(contentItem.getContributorIds(), new ContributorsCallback());
   }
   
   public void setNavLinks(List<Widget> navLinks) {
@@ -96,12 +96,12 @@ public class BylineWidget extends Composite {
         && navLinkCount + contributorCount > MANUAL_BREAK_THRESHOLD);
   }
   
-  private class ContributorsCallback implements AsyncCallback<List<PlayerAtom>> {
+  private class ContributorsCallback implements AsyncCallback<List<PlayerContentItem>> {
     public void onFailure(Throwable t) {
       // Do nothing
     }
     
-    public void onSuccess(List<PlayerAtom> contributors) {
+    public void onSuccess(List<PlayerContentItem> contributors) {
       if (!contributors.isEmpty()) {
         HTML leadinLabel = new InlineHTML(leadin + "&nbsp;");
         leadinLabel.addStyleName("greyFont");
@@ -109,7 +109,7 @@ public class BylineWidget extends Composite {
       }
 
       boolean notFirst = false;
-      for (final PlayerAtom contributor : contributors) {
+      for (final PlayerContentItem contributor : contributors) {
         if (notFirst) {
           container.add(new InlineHTML(", "));
         }
@@ -120,7 +120,7 @@ public class BylineWidget extends Composite {
           @Override
           public void onClick(ClickEvent e) {
             // TODO: this isn't great, but it works.
-            // The right way to do this would probably be to store all atoms in the
+            // The right way to do this would probably be to store all content items in the
             // ClientCache and fire a history change event here to load the page, instead
             // of trying to hack around the history system.
             Page page = (Page) contributor.renderContent(new HashSet<Long>());
@@ -137,21 +137,21 @@ public class BylineWidget extends Composite {
   }
   
   /**
-   * Conditionally creates a new byline widget to a panel for the contributors to an atom.
+   * Conditionally creates a new byline widget to a panel for the contributors to a content item.
    * Only does this if there are contributors, and the contributors are _not the same_ as the
    * containing context's contributor set. (Partial overlap is okay.)
-   * @param atom The atom that the byline widget is based on
+   * @param contentItem The content item that the byline widget is based on
    * @param containingContributorIds The contributorIds of the content eventBlock, if any.
    *   If this argument is null, the method is a no-op; if this argument is an empty
    *   set, this will serve to always add a byline widget (provided there are _some_ contributors).
    * @return the newly-created byline widget, or null if one was not created.
    */
   public static BylineWidget makeContextSensitive(
-      BaseAtom atom, Set<Long> containingContributorIds) {
-    Set<Long> atomContributorIds = atom.getContributorIds();
-    if (containingContributorIds != null && !atomContributorIds.isEmpty()
-        && !atomContributorIds.equals(containingContributorIds)) {
-      return new BylineWidget(atom);
+      BaseContentItem contentItem, Set<Long> containingContributorIds) {
+    Set<Long> contentItemContributorIds = contentItem.getContributorIds();
+    if (containingContributorIds != null && !contentItemContributorIds.isEmpty()
+        && !contentItemContributorIds.equals(containingContributorIds)) {
+      return new BylineWidget(contentItem);
     } else {
       return null;
     }

@@ -96,10 +96,10 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
           ClickEvent.fireNativeEvent(event, this);
           boolean opened = !isOpen;
           // Need to set this open first here instead of relying on the event
-          // in case the user didn't specify an atom id for this widget.
+          // in case the user didn't specify an contentItem id for this widget.
           setOpen(opened, true);
-          if (atomId != null) {
-            EventBus.INSTANCE.fireEvent(new BlockToggledEvent(opened, atomId));
+          if (contentItemId != null) {
+            EventBus.INSTANCE.fireEvent(new BlockToggledEvent(opened, contentItemId));
           }
       }
     }
@@ -126,7 +126,7 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
   private Widget openedWidget;
   private Command onAnimationCompletion;
   private HandlerRegistration toggleEventHandler;
-  private Long atomId;
+  private Long contentItemId;
 
   @UiConstructor
   public ToggleDisclosurePanel(boolean headerOnTop) {
@@ -226,15 +226,15 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
   }
 
   /**
-   * Make this panel listen for events being fired for the specified atom id.
+   * Make this panel listen for events being fired for the specified contentItem id.
    */
-  public void handleAtomEvents(Long currentAtomId) {
-    this.atomId = currentAtomId;
+  public void handleContentItemEvents(Long currentContentItemId) {
+    this.contentItemId = currentContentItemId;
     toggleEventHandler = EventBus.INSTANCE.addHandler(BlockToggledEvent.TYPE,
         new BlockToggledEvent.Handler() {
           @Override
           public void onToggle(BlockToggledEvent e) {
-            if (atomId.equals(e.getAtomId())) {
+            if (contentItemId.equals(e.getContentItemId())) {
               setOpen(e.isOpened(), e.shouldAnimate());
               e.finish();
             }

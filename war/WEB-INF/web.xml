@@ -87,17 +87,17 @@
 
   <servlet-mapping>
     <servlet-name>atomServlet</servlet-name>
-    <url-pattern>/ContentManager/atomservice</url-pattern>
+    <url-pattern>/ContentManager/contentservice</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>atomServlet</servlet-name>
-    <url-pattern>/StartPage/atomservice</url-pattern>
+    <url-pattern>/StartPage/contentservice</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>atomServlet</servlet-name>
-    <url-pattern>/LivingStoryPage/atomservice</url-pattern>
+    <url-pattern>/LivingStoryPage/contentservice</url-pattern>
   </servlet-mapping>
 
   <servlet>

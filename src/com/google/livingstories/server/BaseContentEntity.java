@@ -17,24 +17,24 @@
 package com.google.livingstories.server;
 
 import com.google.appengine.api.datastore.Text;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BackgroundAtom;
-import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.DataAtom;
-import com.google.livingstories.client.DefaultAtom;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BackgroundContentItem;
+import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.DataContentItem;
+import com.google.livingstories.client.DefaultContentItem;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.Location;
-import com.google.livingstories.client.NarrativeAtom;
+import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.NarrativeType;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PlayerType;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.QuoteAtom;
-import com.google.livingstories.client.ReactionAtom;
-import com.google.livingstories.client.StoryPlayerAtom;
+import com.google.livingstories.client.QuoteContentItem;
+import com.google.livingstories.client.ReactionContentItem;
+import com.google.livingstories.client.StoryPlayerContentItem;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.server.rpcimpl.ContentRpcImpl;
 import com.google.livingstories.server.util.TimeUtil;
@@ -86,7 +86,7 @@ public class BaseContentEntity
   
   // Enum for the classification of this content such as "Fact", "Context", "Analysis", etc.
   @Persistent
-  private AtomType atomType;
+  private ContentItemType contentItemType;
 
   // This is the HTML content.
   @Persistent
@@ -105,7 +105,7 @@ public class BaseContentEntity
   private Set<Long> contributorIds;
 
   @Persistent
-  private Set<Long> linkedAtomIds;
+  private Set<Long> linkedContentEntityIds;
   
   @Persistent
   private Set<Long> angleIds;
@@ -193,7 +193,7 @@ public class BaseContentEntity
   private Text sourceDescription;
   
   @Persistent
-  private Long sourceAtomId;
+  private Long sourceContentEntityId;
   
   /*** Event specific properties ***/
   
@@ -223,12 +223,12 @@ public class BaseContentEntity
   private PlayerType playerType;
   
   @Persistent
-  private Long photoAtomId; // Asset atom id
+  private Long photoContentEntityId;  // id of an associated asset entity
   
   /*** StoryPlayer specific properties ***/
   
   @Persistent
-  private Long parentPlayerAtomId;
+  private Long parentPlayerContentEntityId;
   
   /*** Asset specific properties ***/
   
@@ -261,10 +261,10 @@ public class BaseContentEntity
 
   private BaseContentEntity() {}
   
-  public BaseContentEntity(Date timestamp, AtomType atomType,
+  public BaseContentEntity(Date timestamp, ContentItemType contentItemType,
       String content, Importance importance, Long livingStoryId) {
     this.timestamp = timestamp;
-    this.atomType = atomType;
+    this.contentItemType = contentItemType;
     this.content = new Text(content);
     this.importance = importance;
     this.livingStoryId = livingStoryId;
@@ -283,12 +283,12 @@ public class BaseContentEntity
     this.timestamp = timestamp;
   }
 
-  public AtomType getAtomType() {
-    return atomType;
+  public ContentItemType getContentItemType() {
+    return contentItemType;
   }
 
-  public void setAtomType(AtomType atomType) {
-    this.atomType = atomType;
+  public void setContentItemType(ContentItemType contentItemType) {
+    this.contentItemType = contentItemType;
   }
 
   public String getContent() {
@@ -345,24 +345,24 @@ public class BaseContentEntity
     }
   }
   
-  public Set<Long> getLinkedAtomIds() {
-    return GlobalUtil.copySet(linkedAtomIds);
+  public Set<Long> getLinkedContentEntityIds() {
+    return GlobalUtil.copySet(linkedContentEntityIds);
   }
   
-  public void setLinkedAtomIds(Set<Long> linkedAtomIds) {
-    this.linkedAtomIds = GlobalUtil.copySet(linkedAtomIds);
+  public void setLinkedContentEntityIds(Set<Long> linkedContentEntityIds) {
+    this.linkedContentEntityIds = GlobalUtil.copySet(linkedContentEntityIds);
   }
   
-  public void addLinkedAtomId(long linkedAtomId) {
-    if (linkedAtomIds == null) {
-      linkedAtomIds = new HashSet<Long>();
+  public void addLinkedContentEntityId(long linkedContentEntityId) {
+    if (linkedContentEntityIds == null) {
+      linkedContentEntityIds = new HashSet<Long>();
     }
-    linkedAtomIds.add(linkedAtomId);
+    linkedContentEntityIds.add(linkedContentEntityId);
   }  
 
-  public void removeLinkedAtomId(long atomId) {
-    if (linkedAtomIds != null) {
-      linkedAtomIds.remove(atomId);
+  public void removeLinkedContentEntityId(long linkedContentEntityId) {
+    if (linkedContentEntityIds != null) {
+      linkedContentEntityIds.remove(linkedContentEntityId);
     }
   }
 
@@ -409,12 +409,12 @@ public class BaseContentEntity
     }
   }
 
-  public Long getSourceAtomId() {
-    return sourceAtomId;
+  public Long getSourceContentEntityId() {
+    return sourceContentEntityId;
   }
 
-  public void setSourceAtomId(Long sourceAtomId) {
-    this.sourceAtomId = sourceAtomId;
+  public void setSourceContentEntityId(Long sourceContentEntityId) {
+    this.sourceContentEntityId = sourceContentEntityId;
   }
 
   public Date getEventStartDate() {
@@ -473,20 +473,20 @@ public class BaseContentEntity
     this.playerType = playerType;
   }
   
-  public Long getPhotoAtomId() {
-    return photoAtomId;
+  public Long getPhotoContentEntityId() {
+    return photoContentEntityId;
   }
   
-  public void setPhotoAtomId(Long photoAtomId) {
-    this.photoAtomId = photoAtomId;
+  public void setPhotoContentEntityId(Long photoContentEntityId) {
+    this.photoContentEntityId = photoContentEntityId;
   }
   
-  public Long getParentPlayerAtomId() {
-    return parentPlayerAtomId;
+  public Long getParentPlayerContentEntityId() {
+    return parentPlayerContentEntityId;
   }
   
-  public void setParentPlayerAtomId(Long parentPlayerAtomId) {
-    this.parentPlayerAtomId = parentPlayerAtomId;
+  public void setParentPlayerContentEntityId(Long parentPlayerContentEntityId) {
+    this.parentPlayerContentEntityId = parentPlayerContentEntityId;
   }
   
   public AssetType getAssetType() {
@@ -554,56 +554,56 @@ public class BaseContentEntity
     this.narrativeSummary = new Text(narrativeSummary);
   }
     
-  public void copyFields(BaseAtom clientAtom) {
-    setTimestamp(clientAtom.getTimestamp());
-    setAtomType(clientAtom.getAtomType());
-    setContent(fixLinks(trimWithBrs(clientAtom.getContent())));
-    setImportance(clientAtom.getImportance());
-    setLivingStoryId(clientAtom.getLivingStoryId());
-    setThemeIds(clientAtom.getThemeIds());
-    setContributorIds(clientAtom.getContributorIds());
-    setLinkedAtomIds(clientAtom.getLinkedAtomIds());
-    setPublishState(clientAtom.getPublishState());
-    setLocation(clientAtom.getLocation());
-    setSourceDescription(clientAtom.getSourceDescription());
-    setSourceAtomId(clientAtom.getSourceAtomId());
-    switch (clientAtom.getAtomType()) {
+  public void copyFields(BaseContentItem clientContentItem) {
+    setTimestamp(clientContentItem.getTimestamp());
+    setContentItemType(clientContentItem.getContentItemType());
+    setContent(fixLinks(trimWithBrs(clientContentItem.getContent())));
+    setImportance(clientContentItem.getImportance());
+    setLivingStoryId(clientContentItem.getLivingStoryId());
+    setThemeIds(clientContentItem.getThemeIds());
+    setContributorIds(clientContentItem.getContributorIds());
+    setLinkedContentEntityIds(clientContentItem.getLinkedContentItemIds());
+    setPublishState(clientContentItem.getPublishState());
+    setLocation(clientContentItem.getLocation());
+    setSourceDescription(clientContentItem.getSourceDescription());
+    setSourceContentEntityId(clientContentItem.getSourceContentItemId());
+    switch (clientContentItem.getContentItemType()) {
       case EVENT:
-        EventAtom eventAtom = (EventAtom) clientAtom;
-        setEventStartDate(eventAtom.getEventStartDate());
-        setEventEndDate(eventAtom.getEventEndDate());
-        setEventUpdate(fixLinks(trimWithBrs(eventAtom.getEventUpdate())));
-        setEventSummary(fixLinks(trimWithBrs(eventAtom.getEventSummary())));
+        EventContentItem eventContentItem = (EventContentItem) clientContentItem;
+        setEventStartDate(eventContentItem.getEventStartDate());
+        setEventEndDate(eventContentItem.getEventEndDate());
+        setEventUpdate(fixLinks(trimWithBrs(eventContentItem.getEventUpdate())));
+        setEventSummary(fixLinks(trimWithBrs(eventContentItem.getEventSummary())));
         break;
       case PLAYER:
-        if (clientAtom.getLivingStoryId() == null) {
-          PlayerAtom playerAtom = (PlayerAtom) clientAtom;
-          setName(playerAtom.getName());
-          setAliases(playerAtom.getAliases());
-          setPlayerType(playerAtom.getPlayerType());
-          setPhotoAtomId(playerAtom.getPhotoAtomId());
+        if (clientContentItem.getLivingStoryId() == null) {
+          PlayerContentItem playerContentItem = (PlayerContentItem) clientContentItem;
+          setName(playerContentItem.getName());
+          setAliases(playerContentItem.getAliases());
+          setPlayerType(playerContentItem.getPlayerType());
+          setPhotoContentEntityId(playerContentItem.getPhotoContentItemId());
         } else {
-          StoryPlayerAtom storyPlayerAtom = (StoryPlayerAtom) clientAtom;
-          setParentPlayerAtomId(storyPlayerAtom.getParentPlayerAtom().getId());
+          StoryPlayerContentItem storyPlayerContentItem = (StoryPlayerContentItem) clientContentItem;
+          setParentPlayerContentEntityId(storyPlayerContentItem.getParentPlayerContentItem().getId());
         }
         break;
       case ASSET:
-        AssetAtom assetAtom = (AssetAtom) clientAtom;
-        setAssetType(assetAtom.getAssetType());
-        setCaption(assetAtom.getCaption());
-        setPreviewUrl(assetAtom.getPreviewUrl());
+        AssetContentItem assetContentItem = (AssetContentItem) clientContentItem;
+        setAssetType(assetContentItem.getAssetType());
+        setCaption(assetContentItem.getCaption());
+        setPreviewUrl(assetContentItem.getPreviewUrl());
         break;
       case NARRATIVE:
-        NarrativeAtom narrativeAtom = (NarrativeAtom) clientAtom;
-        setHeadline(narrativeAtom.getHeadline());
-        setNarrativeType(narrativeAtom.getNarrativeType());
-        setIsStandalone(narrativeAtom.isStandalone());
-        setNarrativeDate(narrativeAtom.getNarrativeDate());
-        setNarrativeSummary(narrativeAtom.getNarrativeSummary());
+        NarrativeContentItem narrativeContentItem = (NarrativeContentItem) clientContentItem;
+        setHeadline(narrativeContentItem.getHeadline());
+        setNarrativeType(narrativeContentItem.getNarrativeType());
+        setIsStandalone(narrativeContentItem.isStandalone());
+        setNarrativeDate(narrativeContentItem.getNarrativeDate());
+        setNarrativeSummary(narrativeContentItem.getNarrativeSummary());
         break;
       case BACKGROUND:
-        BackgroundAtom backgroundAtom = (BackgroundAtom) clientAtom;
-        setName(backgroundAtom.getConceptName());
+        BackgroundContentItem backgroundContentItem = (BackgroundContentItem) clientContentItem;
+        setName(backgroundContentItem.getConceptName());
         break;
     }
   }
@@ -639,86 +639,87 @@ public class BaseContentEntity
     return sb.toString();
   }
   
-  public BaseAtom toClientObject() {
-    BaseAtom ret = toClientObjectImpl();
+  public BaseContentItem toClientObject() {
+    BaseContentItem ret = toClientObjectImpl();
     ret.setPublishState(publishState);
     ret.setThemeIds(angleIds);
-    ret.setLinkedAtomIds(linkedAtomIds);
+    ret.setLinkedContentItemIds(linkedContentEntityIds);
     ret.setLocation(location.toClientObject());
     ret.setTimeElapsedSinceLastUpdate(TimeUtil.getElapsedTimeString(this.timestamp));
     
-    BaseAtom sourceAtom = null;
-    if (getSourceAtomId() != null) {
+    BaseContentItem sourceContentItem = null;
+    Long sourceContentEntityId = getSourceContentEntityId();
+    if (sourceContentEntityId != null) {
       try {
-        sourceAtom = new ContentRpcImpl().getAtom(getSourceAtomId(), false);
+        sourceContentItem = new ContentRpcImpl().getContentItem(sourceContentEntityId, false);
       } catch (JDOException ex) {
-        // leave sourceAtom as null;
+        // leave sourceContentEntity as null;
       }
     }
-    ret.setSourceAtom(sourceAtom);
+    ret.setSourceContentItem(sourceContentItem);
     ret.setSourceDescription(getSourceDescription());
     
     return ret;
   }
   
-  private BaseAtom toClientObjectImpl() {
-    switch (getAtomType()) {
+  private BaseContentItem toClientObjectImpl() {
+    switch (getContentItemType()) {
       case EVENT:
         if (getEventUpdate().isEmpty()) {
-          return new DefaultAtom(getId(), getLivingStoryId());
+          return new DefaultContentItem(getId(), getLivingStoryId());
         } else {
-          return new EventAtom(getId(), getTimestamp(), getContributorIds(),
+          return new EventContentItem(getId(), getTimestamp(), getContributorIds(),
               getImportance(), getLivingStoryId(), getEventStartDate(), getEventEndDate(), 
               getEventUpdate(), getEventSummary(), getContent());
         }
       case PLAYER:
         Long livingStoryId = getLivingStoryId();
         if (livingStoryId == null) {
-          AssetAtom photoAtom = null;
-          if (getPhotoAtomId() != null) {
+          AssetContentItem photoContentItem = null;
+          if (getPhotoContentEntityId() != null) {
             try {
-              photoAtom = (AssetAtom) new ContentRpcImpl().getAtom(getPhotoAtomId(), false);
+              photoContentItem = (AssetContentItem) new ContentRpcImpl().getContentItem(getPhotoContentEntityId(), false);
             } catch (JDOException ex) {
-              // leave photoAtom as null;
+              // leave photoContentItem as null;
             }
           }
-          return new PlayerAtom(getId(), getTimestamp(), getContributorIds(), getContent(), 
-              getImportance(), getName(), getAliases(), getPlayerType(), photoAtom);
+          return new PlayerContentItem(getId(), getTimestamp(), getContributorIds(), getContent(), 
+              getImportance(), getName(), getAliases(), getPlayerType(), photoContentItem);
         } else {
-          return new StoryPlayerAtom(getId(), getTimestamp(), getContributorIds(), getContent(),
+          return new StoryPlayerContentItem(getId(), getTimestamp(), getContributorIds(), getContent(),
               getImportance(), livingStoryId,
-              (PlayerAtom) new ContentRpcImpl().getAtom(getParentPlayerAtomId(), false));
+              (PlayerContentItem) new ContentRpcImpl().getContentItem(getParentPlayerContentEntityId(), false));
         }
       case QUOTE:
-        return new QuoteAtom(getId(), getTimestamp(), getContributorIds(),
+        return new QuoteContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId());
       case BACKGROUND:
-        return new BackgroundAtom(getId(), getTimestamp(), getContributorIds(),
+        return new BackgroundContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId(), getName());
       case DATA:
-        return new DataAtom(getId(), getTimestamp(), getContributorIds(),
+        return new DataContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId());
       case ASSET:
-        return new AssetAtom(getId(), getTimestamp(), getContributorIds(),
+        return new AssetContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId(),
             getAssetType(), getCaption(), getPreviewUrl());
       case NARRATIVE:
-        return new NarrativeAtom(getId(), getTimestamp(), getContributorIds(),
+        return new NarrativeContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId(),
             getHeadline(), getNarrativeType(), isStandalone(), getNarrativeDate(), 
             getNarrativeSummary());
       case REACTION:
-        return new ReactionAtom(getId(), getTimestamp(), getContributorIds(),
+        return new ReactionContentItem(getId(), getTimestamp(), getContributorIds(),
             getContent(), getImportance(), getLivingStoryId());
       default:
-        throw new IllegalStateException("Unknown Atom Type");
+        throw new IllegalStateException("Unknown Content Item Type");
     }
   }
 
-  public static BaseContentEntity fromClientObject(BaseAtom clientAtom) {
-    BaseContentEntity atomEntity = new BaseContentEntity();
-    atomEntity.copyFields(clientAtom);
-    return atomEntity;
+  public static BaseContentEntity fromClientObject(BaseContentItem clientContentItem) {
+    BaseContentEntity contentEntity = new BaseContentEntity();
+    contentEntity.copyFields(clientContentItem);
+    return contentEntity;
   }
   
   @Override
@@ -736,20 +737,20 @@ public class BaseContentEntity
     try {
       object.put("id", getId());
       object.put("timestamp", SimpleDateFormat.getInstance().format(getTimestamp()));
-      object.put("atomType", getAtomType().name());
+      object.put("contentItemType", getContentItemType().name());
       object.put("content", getContent());
       object.put("importance", getImportance().name());
       object.put("livingStoryId", getLivingStoryId());
       object.put("publishState", getPublishState().name());
       object.put("contributorIds", new JSONArray(getContributorIds()));
-      object.put("linkedAtomIds", new JSONArray(getLinkedAtomIds()));
-      object.put("angleIds", new JSONArray(getThemeIds()));
+      object.put("linkedContentEntityIds", new JSONArray(getLinkedContentEntityIds()));
+      object.put("themeIds", new JSONArray(getThemeIds()));
       object.put("location", location.toJSON());
       object.put("sourceDescription", getSourceDescription());
-      object.put("sourceAtomId", getSourceAtomId());
+      object.put("sourceContentEntityId", getSourceContentEntityId());
       
-      // Optional properties depending on atom type
-      switch (getAtomType()) {
+      // Optional properties depending on contentItem type
+      switch (getContentItemType()) {
         case EVENT:
           if (startDate != null) {
             object.put("startDate", SimpleDateFormat.getInstance().format(startDate));
@@ -767,11 +768,11 @@ public class BaseContentEntity
             if (aliases != null && !aliases.isEmpty()) {
               object.put("aliases", new JSONArray(getAliases()));
             }
-            if (photoAtomId != null) {
-              object.put("photoAtomId", photoAtomId);
+            if (photoContentEntityId != null) {
+              object.put("photoContentEntityId", photoContentEntityId);
             }
           } else {
-            object.put("parentPlayerAtomId", parentPlayerAtomId);
+            object.put("parentPlayerContentEntityId", parentPlayerContentEntityId);
           }
           break;
         case ASSET:
@@ -802,10 +803,10 @@ public class BaseContentEntity
     DateFormat dateFormatter = SimpleDateFormat.getInstance();
     
     try {
-      AtomType atomType = AtomType.valueOf(json.getString("atomType"));
+      ContentItemType contentItemType = ContentItemType.valueOf(json.getString("contentItemType"));
       Long livingStoryId = json.has("livingStoryId") ? json.getLong("livingStoryId") : null;
       BaseContentEntity entity = new BaseContentEntity(
-          dateFormatter.parse(json.getString("timestamp")), atomType, json.getString("content"),
+          dateFormatter.parse(json.getString("timestamp")), contentItemType, json.getString("content"),
           Importance.valueOf(json.getString("importance")), livingStoryId);
       
       entity.setPublishState(PublishState.valueOf(json.getString("publishState")));
@@ -817,15 +818,15 @@ public class BaseContentEntity
       }
       entity.setContributorIds(contributorIds);
 
-      Set<Long> linkedAtomIds = new HashSet<Long>();
-      JSONArray linkedAtomIdsJSON = json.getJSONArray("linkedAtomIds");
-      for (int i = 0; i < linkedAtomIdsJSON.length(); i++) {
-        linkedAtomIds.add(linkedAtomIdsJSON.getLong(i));
+      Set<Long> linkedContentEntityIds = new HashSet<Long>();
+      JSONArray linkedContentEntityIdsJSON = json.getJSONArray("linkedContentEntityIds");
+      for (int i = 0; i < linkedContentEntityIdsJSON.length(); i++) {
+        linkedContentEntityIds.add(linkedContentEntityIdsJSON.getLong(i));
       }
-      entity.setLinkedAtomIds(linkedAtomIds);
+      entity.setLinkedContentEntityIds(linkedContentEntityIds);
       
       Set<Long> themeIds = new HashSet<Long>();
-      JSONArray themeIdsJSON = json.getJSONArray("angleIds");
+      JSONArray themeIdsJSON = json.getJSONArray("themeIds");
       for (int i = 0; i < themeIdsJSON.length(); i++) {
         themeIds.add(themeIdsJSON.getLong(i));
       }
@@ -836,12 +837,12 @@ public class BaseContentEntity
       if (json.has("sourceDescription")) {
         entity.setSourceDescription(json.getString("sourceDescription"));
       }
-      if (json.has("sourceAtomId")) {
-        entity.setSourceAtomId(json.getLong("sourceAtomId"));
+      if (json.has("sourceContentEntityId")) {
+        entity.setSourceContentEntityId(json.getLong("sourceContentEntityId"));
       }
       
-      // Optional properties depending on atom type
-      switch (atomType) {
+      // Optional properties depending on contentItem type
+      switch (contentItemType) {
         case EVENT:
           if (json.has("startDate")) {
             entity.setEventStartDate(dateFormatter.parse(json.getString("startDate")));
@@ -864,11 +865,11 @@ public class BaseContentEntity
               }
               entity.setAliases(aliases);
             }
-            if (json.has("photoAtomId")) {
-              entity.setPhotoAtomId(json.getLong("photoAtomId"));
+            if (json.has("photoContentEntityId")) {
+              entity.setPhotoContentEntityId(json.getLong("photoContentEntityId"));
             }
           } else {
-            entity.setParentPlayerAtomId(json.getLong("parentPlayerAtomId"));
+            entity.setParentPlayerContentEntityId(json.getLong("parentPlayerContentEntityId"));
           }
           break;
         case ASSET:

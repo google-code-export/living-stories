@@ -21,12 +21,12 @@ import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.stdimpl.GCacheException;
 import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
 import com.google.appengine.repackaged.com.google.common.base.Joiner;
-import com.google.livingstories.client.AtomTypesBundle;
-import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.DisplayAtomBundle;
+import com.google.livingstories.client.ContentItemTypesBundle;
+import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.DisplayContentItemBundle;
 import com.google.livingstories.client.FilterSpec;
 import com.google.livingstories.client.LivingStory;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.Theme;
 import com.google.livingstories.server.util.LRUCache;
@@ -98,28 +98,30 @@ public class Caches {
   }
 
 
-  /** Atoms for livingStory cache methods **/
+  /** ContentItems for livingStory cache methods **/
 
-  public static List<BaseAtom> getLivingStoryAtoms(Long livingStoryId, boolean onlyPublished) {
-    return get(getLivingStoryAtomsCacheKey(livingStoryId, onlyPublished));
+  public static List<BaseContentItem> getLivingStoryContentItems(Long livingStoryId,
+      boolean onlyPublished) {
+    return get(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished));
   }
 
-  public static void setLivingStoryAtoms(
-      Long livingStoryId, boolean onlyPublished, List<BaseAtom> livingStoryAtoms) {
-    put(getLivingStoryAtomsCacheKey(livingStoryId, onlyPublished), livingStoryAtoms);
+  public static void setLivingStoryContentItems(
+      Long livingStoryId, boolean onlyPublished, List<BaseContentItem> livingStoryContentItems) {
+    put(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished), livingStoryContentItems);
   }
 
-  public static void clearLivingStoryAtoms(Long livingStoryId) {
-    remove(getLivingStoryAtomsCacheKey(livingStoryId, true));
-    remove(getLivingStoryAtomsCacheKey(livingStoryId, false));
-    remove(getDisplayAtomBundleCacheKey(livingStoryId));
+  public static void clearLivingStoryContentItems(Long livingStoryId) {
+    remove(getLivingStoryContentItemsCacheKey(livingStoryId, true));
+    remove(getLivingStoryContentItemsCacheKey(livingStoryId, false));
+    remove(getDisplayContentItemBundleCacheKey(livingStoryId));
     remove(getContributorsForLivingStoryCacheKey(livingStoryId));
     // also, in case any non-living-story-specific information was changed here; e.g., authorship
-    remove(getDisplayAtomBundleCacheKey(null));
+    remove(getDisplayContentItemBundleCacheKey(null));
   }
 
-  private static String getLivingStoryAtomsCacheKey(Long livingStoryId, boolean onlyPublished) {
-    return "livingStoryAtoms:" + livingStoryId + ":" + onlyPublished;
+  private static String getLivingStoryContentItemsCacheKey(Long livingStoryId,
+      boolean onlyPublished) {
+    return "livingStoryContentItems:" + livingStoryId + ":" + onlyPublished;
   }
 
 
@@ -141,12 +143,12 @@ public class Caches {
     return "angles:" + String.valueOf(livingStoryId);
   }
 
-  public static Map<Long, AtomTypesBundle> getLivingStoryThemeInfo(Long livingStoryId) {
+  public static Map<Long, ContentItemTypesBundle> getLivingStoryThemeInfo(Long livingStoryId) {
     return get(getLivingStoryThemeInfoCacheKey(livingStoryId));
   }
   
   public static void setLivingStoryThemeInfo(
-      Long livingStoryId, Map<Long, AtomTypesBundle> themeInfo) {
+      Long livingStoryId, Map<Long, ContentItemTypesBundle> themeInfo) {
     put(getLivingStoryThemeInfoCacheKey(livingStoryId), themeInfo);
   }
   
@@ -160,12 +162,12 @@ public class Caches {
   
   /** Contributor cache methods **/
   
-  public static Map<Long, PlayerAtom> getContributorsForLivingStory(Long livingStoryId) {
+  public static Map<Long, PlayerContentItem> getContributorsForLivingStory(Long livingStoryId) {
     return get(getContributorsForLivingStoryCacheKey(livingStoryId));
   }
   
   public static void setContributorsForLivingStory(
-      Long livingStoryId, Map<Long, PlayerAtom> contributors) {
+      Long livingStoryId, Map<Long, PlayerContentItem> contributors) {
     put(getContributorsForLivingStoryCacheKey(livingStoryId), contributors);
   }
   
@@ -177,43 +179,45 @@ public class Caches {
     return "contributors:" + livingStoryId;
   }
   
-  /** Display Atom Bundle cache methods **/
+  /** Display content item bundle cache methods **/
   
-  private static final int DISPLAY_ATOM_BUNDLE_CACHE_SIZE = 5;
+  private static final int DISPLAY_CONTENT_ITEM_BUNDLE_CACHE_SIZE = 5;
   
-  public static DisplayAtomBundle getDisplayAtomBundle(Long livingStoryId,
-      FilterSpec filter, Long focusedAtomId, Date cutoff) {
-    LRUCache<String, DisplayAtomBundle> cache = get(getDisplayAtomBundleCacheKey(livingStoryId));
+  public static DisplayContentItemBundle getDisplayContentItemBundle(Long livingStoryId,
+      FilterSpec filter, Long focusedContentItemId, Date cutoff) {
+    LRUCache<String, DisplayContentItemBundle> cache =
+        get(getDisplayContentItemBundleCacheKey(livingStoryId));
     if (cache != null) {
-      return cache.get(getDisplayAtomBundleMapKey(filter, focusedAtomId, cutoff));
+      return cache.get(getDisplayContentItemBundleMapKey(filter, focusedContentItemId, cutoff));
     } else {
       return null;
     }
   }
 
-  public static void setDisplayAtomBundle(Long livingStoryId,
-      FilterSpec filter, Long focusedAtomId, Date cutoff, DisplayAtomBundle bundle) {
-    String cacheKey = getDisplayAtomBundleCacheKey(livingStoryId);
-    LRUCache<String, DisplayAtomBundle> cache = get(cacheKey);
+  public static void setDisplayContentItemBundle(Long livingStoryId,
+      FilterSpec filter, Long focusedContentItemId, Date cutoff, DisplayContentItemBundle bundle) {
+    String cacheKey = getDisplayContentItemBundleCacheKey(livingStoryId);
+    LRUCache<String, DisplayContentItemBundle> cache = get(cacheKey);
     if (cache == null) {
-      cache = new LRUCache<String, DisplayAtomBundle>(DISPLAY_ATOM_BUNDLE_CACHE_SIZE);
+      cache = new LRUCache<String, DisplayContentItemBundle>(
+          DISPLAY_CONTENT_ITEM_BUNDLE_CACHE_SIZE);
     }
-    cache.put(getDisplayAtomBundleMapKey(filter, focusedAtomId, cutoff), bundle);
+    cache.put(getDisplayContentItemBundleMapKey(filter, focusedContentItemId, cutoff), bundle);
     put(cacheKey, cache);
   }
 
-  public static void clearDisplayAtomBundles(Long livingStoryId) {
-    remove(getDisplayAtomBundleCacheKey(livingStoryId));
+  public static void clearDisplayContentItemBundles(Long livingStoryId) {
+    remove(getDisplayContentItemBundleCacheKey(livingStoryId));
   }
 
-  private static String getDisplayAtomBundleCacheKey(Long livingStoryId) {
-    return "displayAtomBundle:" + String.valueOf(livingStoryId);
+  private static String getDisplayContentItemBundleCacheKey(Long livingStoryId) {
+    return "displayContentItemBundle:" + String.valueOf(livingStoryId);
   }  
 
-  private static String getDisplayAtomBundleMapKey(FilterSpec filter,
-      Long focusedAtomId, Date cutoff) {
+  private static String getDisplayContentItemBundleMapKey(FilterSpec filter,
+      Long focusedContentItemId, Date cutoff) {
     return Joiner.on(":").useForNull("null").join(filter.getMapKeyString(),
-        focusedAtomId, (cutoff == null ? null : cutoff.getTime()));
+        focusedContentItemId, (cutoff == null ? null : cutoff.getTime()));
   }
   
   /** Start page cache methods **/

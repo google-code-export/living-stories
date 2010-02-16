@@ -20,9 +20,9 @@ import com.google.appengine.repackaged.com.google.common.base.Pair;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BackgroundAtom;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BackgroundContentItem;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PlayerType;
 import com.google.livingstories.server.BaseContentEntity;
 
@@ -33,62 +33,64 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for scanning the text of an atom's main content and replacing the first occurrence
- * of a player's name or alias with an <a href="javascript:showAtomPopup()"> tag so that
- * appropriate popup links will show on the LSP. It's more efficient to do this at the time of
- * saving the content in the content manager than on-the-fly while rendering on the LSP.
- * New as of 12/16/2009: whenever a new showAtomPopup() link is added, the corresponding
- * player will also be added to the linked atoms of atomEntity.
- * New as of 1/15/2010: background atoms with a name i.e. concepts are also auto-linked in the
- * content. They are not returned in the suggestions.
+ * Utility class for scanning the text of an contentItem's main content and replacing the first
+ * occurrence of a player's name or alias with an <a href="javascript:showContentItemPopup()"> tag
+ * so that appropriate popup links will show on the LSP. It's more efficient to do this at the time
+ * of saving the content in the content manager than on-the-fly while rendering on the LSP.
+ * New as of 12/16/2009: whenever a new showContentItemPopup() link is added, the corresponding
+ * player will also be added to the linked content entities of contentEntity.
+ * New as of 1/15/2010: background content items with a name i.e. concepts are also auto-linked in
+ * the content. They are not returned in the suggestions.
  */
 public class AutoLinkEntitiesInContent {
   
   /**
-   * Looks for matches of the names and aliases of each of the given players in the atom's content.
+   * Looks for matches of the names and aliases of each of the given players in the content entity.
    * If a match is found and a corresponding link is not found around it, creates 1 per
-   * player. Also adds these players to the base atom as new linked atoms.
+   * player. Also adds these players to the base content entity as new linked content entities.
    * Also looks for matches of the names of concepts and creates a link if one doesn't exist. 
    */
-  public static Set<Long> createLinks(BaseContentEntity atomEntity, 
-      List<PlayerAtom> playerAtoms, List<BackgroundAtom> concepts) {
+  public static Set<Long> createLinks(BaseContentEntity contentEntity, 
+      List<PlayerContentItem> playerContentItems, List<BackgroundContentItem> concepts) {
     Set<Long> suggestedAdditionIds = Sets.newHashSet();
-    AtomType atomType = atomEntity.getAtomType();
-    Long atomId = atomEntity.getId();
-    if (atomType != AtomType.ASSET && atomType != AtomType.PLAYER) {
-      MatchResult matchResult = match(atomId, atomEntity.getContent(), playerAtoms, concepts);
+    ContentItemType contentItemType = contentEntity.getContentItemType();
+    Long contentEntityId = contentEntity.getId();
+    if (contentItemType != ContentItemType.ASSET && contentItemType != ContentItemType.PLAYER) {
+      MatchResult matchResult = match(contentEntityId, contentEntity.getContent(),
+          playerContentItems, concepts);
       // If matches were found, set the current content string with the new one that contains
-      // <atom> tags
+      // <contentItem> tags
       if (matchResult.matchesFound) {
-        atomEntity.setContent(matchResult.newContent);
+        contentEntity.setContent(matchResult.newContent);
       }
       suggestedAdditionIds.addAll(matchResult.suggestedPlayerIds);
     }
     
     // Do the same for event summary
-    if (atomType == AtomType.EVENT) {
-      MatchResult matchResult = match(atomId, atomEntity.getEventSummary(), playerAtoms, concepts);
+    if (contentItemType == ContentItemType.EVENT) {
+      MatchResult matchResult = match(contentEntityId, contentEntity.getEventSummary(),
+          playerContentItems, concepts);
       if (matchResult.matchesFound) {
-        atomEntity.setEventSummary(matchResult.newContent);
+        contentEntity.setEventSummary(matchResult.newContent);
       }
       suggestedAdditionIds.addAll(matchResult.suggestedPlayerIds);
     }
     
     // For narrative summary: (some need for refactoring here!)
-    if (atomType == AtomType.NARRATIVE) {
-      MatchResult matchResult = match(atomId, atomEntity.getNarrativeSummary(), playerAtoms, 
+    if (contentItemType == ContentItemType.NARRATIVE) {
+      MatchResult matchResult = match(contentEntityId, contentEntity.getNarrativeSummary(), playerContentItems, 
           concepts);
       if (matchResult.matchesFound) {
-        atomEntity.setNarrativeSummary(matchResult.newContent);
+        contentEntity.setNarrativeSummary(matchResult.newContent);
       }
       suggestedAdditionIds.addAll(matchResult.suggestedPlayerIds);
     }
     
     // For asset caption, if applicable: (again, refactoring would be very good...)
-    if (atomType == AtomType.ASSET && atomEntity.getAssetType() != AssetType.LINK) {
+    if (contentItemType == ContentItemType.ASSET && contentEntity.getAssetType() != AssetType.LINK) {
       // Send an empty concept list here because we are only looking for player names to suggest
-      MatchResult matchResult = match(atomId, atomEntity.getCaption(), playerAtoms, 
-          Lists.<BackgroundAtom>newArrayList());
+      MatchResult matchResult = match(contentEntityId, contentEntity.getCaption(), playerContentItems, 
+          Lists.<BackgroundContentItem>newArrayList());
       // We _don't_ reset the caption, which is just plain text, not HTML.
       suggestedAdditionIds.addAll(matchResult.suggestedPlayerIds);
     }
@@ -96,17 +98,17 @@ public class AutoLinkEntitiesInContent {
   }
   
   
-  private static MatchResult match(Long atomId, String content, List<PlayerAtom> playerAtoms,
-          List<BackgroundAtom> concepts) {
+  private static MatchResult match(Long contentEntityId, String content,
+      List<PlayerContentItem> playerContentItems, List<BackgroundContentItem> concepts) {
     MatchResult matchResult = new MatchResult();
     // We need to remove the newline characters \n from the string so we can look for matches
     content = content.replaceAll("\\s+", " ");
     
     // First find the concept matches and construct the result partially
-    for (BackgroundAtom concept : concepts) {
+    for (BackgroundContentItem concept : concepts) {
       Long conceptId = concept.getId();
-      String javascript = "showAtomPopup(" + conceptId + ", this)";
-      if (!conceptId.equals(atomId) && !content.contains(javascript)) {
+      String javascript = "showContentItemPopup(" + conceptId + ", this)";
+      if (!conceptId.equals(contentEntityId) && !content.contains(javascript)) {
         String conceptName = concept.getConceptName();
         Pair<Boolean, String> result = matchAndReplace(content, conceptName, javascript);
         if (result.first) {
@@ -118,26 +120,26 @@ public class AutoLinkEntitiesInContent {
 
     // Then look for the player matches
     Set<Long> suggestedPlayerIds = Sets.newHashSet();
-    for (PlayerAtom playerAtom : playerAtoms) {
-      Long playerId = playerAtom.getId();
-      String javascript = "showAtomPopup(" + playerId + ", this)";      
+    for (PlayerContentItem playerContentItem : playerContentItems) {
+      Long playerId = playerContentItem.getId();
+      String javascript = "showContentItemPopup(" + playerId + ", this)";      
       if (content.contains(javascript)) {
-        // If a showAtomPopup() link for a player is already there, we should consistently
-        // and repeatedly suggest that the player atom be linked as well. Note that it's no problem
-        // if the suggestion duplicates an atom that has already really been linked up;
-        // the frontend treats this as a sane, expected case.
+        // If a showContentItemPopup() link for a player is already there, we should consistently
+        // and repeatedly suggest that the player content item be linked as well. Note that it's no
+        // problem if the suggestion duplicates an contentItem that has already really been linked
+        // up; the frontend treats this as a sane, expected case.
         suggestedPlayerIds.add(playerId);
       } else {
-        String playerName = playerAtom.getName();
+        String playerName = playerContentItem.getName();
         // If a link to that player doesn't already exist, first look for the player's full
         // name in the content
         Pair<Boolean, String> result = matchAndReplace(content, playerName, javascript);
         // If that doesn't exist, look for the aliases
-        Iterator<String> aliasIterator = playerAtom.getAliases().iterator();
+        Iterator<String> aliasIterator = playerContentItem.getAliases().iterator();
         while (!result.first && aliasIterator.hasNext()) {
           result = matchAndReplace(content, aliasIterator.next(), javascript);
         }
-        if (!result.first && playerAtom.getPlayerType() == PlayerType.PERSON) {
+        if (!result.first && playerContentItem.getPlayerType() == PlayerType.PERSON) {
           // If the full name or aliases don't exist, just look for the last part of the name
           // for people (but not for organizations because the last words in their names are often
           // common words such as "Group" or "Association")
@@ -182,9 +184,9 @@ public class AutoLinkEntitiesInContent {
     if (matcher.find()) {
       foundMatch = true;
       String match = matcher.group();
-      String atomLink = "<a href=\"javascript:;\" onclick=\"" +
+      String contentItemLink = "<a href=\"javascript:;\" onclick=\"" +
           javascript + "\">" + matcher.group(2) + "</a>";
-      match = match.replace(playerName, atomLink);
+      match = match.replace(playerName, contentItemLink);
       matcher.appendReplacement(sb, Matcher.quoteReplacement(match));
     }
     matcher.appendTail(sb);

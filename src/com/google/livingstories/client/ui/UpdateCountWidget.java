@@ -31,7 +31,7 @@ import java.util.Date;
  * Class that displays the number of updates in the living story since the specified date.
  */
 public class UpdateCountWidget extends Composite {
-  private ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
   
   private Label label;
   
@@ -43,7 +43,7 @@ public class UpdateCountWidget extends Composite {
 
   public void load(long livingStoryId, final Date lastVisitTime) {
     if (lastVisitTime != null) {
-      atomService.getUpdateCountSinceTime(livingStoryId, lastVisitTime,
+      contentService.getUpdateCountSinceTime(livingStoryId, lastVisitTime,
           new AsyncCallback<Integer>() {
             @Override
             public void onFailure(Throwable caught) {}

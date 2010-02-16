@@ -23,17 +23,17 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.livingstories.client.AssetAtom;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BackgroundAtom;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.AssetContentItem;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BackgroundContentItem;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
-import com.google.livingstories.client.DisplayAtomBundle;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.DisplayContentItemBundle;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.FilterSpec;
 import com.google.livingstories.client.Importance;
-import com.google.livingstories.client.NarrativeAtom;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.NarrativeContentItem;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.contentmanager.SearchTerms;
 import com.google.livingstories.client.util.GlobalUtil;
@@ -68,11 +68,11 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Implementation of the RPC service that is used for reading and writing {@link BaseContentEntity}
  * objects to the AppEngine datastore. This service converts the {@link BaseContentEntity} data
- * objects to {@link BaseAtom} for the client use.
+ * objects to {@link BaseContentItem} for the client use.
  */
 public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcService {
-  public static final int ATOM_COUNT_LIMIT = 20;  
-  public static final int JUMP_TO_ATOM_CONTEXT_COUNT = 3;
+  public static final int CONTENT_ITEM_COUNT_LIMIT = 20;  
+  public static final int JUMP_TO_CONTENT_ITEM_CONTEXT_COUNT = 3;
   private static final int EMAIL_ALERT_SNIPPET_LENGTH = 500;
   
   private static final Logger logger =
@@ -81,21 +81,21 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   private InternetAddress fromAddress = null;
 
   @Override
-  public synchronized BaseAtom createOrChangeAtom(BaseAtom clientAtom) {
-    // Get the list of atoms to link within the content first so that if there is an exception with
-    // the queries, it doesn't affect the saving of the atom. Except for unassigned atoms and
-    // player atoms because we don't auto-link from their content. Or if the atom doesn't have
-    // any content.
-    boolean runAutoLink = clientAtom.getLivingStoryId() != null 
-        && clientAtom.getAtomType() != AtomType.PLAYER
-        && !GlobalUtil.isContentEmpty(clientAtom.getContent());
-    List<PlayerAtom> playerAtoms = null;
-    List<BackgroundAtom> concepts = null;
+  public synchronized BaseContentItem createOrChangeContentItem(BaseContentItem contentItem) {
+    // Get the list of content items to link within the content first so that if there is an
+    // exception with the queries, it doesn't affect the saving of the content entity. Except for
+    // unassigned content items and player content items, because we don't auto-link from their
+    // content. Or if the content item doesn't have any content.
+    boolean runAutoLink = contentItem.getLivingStoryId() != null 
+        && contentItem.getContentItemType() != ContentItemType.PLAYER
+        && !GlobalUtil.isContentEmpty(contentItem.getContent());
+    List<PlayerContentItem> playerContentItems = null;
+    List<BackgroundContentItem> concepts = null;
     
     try {
       if (runAutoLink) {
-        playerAtoms = getPlayers(clientAtom.getLivingStoryId());
-        concepts = getConcepts(clientAtom.getLivingStoryId());
+        playerContentItems = getPlayers(contentItem.getLivingStoryId());
+        concepts = getConcepts(contentItem.getLivingStoryId());
       }
     } catch (Exception e) {
       logger.warning("Skipping auto-linking. Error with retrieving players or concepts."
@@ -105,56 +105,57 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
     Transaction tx = null;
-    BaseContentEntity atomEntity;
+    BaseContentEntity contentEntity;
     PublishState oldPublishState = null;
     
-    Set<Long> newLinkedAtomSuggestions = null;
+    Set<Long> newLinkedContentItemSuggestions = null;
     
     try {
-      if (clientAtom.getId() != null) {
-        atomEntity = pm.getObjectById(BaseContentEntity.class, clientAtom.getId());
-        oldPublishState = atomEntity.getPublishState();
-        atomEntity.copyFields(clientAtom);
+      if (contentItem.getId() != null) {
+        contentEntity = pm.getObjectById(BaseContentEntity.class, contentItem.getId());
+        oldPublishState = contentEntity.getPublishState();
+        contentEntity.copyFields(contentItem);
       } else {
-        atomEntity = BaseContentEntity.fromClientObject(clientAtom);
+        contentEntity = BaseContentEntity.fromClientObject(contentItem);
       }
       
       if (runAutoLink) {
-        newLinkedAtomSuggestions = 
-            AutoLinkEntitiesInContent.createLinks(atomEntity, playerAtoms, concepts);
+        newLinkedContentItemSuggestions = 
+            AutoLinkEntitiesInContent.createLinks(contentEntity, playerContentItems, concepts);
       }
 
       tx = pm.currentTransaction();
       tx.begin();
-      pm.makePersistent(atomEntity);
+      pm.makePersistent(contentEntity);
       tx.commit();
       
       // If this was an event or a narrative and had a linked narrative, then the 'standalone'
-      // field on the narrative atom needs to be updated to 'false'.
-      // Note: this doesn't handle the case of unlinking a previously linked narrative atom.
-      // That would require checking the linked atoms of every single other event atom to make
-      // sure it's not linked to from anywhere else, which would be an expensive operation.
-      Set<Long> linkedAtomIds = atomEntity.getLinkedAtomIds();
-      AtomType atomType = atomEntity.getAtomType();
-      if ((atomType == AtomType.EVENT || atomType == AtomType.NARRATIVE)
-          && !linkedAtomIds.isEmpty()) {
-        List<Object> oids = new ArrayList<Object>(linkedAtomIds.size());
-        for (Long id : linkedAtomIds) {
+      // field on the narrative contentItem needs to be updated to 'false'.
+      // Note: this doesn't handle the case of unlinking a previously linked narrative content item.
+      // That would require checking the linked content items of every single other event
+      // content item to make sure it's not linked to from anywhere else, which would be an
+      // expensive operation.
+      Set<Long> linkedContentEntityIds = contentEntity.getLinkedContentEntityIds();
+      ContentItemType contentItemType = contentEntity.getContentItemType();
+      if ((contentItemType == ContentItemType.EVENT || contentItemType == ContentItemType.NARRATIVE)
+          && !linkedContentEntityIds.isEmpty()) {
+        List<Object> oids = new ArrayList<Object>(linkedContentEntityIds.size());
+        for (Long id : linkedContentEntityIds) {
           oids.add(pm.newObjectIdInstance(BaseContentEntity.class, id));
         }
 
         @SuppressWarnings("unchecked")
-        Collection<BaseContentEntity> linkedAtoms = pm.getObjectsById(oids);
-        for (BaseContentEntity linkedAtom : linkedAtoms) {
-          if (linkedAtom.getAtomType() == AtomType.NARRATIVE) {
-            linkedAtom.setIsStandalone(false);
+        Collection<BaseContentEntity> linkedContentEntities = pm.getObjectsById(oids);
+        for (BaseContentEntity linkedContentEntity : linkedContentEntities) {
+          if (linkedContentEntity.getContentItemType() == ContentItemType.NARRATIVE) {
+            linkedContentEntity.setIsStandalone(false);
           }
         }
       }
 
-      // TODO(ericzhang): may also want to invalidate linked atoms if they changed
+      // TODO(ericzhang): may also want to invalidate linked content entities if they changed
       // and aren't from the same living story.
-      invalidateCache(clientAtom.getLivingStoryId());
+      invalidateCache(contentItem.getLivingStoryId());
     } finally {
       if (tx != null && tx.isActive()) {
         tx.rollback();
@@ -162,61 +163,61 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       pm.close();
     }
     
-    // Send email alerts if an event atom was changed from 'Draft' to 'Published'
-    if (atomEntity.getAtomType() == AtomType.EVENT
-        && atomEntity.getPublishState() == PublishState.PUBLISHED
+    // Send email alerts if an event contentItem was changed from 'Draft' to 'Published'
+    if (contentEntity.getContentItemType() == ContentItemType.EVENT
+        && contentEntity.getPublishState() == PublishState.PUBLISHED
         && oldPublishState != null && oldPublishState == PublishState.DRAFT) {
-      sendEmailAlerts((EventAtom)clientAtom);
+      sendEmailAlerts((EventContentItem)contentItem);
     }
 
-    // We pass suggested new linked atoms back to the client by adding their ids to the
-    // client object before returning it. It's the client's responsibility to check
-    // the linked atom ids it passed in with those that came back, and to present appropriate
+    // We pass suggested new linked content items back to the client by adding their ids to the
+    // client object before returning it. It's the client's responsibility to check the linked
+    // content item ids it passed in with those that came back, and to present appropriate
     // UI for processing the suggestions. Note that we shouldn't add the suggestions directly
-    // to atomEntity! This will persist them to the datastore prematurely.
-    BaseAtom ret = atomEntity.toClientObject();
+    // to contentEntity! This will persist them to the datastore prematurely.
+    BaseContentItem ret = contentEntity.toClientObject();
     
-    if (newLinkedAtomSuggestions != null) {
-      ret.addAllLinkedAtomIds(newLinkedAtomSuggestions);
+    if (newLinkedContentItemSuggestions != null) {
+      ret.addAllLinkedContentItemIds(newLinkedContentItemSuggestions);
     }
     
     return ret;
   }
   
   @Override
-  public List<PlayerAtom> getUnassignedPlayers() {
+  public List<PlayerContentItem> getUnassignedPlayers() {
     return getPlayers(null);
   }
   
-  private List<PlayerAtom> getPlayers(Long livingStoryId) {
+  private List<PlayerContentItem> getPlayers(Long livingStoryId) {
     List<BaseContentEntity> playerEntities =
-        getPublishedAtomsByType(livingStoryId, AtomType.PLAYER);
-    List<PlayerAtom> playerAtoms = Lists.newArrayList();
+        getPublishedContentEntitiesByType(livingStoryId, ContentItemType.PLAYER);
+    List<PlayerContentItem> playerContentItems = Lists.newArrayList();
     for (BaseContentEntity playerEntity : playerEntities) {
-      playerAtoms.add((PlayerAtom)(playerEntity.toClientObject()));
+      playerContentItems.add((PlayerContentItem)(playerEntity.toClientObject()));
     }
-    return playerAtoms;
+    return playerContentItems;
   }
   
-  private List<BackgroundAtom> getConcepts(Long livingStoryId) {
+  private List<BackgroundContentItem> getConcepts(Long livingStoryId) {
     List<BaseContentEntity> backgroundEntities = 
-        getPublishedAtomsByType(livingStoryId, AtomType.BACKGROUND);
-    List<BackgroundAtom> backgroundAtoms = Lists.newArrayList();
+        getPublishedContentEntitiesByType(livingStoryId, ContentItemType.BACKGROUND);
+    List<BackgroundContentItem> backgroundContentItems = Lists.newArrayList();
     for (BaseContentEntity backgroundEntity : backgroundEntities) {
       if (!GlobalUtil.isContentEmpty(backgroundEntity.getName())) {
-        backgroundAtoms.add((BackgroundAtom)(backgroundEntity.toClientObject()));
+        backgroundContentItems.add((BackgroundContentItem)(backgroundEntity.toClientObject()));
       }
     }
-    return backgroundAtoms;
+    return backgroundContentItems;
   }
   
-  private List<BaseContentEntity> getPublishedAtomsByType(Long livingStoryId, AtomType atomType) {
+  private List<BaseContentEntity> getPublishedContentEntitiesByType(Long livingStoryId, ContentItemType contentItemType) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     Query query = pm.newQuery(BaseContentEntity.class); 
     query.setFilter("livingStoryId == livingStoryIdParam " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED " +
-        "&& atomType == '" + atomType.name() + "'");
+        "&& contentItemType == '" + contentItemType.name() + "'");
     query.declareParameters("java.lang.Long livingStoryIdParam");
     
     try {
@@ -230,7 +231,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     }
   }
   
-  private void sendEmailAlerts(EventAtom eventAtom) {
+  private void sendEmailAlerts(EventContentItem eventContentItem) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     // Get list of users
@@ -241,23 +242,23 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     try {
       @SuppressWarnings("unchecked")
       List<UserLivingStoryEntity> userLivingStoryEntities =
-          (List<UserLivingStoryEntity>) query.execute(eventAtom.getLivingStoryId());
+          (List<UserLivingStoryEntity>) query.execute(eventContentItem.getLivingStoryId());
       List<String> users = new ArrayList<String>();
       for (UserLivingStoryEntity entity : userLivingStoryEntities) {
         users.add(entity.getId().getParent().getName());
       }
       if (!users.isEmpty()) {
         LivingStoryEntity livingStory = pm.getObjectById(LivingStoryEntity.class,
-            eventAtom.getLivingStoryId());
+            eventContentItem.getLivingStoryId());
         String baseLspUrl = getBaseServerUrl() + "/lsps/" + livingStory.getUrl();
         
         StringBuilder emailContent = new StringBuilder("<b>");
-        emailContent.append(eventAtom.getEventUpdate()).append("</b>");
+        emailContent.append(eventContentItem.getEventUpdate()).append("</b>");
         emailContent.append("<span style=\"color: #777;\">&nbsp;-&nbsp;");
         emailContent.append(livingStory.getPublisher().toString());
         emailContent.append("</span>");
-        String eventSummary = eventAtom.getEventSummary();
-        String eventDetails = eventAtom.getContent();
+        String eventSummary = eventContentItem.getEventSummary();
+        String eventDetails = eventContentItem.getContent();
         if (GlobalUtil.isContentEmpty(eventSummary) 
             && !GlobalUtil.isContentEmpty(eventDetails)) {
           eventSummary = SnippetUtil.createSnippet(JavaNodeAdapter.fromHtml(eventDetails), 
@@ -269,7 +270,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
         emailContent.append("<br><a href=\"")
             .append(baseLspUrl)
             .append("#OVERVIEW:false,false,false,n,n,n:")
-            .append(eventAtom.getId())
+            .append(eventContentItem.getId())
             .append(";\">Read more</a>")
             .append("<br><br>-----<br>")
             .append("<span style=\"font-size:small\">This is an automated alert. ")
@@ -303,12 +304,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized List<BaseAtom> getAtomsForLivingStory(
+  public synchronized List<BaseContentItem> getContentItemsForLivingStory(
       Long livingStoryId, boolean onlyPublished) {
-    List<BaseAtom> atoms = Caches.getLivingStoryAtoms(livingStoryId, onlyPublished);
-    if
-    (atoms != null) {
-      return atoms;
+    List<BaseContentItem> contentItems =
+        Caches.getLivingStoryContentItems(livingStoryId, onlyPublished);
+    if (contentItems != null) {
+      return contentItems;
     }
  
     PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -319,16 +320,15 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     query.declareParameters("java.lang.Long livingStoryIdParam");
 
     try {
-      List<BaseAtom> clientAtoms = new ArrayList<BaseAtom>();
+      List<BaseContentItem> clientContentItems = new ArrayList<BaseContentItem>();
       
       @SuppressWarnings("unchecked")
       List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(livingStoryId);
       for (BaseContentEntity result : results) {
-        BaseAtom atom = result.toClientObject();
-        clientAtoms.add(atom);
+        clientContentItems.add(result.toClientObject());
       }
-      Caches.setLivingStoryAtoms(livingStoryId, onlyPublished, clientAtoms);
-      return clientAtoms;
+      Caches.setLivingStoryContentItems(livingStoryId, onlyPublished, clientContentItems);
+      return clientContentItems;
     } finally {
       query.closeAll();
       pm.close();
@@ -339,36 +339,36 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
    * Gets the eventBundle for a given date range within a living story. 
    * @param livingStoryId the relevant story's id.
    * @param filterSpec a specification of how to filter the results
-   * @param focusedAtomId An optional atom that should be included in the returned
-   *    list.  Specifying this parameter causes the method to return all atoms
-   *    from cutoff up until 3 atoms after the focused atom.  Otherwise, the
-   *    method just returns the first 20 atoms after cutoff.
-   * @param cutoff Do not return atoms that sort earlier/later than this date (exclusive)
+   * @param focusedContentItemId optional; indicates that contentItem with this id should be
+   *    included in the returned list.  Specifying this parameter causes the method to return all
+   *    content items from cutoff up until 3 items after the focused content item.  Otherwise, the
+   *    method just returns the first 20 content items after cutoff.
+   * @param cutoff Do not return content items that sort earlier/later than this date (exclusive)
    *    (Depends on order specified in filterSpec). Null if there is no bound.
-   * @return an appropriate DisplayAtomBundle
+   * @return an appropriate DisplayContentItemBundle
    */
   @Override
-  public synchronized DisplayAtomBundle getDisplayAtomBundle(Long livingStoryId,
-      FilterSpec filterSpec, Long focusedAtomId, Date cutoff) {
+  public synchronized DisplayContentItemBundle getDisplayContentItemBundle(Long livingStoryId,
+      FilterSpec filterSpec, Long focusedContentItemId, Date cutoff) {
     if (filterSpec.contributorId != null || filterSpec.playerId != null) {
       throw new IllegalArgumentException(
           "filterSpec.contributorId and filterSpec.playerId should not be set by remote callers."
           + " contributorId = " + filterSpec.contributorId + " playerId = "+ filterSpec.playerId);
     }
-    DisplayAtomBundle result = Caches.getDisplayAtomBundle(
-        livingStoryId, filterSpec, focusedAtomId, cutoff);
+    DisplayContentItemBundle result = Caches.getDisplayContentItemBundle(
+        livingStoryId, filterSpec, focusedContentItemId, cutoff);
     if (result != null) {
       return result;
     }
     
     FilterSpec localFilterSpec = new FilterSpec(filterSpec);
     
-    BaseAtom focusedAtom = null;
-    if (focusedAtomId != null) {
-      focusedAtom = getAtom(focusedAtomId, false);
-      if (focusedAtom != null) {
-        if (adjustFilterSpecForAtom(localFilterSpec, focusedAtom)) {
-          // If we had to adjust the filter spec to accommodate the focused atom,
+    BaseContentItem focusedContentItem = null;
+    if (focusedContentItemId != null) {
+      focusedContentItem = getContentItem(focusedContentItemId, false);
+      if (focusedContentItem != null) {
+        if (adjustFilterSpecForContentItem(localFilterSpec, focusedContentItem)) {
+          // If we had to adjust the filter spec to accommodate the focused content item,
           // we'll be switching filter views, so we want to clear the start date
           // and reload the list from the beginning.
           cutoff = null;
@@ -376,157 +376,162 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       }
     }
     
-    // Some preliminaries. Note that the present implementation just filters all atoms for
+    // Some preliminaries. Note that the present implementation just filters all content items for
     // a story, which could be a bit expensive if there's a cache miss. By and large, though,
     // we'd expect a lot more cache hits than cache misses, unlike the case with, say,
     // a twitter "following" feed, which is more likely to be unique to that user.
-    List<BaseAtom> allAtoms = getAtomsForLivingStory(livingStoryId, true);
+    List<BaseContentItem> allContentItems = getContentItemsForLivingStory(livingStoryId, true);
     
-    Map<Long, BaseAtom> idToAtomMap = Maps.newHashMap();
-    List<BaseAtom> relevantAtoms = Lists.newArrayList();
-    for (BaseAtom atom : allAtoms) {
-      idToAtomMap.put(atom.getId(), atom);
+    Map<Long, BaseContentItem> idToContentItemMap = Maps.newHashMap();
+    List<BaseContentItem> relevantContentItems = Lists.newArrayList();
+    for (BaseContentItem contentItem : allContentItems) {
+      idToContentItemMap.put(contentItem.getId(), contentItem);
       
-      Date sortKey = atom.getDateSortKey();
+      Date sortKey = contentItem.getDateSortKey();
       boolean matchesStartDate = (cutoff == null) ||
           (localFilterSpec.oldestFirst ? !sortKey.before(cutoff) : !sortKey.after(cutoff));
 
-      if (matchesStartDate && localFilterSpec.doesAtomMatch(atom)) {
-        relevantAtoms.add(atom);
+      if (matchesStartDate && localFilterSpec.doesContentItemMatch(contentItem)) {
+        relevantContentItems.add(contentItem);
       }
     }
-    sortBaseAtomList(relevantAtoms, localFilterSpec);
+    sortContentItemList(relevantContentItems, localFilterSpec);
 
-    // Need to get the focused atom from the idToAtomMap instead of using the object directly.
-    // This is because we use indexOf() to find the location of the focused atom in the list,
-    // and the original atom isn't the same object instance.
-    List<BaseAtom> coreAtoms = getSublist(relevantAtoms,
-        focusedAtom == null ? null : idToAtomMap.get(focusedAtomId), cutoff);
-    Set<Long> linkedAtomIds = Sets.newHashSet();
+    // Need to get the focused contentItem from the map instead of using the object directly.
+    // This is because we use indexOf() to find the location of the focused contentItem in the list,
+    // and the original contentItem isn't the same object instance.
+    List<BaseContentItem> coreContentItems = getSublist(relevantContentItems,
+        focusedContentItem == null ? null : idToContentItemMap.get(focusedContentItemId), cutoff);
+    Set<Long> linkedContentItemIds = Sets.newHashSet();
     
-    for (BaseAtom atom : coreAtoms) {
-      if (atom.displayTopLevel()) {
-        // If an atom isn't a top-level display atom, we can get away without returning its
-        // linked atoms.
-        linkedAtomIds.addAll(atom.getLinkedAtomIds());
+    for (BaseContentItem contentItem : coreContentItems) {
+      if (contentItem.displayTopLevel()) {
+        // If a content item isn't a top-level display content item, we can get away without
+        // returning its linked content items.
+        linkedContentItemIds.addAll(contentItem.getLinkedContentItemIds());
       }
     }
 
-    Set<BaseAtom> linkedAtoms = Sets.newHashSet();
-    for (Long id : linkedAtomIds) {
-      BaseAtom linkedAtom = idToAtomMap.get(id);
-      if (linkedAtom == null) {
-        System.err.println("Linked atom with id " + id + " is not found.");
+    Set<BaseContentItem> linkedContentItems = Sets.newHashSet();
+    for (Long id : linkedContentItemIds) {
+      BaseContentItem linkedContentItem = idToContentItemMap.get(id);
+      if (linkedContentItem == null) {
+        System.err.println("Linked content item with id " + id + " is not found.");
       } else {
-        linkedAtoms.add(linkedAtom);
-        // For linked narratives, we want to get their own linked atoms as well
-        if (linkedAtom.getAtomType() == AtomType.NARRATIVE) {
-          for (Long linkedToLinkedAtomId : linkedAtom.getLinkedAtomIds()) {
-            BaseAtom linkedToLinkedAtom = idToAtomMap.get(linkedToLinkedAtomId);
-            if (linkedToLinkedAtom != null) {
-              linkedAtoms.add(linkedToLinkedAtom);
+        linkedContentItems.add(linkedContentItem);
+        // For linked narratives, we want to get their own linked content items as well
+        if (linkedContentItem.getContentItemType() == ContentItemType.NARRATIVE) {
+          for (Long linkedToLinkedContentItemId : linkedContentItem.getLinkedContentItemIds()) {
+            BaseContentItem linkedToLinkedContentItem =
+                idToContentItemMap.get(linkedToLinkedContentItemId);
+            if (linkedToLinkedContentItem != null) {
+              linkedContentItems.add(linkedToLinkedContentItem);
             }
           }
         }
       }
     }
     
-    Date nextDateInSequence = getNextDateInSequence(coreAtoms, relevantAtoms);
+    Date nextDateInSequence = getNextDateInSequence(coreContentItems, relevantContentItems);
 
-    result = new DisplayAtomBundle(coreAtoms, linkedAtoms, nextDateInSequence, localFilterSpec);
-    Caches.setDisplayAtomBundle(livingStoryId, filterSpec, focusedAtomId, cutoff, result);
+    result = new DisplayContentItemBundle(coreContentItems, linkedContentItems, nextDateInSequence, localFilterSpec);
+    Caches.setDisplayContentItemBundle(livingStoryId, filterSpec, focusedContentItemId, cutoff, result);
     return result;
   }
 
   /**
-   * Check if the atom matches the filterSpec.  If not, this method adjusts the filter
-   * spec so that the atom will match.
+   * Check if the contentItem matches the filterSpec.  If not, this method adjusts the filter
+   * spec so that the contentItem will match.
    * @return whether or not the filterSpec was adjusted.
    */
-  private boolean adjustFilterSpecForAtom(FilterSpec filterSpec, BaseAtom atom) {
-    if (filterSpec.doesAtomMatch(atom)) {
+  private boolean adjustFilterSpecForContentItem(FilterSpec filterSpec,
+      BaseContentItem contentItem) {
+    if (filterSpec.doesContentItemMatch(contentItem)) {
       return false;
     }
-    if (filterSpec.themeId != null && !atom.getThemeIds().contains(filterSpec.themeId)) {
+    if (filterSpec.themeId != null && !contentItem.getThemeIds().contains(filterSpec.themeId)) {
       filterSpec.themeId = null;
     }
-    if (filterSpec.importantOnly && atom.getImportance() != Importance.HIGH) {
+    if (filterSpec.importantOnly && contentItem.getImportance() != Importance.HIGH) {
       filterSpec.importantOnly = false;
     }
-    if (filterSpec.atomType != atom.getAtomType()) {
-      filterSpec.atomType = null;
-    } else if (atom.getAtomType() == AtomType.ASSET
-        && filterSpec.assetType != ((AssetAtom) atom).getAssetType()) {
-      filterSpec.atomType = null;
+    if (filterSpec.contentItemType != contentItem.getContentItemType()) {
+      filterSpec.contentItemType = null;
+    } else if (contentItem.getContentItemType() == ContentItemType.ASSET
+        && filterSpec.assetType != ((AssetContentItem) contentItem).getAssetType()) {
+      filterSpec.contentItemType = null;
       filterSpec.assetType = null;
     }
-    if (filterSpec.opinion && (atom.getAtomType() != AtomType.NARRATIVE
-        || !((NarrativeAtom) atom).isOpinion())) {
+    if (filterSpec.opinion && (contentItem.getContentItemType() != ContentItemType.NARRATIVE
+        || !((NarrativeContentItem) contentItem).isOpinion())) {
       filterSpec.opinion = false;
     }
     return true;
   }
   
-  private void sortBaseAtomList(List<BaseAtom> atoms, FilterSpec filterSpec) {
-    Collections.sort(
-        atoms, filterSpec.oldestFirst ? BaseAtom.COMPARATOR : BaseAtom.REVERSE_COMPARATOR);
+  private void sortContentItemList(List<BaseContentItem> contentItems, FilterSpec filterSpec) {
+    Collections.sort(contentItems,
+        filterSpec.oldestFirst ? BaseContentItem.COMPARATOR : BaseContentItem.REVERSE_COMPARATOR);
   }
   
-  private List<BaseAtom> getSublist(List<BaseAtom> allAtoms, BaseAtom focusedAtom, Date cutoff) {
-    int atomLimit;
-    if (focusedAtom == null) {
-      atomLimit = ATOM_COUNT_LIMIT;
+  private List<BaseContentItem> getSublist(List<BaseContentItem> allContentItems,
+      BaseContentItem focusedContentItem, Date cutoff) {
+    int contentItemLimit;
+    if (focusedContentItem == null) {
+      contentItemLimit = CONTENT_ITEM_COUNT_LIMIT;
     } else {
-      atomLimit = allAtoms.indexOf(focusedAtom) + 1 + JUMP_TO_ATOM_CONTEXT_COUNT;
-      // If we are not appending atoms and there are less than 20 results because of a focussed
-      // atom, bump the limit up to 20
-      if (cutoff == null && atomLimit < ATOM_COUNT_LIMIT) {
-        atomLimit = ATOM_COUNT_LIMIT;
+      contentItemLimit =
+          allContentItems.indexOf(focusedContentItem) + 1 + JUMP_TO_CONTENT_ITEM_CONTEXT_COUNT;
+      // If we are not appending content items and there are less than 20 results because of a
+      // focussed content item, bump the limit up to 20
+      if (cutoff == null && contentItemLimit < CONTENT_ITEM_COUNT_LIMIT) {
+        contentItemLimit = CONTENT_ITEM_COUNT_LIMIT;
       }
     }
-    atomLimit = Math.min(allAtoms.size(), atomLimit);
+    contentItemLimit = Math.min(allContentItems.size(), contentItemLimit);
 
-    while (atomLimit < allAtoms.size() - 1) {
-      Date thisAtomDate = allAtoms.get(atomLimit).getDateSortKey();
-      Date nextAtomDate = allAtoms.get(atomLimit + 1).getDateSortKey();
-      if (!thisAtomDate.equals(nextAtomDate)) {
+    while (contentItemLimit < allContentItems.size() - 1) {
+      Date thisContentItemDate = allContentItems.get(contentItemLimit).getDateSortKey();
+      Date nextContentItemDate = allContentItems.get(contentItemLimit + 1).getDateSortKey();
+      if (!thisContentItemDate.equals(nextContentItemDate)) {
         break;
       }
-      atomLimit++;
+      contentItemLimit++;
     }
     
     // Copy the sublist into a new ArrayList since the sublist() method returns
-    // a view backed by the original list, which includes a bunch of atoms we don't
+    // a view backed by the original list, which includes a bunch of content items we don't
     // care about.
-    return new ArrayList<BaseAtom>(allAtoms.subList(0, atomLimit));
+    return new ArrayList<BaseContentItem>(allContentItems.subList(0, contentItemLimit));
   }
 
   /**
-   * We return the date of the atom after the last core atom returned
+   * We return the date of the content item after the last core content item returned
    * as the 'next date in sequence', which we will use as the startDate in this method
-   * on the next call, when the user wants more atoms.
+   * on the next call, when the user wants more content items.
    * Very rare corner case:
-   * If the user loads up the page, an atom is added whose date falls between 
-   * the date of the last atom returned and the next date in sequence, and then
-   * the user clicks 'view more', we'll miss displaying that new atom.
+   * If the user loads up the page, a content item is added whose date falls between 
+   * the date of the last content item returned and the next date in sequence, and then
+   * the user clicks 'view more', we'll miss displaying that new content item.
    * We don't really care about this corner case though, since it will almost
    * never happen.
    */
-  private Date getNextDateInSequence(List<BaseAtom> coreAtoms, List<BaseAtom> relevantAtoms) {
-    return coreAtoms.size() < relevantAtoms.size()
-        ? relevantAtoms.get(coreAtoms.size()).getDateSortKey() : null;
+  private Date getNextDateInSequence(List<BaseContentItem> coreContentItems,
+      List<BaseContentItem> relevantContentItems) {
+    return coreContentItems.size() < relevantContentItems.size()
+        ? relevantContentItems.get(coreContentItems.size()).getDateSortKey() : null;
   }
   
   @Override
-  public synchronized BaseAtom getAtom(Long id, boolean getLinkedAtoms) {
+  public synchronized BaseContentItem getContentItem(Long id, boolean getLinkedContentItems) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     
     try {
-      BaseAtom atom = pm.getObjectById(BaseContentEntity.class, id).toClientObject();
-      if (getLinkedAtoms) {
-        atom.setLinkedAtoms(getAtoms(atom.getLinkedAtomIds()));
+      BaseContentItem contentItem = pm.getObjectById(BaseContentEntity.class, id).toClientObject();
+      if (getLinkedContentItems) {
+        contentItem.setLinkedContentItems(getContentItems(contentItem.getLinkedContentItemIds()));
       }
-      return atom;
+      return contentItem;
     } catch (JDOObjectNotFoundException e) {
       return null;
     } finally {
@@ -536,9 +541,9 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized List<BaseAtom> getAtoms(Collection<Long> ids) {
+  public synchronized List<BaseContentItem> getContentItems(Collection<Long> ids) {
     if (ids.isEmpty()) {
-      return new ArrayList<BaseAtom>();
+      return new ArrayList<BaseContentItem>();
     }
     
     PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -549,28 +554,28 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     try {
       Collection results = pm.getObjectsById(oids);
-      List<BaseAtom> atoms = new ArrayList<BaseAtom>(results.size());
+      List<BaseContentItem> contentItems = new ArrayList<BaseContentItem>(results.size());
       for (Object result : results) {
-        atoms.add(((BaseContentEntity)result).toClientObject());
+        contentItems.add(((BaseContentEntity)result).toClientObject());
       }
-      return atoms;
+      return contentItems;
     } finally {
       pm.close();
     }
   }
 
   @Override
-  public synchronized DisplayAtomBundle getRelatedAtoms(
-      Long atomId, boolean byContribution, Date cutoff) {
-    // translate atomId and byContribution into an appropriate FilterSpec, which we use
+  public synchronized DisplayContentItemBundle getRelatedContentItems(
+      Long contentItemId, boolean byContribution, Date cutoff) {
+    // translate contentItemId and byContribution into an appropriate FilterSpec, which we use
     // to respond from cache instead of by making fresh queries.
     FilterSpec filterSpec = new FilterSpec();
     if (byContribution) {
-      filterSpec.contributorId = atomId;
+      filterSpec.contributorId = contentItemId;
     } else {
-      filterSpec.playerId = atomId;
+      filterSpec.playerId = contentItemId;
     }
-    DisplayAtomBundle result = Caches.getDisplayAtomBundle(null, filterSpec, null, cutoff);
+    DisplayContentItemBundle result = Caches.getDisplayContentItemBundle(null, filterSpec, null, cutoff);
     if (result != null) {
       return result;
     }
@@ -578,33 +583,34 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseContentEntity.class);
-    String atomIdClause =
-      byContribution ? "contributorIds == atomIdParam" : "linkedAtomIds == atomIdParam";
-    query.setFilter(atomIdClause
+    String contentItemIdClause = byContribution
+        ? "contributorIds == contentItemIdParam" : "linkedContentItemIds == contentItemIdParam";
+    query.setFilter(contentItemIdClause
         + " && publishState == '" + PublishState.PUBLISHED.name() + "'");
     // no need to explicitly set ordering, as we resort by display order.
-    query.declareParameters("java.lang.Long atomIdParam");
+    query.declareParameters("java.lang.Long contentItemIdParam");
 
     try {
-      List<BaseAtom> relevantAtoms = new ArrayList<BaseAtom>();
+      List<BaseContentItem> relevantContentItems = new ArrayList<BaseContentItem>();
       
       @SuppressWarnings("unchecked")
-      List<BaseContentEntity> atomEntities = (List<BaseContentEntity>) query.execute(atomId);
-      for (BaseContentEntity atomEntity : atomEntities) {
-        BaseAtom atom = atomEntity.toClientObject();
-        if (cutoff == null || !atom.getDateSortKey().after(cutoff)) {
-          relevantAtoms.add(atom);
+      List<BaseContentEntity> contentEntities =
+          (List<BaseContentEntity>) query.execute(contentItemId);
+      for (BaseContentEntity contentEntity : contentEntities) {
+        BaseContentItem contentItem = contentEntity.toClientObject();
+        if (cutoff == null || !contentItem.getDateSortKey().after(cutoff)) {
+          relevantContentItems.add(contentItem);
         }
       }
       
       // sort and put a window on the list, get the next date in the sequence
-      sortBaseAtomList(relevantAtoms, filterSpec);
-      List<BaseAtom> coreAtoms = getSublist(relevantAtoms, null, cutoff); 
-      Date nextDateInSequence = getNextDateInSequence(coreAtoms, relevantAtoms);
+      sortContentItemList(relevantContentItems, filterSpec);
+      List<BaseContentItem> coreContentItems = getSublist(relevantContentItems, null, cutoff); 
+      Date nextDateInSequence = getNextDateInSequence(coreContentItems, relevantContentItems);
       
-      result = new DisplayAtomBundle(coreAtoms, Collections.<BaseAtom>emptySet(),
-          nextDateInSequence, filterSpec);
-      Caches.setDisplayAtomBundle(null, filterSpec, null, cutoff, result);
+      result = new DisplayContentItemBundle(coreContentItems,
+          Collections.<BaseContentItem>emptySet(), nextDateInSequence, filterSpec);
+      Caches.setDisplayContentItemBundle(null, filterSpec, null, cutoff, result);
       return result;
     } finally {
       query.closeAll();
@@ -613,22 +619,22 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   /**
-   * Performs an atom query given a set of search filter terms.
+   * Performs an contentItem query given a set of search filter terms.
    * 
    * For all search combinations to be successful, we require the existence
    * of several indexes:
    * - LivingStoryId/PublishState/Timestamp (minimum, required fields)
-   * - LivingStoryId/PublishState/Timestamp/AtomType
-   * - LivingStoryId/PublishState/Timestamp/AtomType/PlayerType
-   * - LivingStoryId/PublishState/Timestamp/AtomType/AssetType
-   * - LivingStoryId/PublishState/Timestamp/AtomType/NarrativeType
-   * - LivingStoryId/PublishState/Timestamp/Importance/AtomType
-   * - LivingStoryId/PublishState/Timestamp/Importance/AtomType/PlayerType
-   * - LivingStoryId/PublishState/Timestamp/Importance/AtomType/AssetType
-   * - LivingStoryId/PublishState/Timestamp/Importance/AtomType/NarrativeType
+   * - LivingStoryId/PublishState/Timestamp/ContentItemType
+   * - LivingStoryId/PublishState/Timestamp/ContentItemType/PlayerType
+   * - LivingStoryId/PublishState/Timestamp/ContentItemType/AssetType
+   * - LivingStoryId/PublishState/Timestamp/ContentItemType/NarrativeType
+   * - LivingStoryId/PublishState/Timestamp/Importance/ContentItemType
+   * - LivingStoryId/PublishState/Timestamp/Importance/ContentItemType/PlayerType
+   * - LivingStoryId/PublishState/Timestamp/Importance/ContentItemType/AssetType
+   * - LivingStoryId/PublishState/Timestamp/Importance/ContentItemType/NarrativeType
    */
   @Override
-  public List<BaseAtom> executeSearch(SearchTerms searchTerms) {
+  public List<BaseContentItem> executeSearch(SearchTerms searchTerms) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseContentEntity.class);
@@ -650,17 +656,17 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       queryFilters.append(" && importance == '" + searchTerms.importance.name() + "'");
     }
     
-    // Optional filter: atom type
-    if (searchTerms.atomType != null) {
-      queryFilters.append( "&& atomType == '" + searchTerms.atomType.name() + "'");
+    // Optional filter: contentItem type
+    if (searchTerms.contentItemType != null) {
+      queryFilters.append( "&& contentItemType == '" + searchTerms.contentItemType.name() + "'");
     }
     
-    // Optional filter: atom subtype
-    if (searchTerms.atomType == AtomType.PLAYER && searchTerms.playerType != null) {
+    // Optional filter: contentItem subtype
+    if (searchTerms.contentItemType == ContentItemType.PLAYER && searchTerms.playerType != null) {
       queryFilters.append(" && playerType == '" + searchTerms.playerType.name() + "'");
-    } else if (searchTerms.atomType == AtomType.ASSET && searchTerms.assetType != null) {
+    } else if (searchTerms.contentItemType == ContentItemType.ASSET && searchTerms.assetType != null) {
       queryFilters.append(" && assetType == '" + searchTerms.assetType.name() + "'");
-    } else if (searchTerms.atomType == AtomType.NARRATIVE && searchTerms.narrativeType != null) {
+    } else if (searchTerms.contentItemType == ContentItemType.NARRATIVE && searchTerms.narrativeType != null) {
       queryFilters.append(" && narrativeType == '" + searchTerms.narrativeType.name() + "'");
     }
     
@@ -669,16 +675,15 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     query.setOrdering("timestamp desc");
 
     try {
-      List<BaseAtom> clientAtoms = new ArrayList<BaseAtom>();
+      List<BaseContentItem> clientContentItems = new ArrayList<BaseContentItem>();
       
       @SuppressWarnings("unchecked")
       List<BaseContentEntity> results =
           (List<BaseContentEntity>) query.execute(searchTerms.beforeDate, searchTerms.afterDate);
       for (BaseContentEntity result : results) {
-        BaseAtom atom = result.toClientObject();
-        clientAtoms.add(atom);
+        clientContentItems.add(result.toClientObject());
       }
-      return clientAtoms;
+      return clientContentItems;
     } finally {
       query.closeAll();
       pm.close();
@@ -688,59 +693,59 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
 
   
   @Override
-  public synchronized void deleteAtom(final Long id) {
+  public synchronized void deleteContentItem(final Long id) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
-      BaseContentEntity atomEntity = pm.getObjectById(BaseContentEntity.class, id);
+      BaseContentEntity contentEntity = pm.getObjectById(BaseContentEntity.class, id);
 
-      updateAtomReferencesHelper(pm, "linkedAtomIds", id,
+      updateContentEntityReferencesHelper(pm, "linkedContentEntityIds", id,
           new Function<BaseContentEntity, Void>() {
-            public Void apply(BaseContentEntity atom) { 
-              atom.removeLinkedAtomId(id); return null;
+            public Void apply(BaseContentEntity contentEntity) { 
+              contentEntity.removeLinkedContentEntityId(id); return null;
             }
           });
 
       // If deleting a contributor as well, update relevant contributor ids too.
-      if (atomEntity.getAtomType() == AtomType.PLAYER) {
-        updateAtomReferencesHelper(pm, "contributorIds", id,
+      if (contentEntity.getContentItemType() == ContentItemType.PLAYER) {
+        updateContentEntityReferencesHelper(pm, "contributorIds", id,
             new Function<BaseContentEntity, Void>() {
-              public Void apply(BaseContentEntity atom) {
-                atom.removeContributorId(id); return null;
+              public Void apply(BaseContentEntity contentEntity) {
+                contentEntity.removeContributorId(id); return null;
               }
             });
       }
       
-      invalidateCache(atomEntity.getLivingStoryId());
-      pm.deletePersistent(atomEntity);
+      invalidateCache(contentEntity.getLivingStoryId());
+      pm.deletePersistent(contentEntity);
     } finally {
       pm.close();
     }
   }
   
   private void invalidateCache(Long livingStoryId) {
-    Caches.clearLivingStoryAtoms(livingStoryId);
+    Caches.clearLivingStoryContentItems(livingStoryId);
     Caches.clearLivingStoryThemeInfo(livingStoryId);
     Caches.clearStartPageBundle();
   }
   
   /**
-   * Helper method that updates atoms that refer to an atom to-be-deleted. 
+   * Helper method that updates content entities that refer to a content entity soon to be deleted. 
    * @param pm the persistence manager
    * @param relevantField relevant field name for the query
    * @param removeFunc a Function to apply to the results of the query
-   * @param id the id of the to-be-deleted atom
+   * @param id the id of the to-be-deleted content entity
    */
-  private void updateAtomReferencesHelper(PersistenceManager pm, String relevantField, Long id,
-      Function<BaseContentEntity, Void> removeFunc) {
+  private void updateContentEntityReferencesHelper(PersistenceManager pm, String relevantField,
+      Long id, Function<BaseContentEntity, Void> removeFunc) {
     Query query = pm.newQuery(BaseContentEntity.class);
-    query.setFilter(relevantField + " == atomIdParam");
-    query.declareParameters("java.lang.Long atomIdParam");
+    query.setFilter(relevantField + " == contentItemIdParam");
+    query.declareParameters("java.lang.Long contentItemIdParam");
     try {
       @SuppressWarnings("unchecked")
       List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(id);
-      for (BaseContentEntity atom : results) {
-        removeFunc.apply(atom);
+      for (BaseContentEntity result : results) {
+        removeFunc.apply(result);
       }
       pm.makePersistentAll(results);
     } finally {
@@ -755,7 +760,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     Query eventsQuery = pm.newQuery(BaseContentEntity.class);
     eventsQuery.setFilter(commonQueryFilter +
-        "&& atomType == com.google.livingstories.client.AtomType.EVENT");
+        "&& contentItemType == com.google.livingstories.client.ContentItemType.EVENT");
     eventsQuery.setOrdering("timestamp desc");
     if (range != 0) {
       eventsQuery.setRange(0, range);
@@ -765,7 +770,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     
     Query narrativesQuery = pm.newQuery(BaseContentEntity.class);
     narrativesQuery.setFilter(commonQueryFilter +
-        "&& atomType == com.google.livingstories.client.AtomType.NARRATIVE " +
+        "&& contentItemType == com.google.livingstories.client.ContentItemType.NARRATIVE " +
         "&& isStandalone == true");
     narrativesQuery.setOrdering("timestamp desc");
     if (range != 0) {
@@ -799,20 +804,19 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   @Override
-  public List<BaseAtom> getUpdatesSinceTime(Long livingStoryId, Date time) {
+  public List<BaseContentItem> getUpdatesSinceTime(Long livingStoryId, Date time) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     List<Query> updateQueries = getUpdateQueries(pm, time, 0);
     
     try {
-      List<BaseAtom> updates = new ArrayList<BaseAtom>();
+      List<BaseContentItem> updates = new ArrayList<BaseContentItem>();
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
         List<BaseContentEntity> results = 
             (List<BaseContentEntity>) query.execute(livingStoryId, time);
         for (BaseContentEntity result : results) {
-          BaseAtom atom = result.toClientObject();
-          updates.add(atom);
+          updates.add(result.toClientObject());
         }
       }
       return updates;
@@ -828,24 +832,23 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
    * Return the latest 3 updates on top-level display items for a story, sorted in reverse-
    * chronological order.
    */
-  public List<BaseAtom> getUpdatesForStartPage(Long livingStoryId) {
+  public List<BaseContentItem> getUpdatesForStartPage(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     List<Query> updateQueries = getUpdateQueries(pm, null, 3);
     try {
-      List<BaseAtom> updates = new ArrayList<BaseAtom>();
+      List<BaseContentItem> updates = new ArrayList<BaseContentItem>();
       // Get the latest 3 events and latest 3 narratives and then return the latest 3 items
       // from those 6 because there is no way to do one appengine query for that
       for (Query query : updateQueries) {
         @SuppressWarnings("unchecked")
         List<BaseContentEntity> results = (List<BaseContentEntity>) query.execute(livingStoryId);
         for (BaseContentEntity result : results) {
-          BaseAtom atom = result.toClientObject();
-          updates.add(atom);
+          updates.add(result.toClientObject());
         }
       }
-      Collections.sort(updates, BaseAtom.REVERSE_COMPARATOR);
+      Collections.sort(updates, BaseContentItem.REVERSE_COMPARATOR);
       // Just return the latest 3 updates
-      return new ArrayList<BaseAtom>(updates.subList(0, Math.min(3, updates.size())));
+      return new ArrayList<BaseContentItem>(updates.subList(0, Math.min(3, updates.size())));
     } finally {
       for (Query query : updateQueries) {
         query.closeAll();
@@ -855,12 +858,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   }
   
   @Override
-  public List<EventAtom> getImportantEventsForLivingStory(Long livingStoryId) {
+  public List<EventContentItem> getImportantEventsForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam " +
-        "&& atomType == com.google.livingstories.client.AtomType.EVENT " +
+        "&& contentItemType == com.google.livingstories.client.ContentItemType.EVENT " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED");
     query.declareParameters("Long livingStoryIdParam");
@@ -869,12 +872,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       @SuppressWarnings("unchecked")
       List<BaseContentEntity> results = 
           (List<BaseContentEntity>) query.execute(livingStoryId);
-      List<EventAtom> events = new ArrayList<EventAtom>();
+      List<EventContentItem> events = new ArrayList<EventContentItem>();
       for (BaseContentEntity result : results) {
-        EventAtom event = (EventAtom) result.toClientObject();
+        EventContentItem event = (EventContentItem) result.toClientObject();
         events.add(event);
       }
-      Collections.sort(events, BaseAtom.REVERSE_COMPARATOR);
+      Collections.sort(events, BaseContentItem.REVERSE_COMPARATOR);
       return events;
     } finally {
       query.closeAll();
@@ -885,26 +888,26 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   /**
    * This method will return a list of all the players in the living story,
    * sorted by importance.  Our importance ranking is currently based solely
-   * on the number of atoms in the living story that are linked to each player. 
+   * on the number of content items in the living story that are linked to each player. 
    */
   @Override
-  public List<PlayerAtom> getImportantPlayersForLivingStory(Long livingStoryId) {
+  public List<PlayerContentItem> getImportantPlayersForLivingStory(Long livingStoryId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     Query query = pm.newQuery(BaseContentEntity.class);
     query.setFilter("livingStoryId == livingStoryIdParam " +
-        "&& atomType == com.google.livingstories.client.AtomType.PLAYER " +
+        "&& contentItemType == com.google.livingstories.client.ContentItemType.PLAYER " +
         "&& importance == com.google.livingstories.client.Importance.HIGH " +
         "&& publishState == com.google.livingstories.client.PublishState.PUBLISHED");
     query.declareParameters("Long livingStoryIdParam");
     
-    List<PlayerAtom> players = Lists.newArrayList();
+    List<PlayerContentItem> players = Lists.newArrayList();
     try {
       @SuppressWarnings("unchecked")
       List<BaseContentEntity> results = 
           (List<BaseContentEntity>) query.execute(livingStoryId);
       for (BaseContentEntity result : results) {
-        players.add((PlayerAtom) result.toClientObject());
+        players.add((PlayerContentItem) result.toClientObject());
       }
     } finally {
       query.closeAll();
@@ -917,25 +920,25 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
    * Returns all the contributors for this living story.
    */
   @Override
-  public Map<Long, PlayerAtom> getContributorsByIdForLivingStory(Long livingStoryId) {
-    Map<Long, PlayerAtom> result = Caches.getContributorsForLivingStory(livingStoryId);
+  public Map<Long, PlayerContentItem> getContributorsByIdForLivingStory(Long livingStoryId) {
+    Map<Long, PlayerContentItem> result = Caches.getContributorsForLivingStory(livingStoryId);
     if (result != null) {
       return result;
     }
     
-    List<BaseAtom> allAtoms = getAtomsForLivingStory(livingStoryId, true);
+    List<BaseContentItem> allContentItems = getContentItemsForLivingStory(livingStoryId, true);
     
     Set<Long> allContributorIds = new HashSet<Long>();
-    for (BaseAtom atom : allAtoms) {
-      allContributorIds.addAll(atom.getContributorIds());
+    for (BaseContentItem contentItem : allContentItems) {
+      allContributorIds.addAll(contentItem.getContributorIds());
     }
     
-    List<BaseAtom> contributors = getAtoms(allContributorIds);
+    List<BaseContentItem> contributors = getContentItems(allContributorIds);
     
-    result = new HashMap<Long, PlayerAtom>();
-    for (BaseAtom contributor : contributors) {
-      if (contributor.getAtomType() == AtomType.PLAYER) {
-        result.put(contributor.getId(), (PlayerAtom) contributor);
+    result = new HashMap<Long, PlayerContentItem>();
+    for (BaseContentItem contributor : contributors) {
+      if (contributor.getContentItemType() == ContentItemType.PLAYER) {
+        result.put(contributor.getId(), (PlayerContentItem) contributor);
       } else {
         logger.warning("Contributor id " + contributor.getId() + " does not map to a player");
       }

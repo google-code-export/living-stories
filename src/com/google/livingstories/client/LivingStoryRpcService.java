@@ -47,7 +47,7 @@ public interface LivingStoryRpcService extends RemoteService {
   // their implementation belongs on the same service.
   List<Theme> getThemesForLivingStory(long livingStoryId);
   
-  Map<Long, AtomTypesBundle> getThemeInfoForLivingStory(long livingStoryId);
+  Map<Long, ContentItemTypesBundle> getThemeInfoForLivingStory(long livingStoryId);
   
   Theme getThemeById(long id);
   

@@ -27,8 +27,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.AtomTypesBundle;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.ContentItemTypesBundle;
 import com.google.livingstories.client.ClientConstants;
 import com.google.livingstories.client.FilterSpec;
 import com.google.livingstories.client.UserRpcService;
@@ -49,13 +49,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Widget that contains different types of filters for the events and atoms displayed on the LSP.
+ * Widget that contains different types of filters for the events and content items displayed on
+ * the LSP.
  */
 public class FilterWidget extends Composite {
   private static final UserRpcServiceAsync userService = GWT.create(UserRpcService.class); 
-  private static final AtomType[] ATOM_TYPE_PRESENTATION_ORDER = {
-    AtomType.EVENT, AtomType.NARRATIVE, AtomType.PLAYER, AtomType.QUOTE,
-    AtomType.DATA, AtomType.REACTION   // asset deliberately skipped 
+  private static final ContentItemType[] CONTENT_ITEM_TYPE_PRESENTATION_ORDER = {
+    ContentItemType.EVENT, ContentItemType.NARRATIVE, ContentItemType.PLAYER, ContentItemType.QUOTE,
+    ContentItemType.DATA, ContentItemType.REACTION   // asset deliberately skipped 
   };
   private static final String OPINION_TEXT;
   static {
@@ -74,7 +75,7 @@ public class FilterWidget extends Composite {
   private Label setAsDefaultLabel;
   private Label defaultViewLabel;
   
-  private Map<Long, AtomTypesBundle> atomTypesBundles;
+  private Map<Long, ContentItemTypesBundle> contentItemTypesBundles;
   
   private FilterSpec currentFilters;
   private Long selectedThemeId;
@@ -99,22 +100,22 @@ public class FilterWidget extends Composite {
     });
   }
     
-  public void load(Map<Long, AtomTypesBundle> atomTypesBundles, Long selectedThemeId) {
-    this.atomTypesBundles = atomTypesBundles;
+  public void load(Map<Long, ContentItemTypesBundle> contentItemTypesBundles, Long selectedThemeId) {
+    this.contentItemTypesBundles = contentItemTypesBundles;
     populateFilterPanel();
     refreshFilters();
     if (selectedThemeId != null) {
-      setAtomTypeFilterVisibility(selectedThemeId);
+      setContentItemTypeFilterVisibility(selectedThemeId);
     }
     loaded = true;
   }
   
   /**
-   * Populate the left column with links for the available atom types and filters for the
+   * Populate the left column with links for the available content item types and filters for the
    * importance.
    */
   private void populateFilterPanel() {
-    createAtomTypeFilters();
+    createContentItemTypeFilters();
     addSeparator();
     createImportanceFilters();
     addSeparator();
@@ -128,7 +129,7 @@ public class FilterWidget extends Composite {
   /**
    * Informs the filter widget that the user has requested a change in selected theme.
    * Apart from side effects, also sets a history token with an adjusted filter spec.
-   * This lets us get different atoms if the current filter isn't available in the
+   * This lets us get different content items if the current filter isn't available in the
    * new theme.
    * @param selectedThemeId the new selectedThemeId
    */
@@ -139,12 +140,12 @@ public class FilterWidget extends Composite {
 
     if (isChange) {
       if (loaded) {
-        setAtomTypeFilterVisibility(selectedThemeId);
+        setContentItemTypeFilterVisibility(selectedThemeId);
       }
       filterCopy.themeId = selectedThemeId;
       
       if (!filterAppliesToTheme(filterCopy, selectedThemeId)) {
-        filterCopy.atomType = null;
+        filterCopy.contentItemType = null;
         filterCopy.assetType = null;
         filterCopy.opinion = false;
       }
@@ -160,16 +161,16 @@ public class FilterWidget extends Composite {
    * "all" view.
    */
   private boolean filterAppliesToTheme(FilterSpec filterSpec, Long newThemeId) {
-    AtomTypesBundle bundle = atomTypesBundles.get(newThemeId);
+    ContentItemTypesBundle bundle = contentItemTypesBundles.get(newThemeId);
     if (bundle == null) {
       throw new IllegalArgumentException("filterAppliesToTheme given an unknown theme id argument");
     }
     return getTuplesForTypesBundle(bundle).contains(new TypeFilterTuple(
-        "", filterSpec.atomType, filterSpec.assetType, filterSpec.opinion));
+        "", filterSpec.contentItemType, filterSpec.assetType, filterSpec.opinion));
   }
   
-  private void createAtomTypeFilters() {
-    for (TypeFilterTuple tuple : getTuplesForTypesBundle(atomTypesBundles.get(null))) {
+  private void createContentItemTypeFilters() {
+    for (TypeFilterTuple tuple : getTuplesForTypesBundle(contentItemTypesBundles.get(null))) {
       createFilterRow(tuple);
     }
     
@@ -181,10 +182,10 @@ public class FilterWidget extends Composite {
     filterPanel.add(spacer);
   }
   
-  private void setAtomTypeFilterVisibility(Long themeId) {
-    Set<TypeFilterTuple> allTuples = getTuplesForTypesBundle(atomTypesBundles.get(null));
+  private void setContentItemTypeFilterVisibility(Long themeId) {
+    Set<TypeFilterTuple> allTuples = getTuplesForTypesBundle(contentItemTypesBundles.get(null));
     Set<TypeFilterTuple> visibleTuples =
-      themeId == null ? null : getTuplesForTypesBundle(atomTypesBundles.get(themeId));
+      themeId == null ? null : getTuplesForTypesBundle(contentItemTypesBundles.get(themeId));
     // There's no need to appeal to visibleTuples at all if themeId is null.
     
     for (TypeFilterTuple tuple : allTuples) {
@@ -193,37 +194,39 @@ public class FilterWidget extends Composite {
   }
   
   private void createFilterRow(TypeFilterTuple tuple) {
-    String key = getAtomFilterKey(tuple.atomType, tuple.assetType, tuple.isOpinion);
-    FilterRow row = new FilterRow(tuple.name,
-        new AtomTypeFilterHandler(tuple.atomType, tuple.assetType, tuple.isOpinion, tuple.name));
+    String key = getContentItemFilterKey(tuple.contentItemType, tuple.assetType, tuple.isOpinion);
+    FilterRow row = new FilterRow(tuple.name, new ContentItemTypeFilterHandler(
+        tuple.contentItemType, tuple.assetType, tuple.isOpinion, tuple.name));
     filterPanel.add(row);
     keyToFilterRowMap.put(key, row);
   }
   
   private void setFilterRowVisibility(TypeFilterTuple tuple, boolean visible) {
-    keyToFilterRowMap.get(
-        getAtomFilterKey(tuple.atomType, tuple.assetType, tuple.isOpinion)).setVisible(visible);
+    keyToFilterRowMap.get(getContentItemFilterKey(tuple.contentItemType, tuple.assetType,
+        tuple.isOpinion)).setVisible(visible);
   }
   
-  private Set<TypeFilterTuple> getTuplesForTypesBundle(AtomTypesBundle atomTypesBundle) {
+  private Set<TypeFilterTuple> getTuplesForTypesBundle(
+      ContentItemTypesBundle contentItemTypesBundle) {
     Set<TypeFilterTuple> tuples = new LinkedHashSet<TypeFilterTuple>();
     
     tuples.add(new TypeFilterTuple(LspMessageHolder.consts.allTypes(), null, null));
-    for (AtomType atomType : ATOM_TYPE_PRESENTATION_ORDER) {
-      if (atomTypesBundle.availableAtomTypes.contains(atomType)) {
-        tuples.add(new TypeFilterTuple(atomType.getFilterString(), atomType, null));
-        if (atomType == AtomType.NARRATIVE && atomTypesBundle.opinionAvailable) {
-          tuples.add(new TypeFilterTuple(OPINION_TEXT, atomType, null, true));
+    for (ContentItemType contentItemType : CONTENT_ITEM_TYPE_PRESENTATION_ORDER) {
+      if (contentItemTypesBundle.availableContentItemTypes.contains(contentItemType)) {
+        tuples.add(new TypeFilterTuple(contentItemType.getFilterString(), contentItemType, null));
+        if (contentItemType == ContentItemType.NARRATIVE
+            && contentItemTypesBundle.opinionAvailable) {
+          tuples.add(new TypeFilterTuple(OPINION_TEXT, contentItemType, null, true));
         }
       }
     }
     
     // Now handle assets, except for links.
-    if (atomTypesBundle.availableAtomTypes.contains(AtomType.ASSET)) {
+    if (contentItemTypesBundle.availableContentItemTypes.contains(ContentItemType.ASSET)) {
       for (AssetType assetType : EnumSet.complementOf(EnumSet.of(AssetType.DOCUMENT))) {
-        if (atomTypesBundle.availableAssetTypes.contains(assetType)) {
+        if (contentItemTypesBundle.availableAssetTypes.contains(assetType)) {
           tuples.add(new TypeFilterTuple(assetType.getPluralPresentationString(),
-              AtomType.ASSET, assetType));
+              ContentItemType.ASSET, assetType));
         }
       }
     }
@@ -231,15 +234,15 @@ public class FilterWidget extends Composite {
     return tuples;
   }
   
-  private class AtomTypeFilterHandler implements ClickHandler {
-    private AtomType atomType;
+  private class ContentItemTypeFilterHandler implements ClickHandler {
+    private ContentItemType contentItemType;
     private AssetType assetType;
     private boolean opinion;
     private String filterName;
     
-    public AtomTypeFilterHandler(AtomType atomType, AssetType assetType, boolean opinion, 
+    public ContentItemTypeFilterHandler(ContentItemType contentItemType, AssetType assetType, boolean opinion, 
         String filterName) {
-      this.atomType = atomType;
+      this.contentItemType = contentItemType;
       this.assetType = assetType;
       this.opinion = opinion;
       this.filterName = filterName;
@@ -247,10 +250,10 @@ public class FilterWidget extends Composite {
     
     @Override
     public void onClick(ClickEvent event) {
-      if (currentFilters.atomType != atomType || currentFilters.assetType != assetType
+      if (currentFilters.contentItemType != contentItemType || currentFilters.assetType != assetType
           || currentFilters.opinion != opinion) {
         FilterSpec newFilter = copyCurrentFilterSpec();
-        newFilter.atomType = atomType;
+        newFilter.contentItemType = contentItemType;
         newFilter.assetType = assetType;
         newFilter.opinion = opinion;
         HistoryManager.newTokenWithEvent(HistoryPages.OVERVIEW,
@@ -261,18 +264,18 @@ public class FilterWidget extends Composite {
   }
   
   /**
-   * Return a key that is used for identifying an atom type filter option. The key is composed
-   * of the atom type and the asset type if the atom is an asset.
+   * Return a key that is used for identifying a content item type filter option. The key is
+   * composed of the content item type and the asset type if the content item is an asset.
    */
-  private String getAtomFilterKey(AtomType atomType, AssetType assetType, boolean opinion) {
-    if (atomType == null) {
+  private String getContentItemFilterKey(ContentItemType contentItemType, AssetType assetType, boolean opinion) {
+    if (contentItemType == null) {
       return "";
-    } else if (atomType == AtomType.ASSET && assetType != null) {
-      return atomType.name() + "," + assetType.name();
-    } else if (atomType == AtomType.NARRATIVE) {
-      return atomType.name() + ",," + opinion;
+    } else if (contentItemType == ContentItemType.ASSET && assetType != null) {
+      return contentItemType.name() + "," + assetType.name();
+    } else if (contentItemType == ContentItemType.NARRATIVE) {
+      return contentItemType.name() + ",," + opinion;
     } else {
-      return atomType.name();
+      return contentItemType.name();
     }
   }
   
@@ -395,8 +398,8 @@ public class FilterWidget extends Composite {
       return;
     }
     
-    keyToFilterRowMap.get(getAtomFilterKey(
-        currentFilters.atomType, currentFilters.assetType, currentFilters.opinion)).select();
+    keyToFilterRowMap.get(getContentItemFilterKey(
+        currentFilters.contentItemType, currentFilters.assetType, currentFilters.opinion)).select();
     keyToFilterRowMap.get(getImportanceFilterKey(currentFilters.importantOnly)).select();
     keyToFilterRowMap.get(getTimeSortKey(currentFilters.oldestFirst)).select();
     
@@ -425,8 +428,8 @@ public class FilterWidget extends Composite {
     // Set the current filters to the provided filter spec, and refreshes which items
     // are shown as selected.
     if (currentFilters != null && !filtersEqual(filter, currentFilters)) {
-      keyToFilterRowMap.get(getAtomFilterKey(
-          currentFilters.atomType, currentFilters.assetType, currentFilters.opinion)).unselect();
+      keyToFilterRowMap.get(getContentItemFilterKey(
+          currentFilters.contentItemType, currentFilters.assetType, currentFilters.opinion)).unselect();
       keyToFilterRowMap.get(getImportanceFilterKey(currentFilters.importantOnly)).unselect();
       keyToFilterRowMap.get(getTimeSortKey(currentFilters.oldestFirst)).unselect();
     }
@@ -445,7 +448,7 @@ public class FilterWidget extends Composite {
     return filter1.importantOnly == filter2.importantOnly
         && filter1.oldestFirst == filter2.oldestFirst
         && filter1.opinion == filter2.opinion
-        && filter1.atomType == filter2.atomType
+        && filter1.contentItemType == filter2.contentItemType
         && filter1.assetType == filter2.assetType;
   }
   
@@ -484,20 +487,20 @@ public class FilterWidget extends Composite {
   
   private class TypeFilterTuple {
     String name;
-    public AtomType atomType;
+    public ContentItemType contentItemType;
     public AssetType assetType;
     public boolean isOpinion;
     
-    public TypeFilterTuple(String name, AtomType atomType, AssetType assetType,
+    public TypeFilterTuple(String name, ContentItemType contentItemType, AssetType assetType,
         boolean isOpinion) {
       this.name = name;
-      this.atomType = atomType;
+      this.contentItemType = contentItemType;
       this.assetType = assetType;
       this.isOpinion = isOpinion;
     }
     
-    public TypeFilterTuple(String name, AtomType atomType, AssetType assetType) {
-      this(name, atomType, assetType, false);
+    public TypeFilterTuple(String name, ContentItemType contentItemType, AssetType assetType) {
+      this(name, contentItemType, assetType, false);
     }
     
     // methods below generated by eclipse, with some streamlining. Also, we don't care about the
@@ -512,7 +515,7 @@ public class FilterWidget extends Composite {
       int result = 1;
       result = prime * result + getOuterType().hashCode();
       result = prime * result + ((assetType == null) ? 0 : assetType.hashCode());
-      result = prime * result + ((atomType == null) ? 0 : atomType.hashCode());
+      result = prime * result + ((contentItemType == null) ? 0 : contentItemType.hashCode());
       result = prime * result + (isOpinion ? 1231 : 1237);
       return result;
     }
@@ -530,9 +533,9 @@ public class FilterWidget extends Composite {
       if (assetType == null) {
         if (other.assetType != null) return false;
       } else if (assetType != other.assetType) return false;
-      if (atomType == null) {
-        if (other.atomType != null) return false;
-      } else if (atomType != other.atomType) return false;
+      if (contentItemType == null) {
+        if (other.contentItemType != null) return false;
+      } else if (contentItemType != other.contentItemType) return false;
       if (isOpinion != other.isOpinion) return false;
       return true;
     }

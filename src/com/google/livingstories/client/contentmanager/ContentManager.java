@@ -33,7 +33,7 @@ public class ContentManager implements EntryPoint {
   
   private Widget livingStoryManager = new LivingStoryManager();
   private Widget themeManager = new ThemeManager();
-  private Widget atomManager = new AtomManager();
+  private Widget contentItemManager = new ContentItemManager();
   private Widget importManager = new ImportManager();
   
   public void onModuleLoad() {
@@ -42,7 +42,7 @@ public class ContentManager implements EntryPoint {
     tabs = new TabPanel();
     tabs.setWidth("100%");
     
-    tabs.add(atomManager, "Manage Content");
+    tabs.add(contentItemManager, "Manage Content");
     tabs.add(livingStoryManager, "Manage Living Stories");
     tabs.add(themeManager, "Manage Themes");
     tabs.add(importManager, "Import/Export Data");
@@ -56,15 +56,15 @@ public class ContentManager implements EntryPoint {
         // anything on the source tab.
         ManagerPane previousTab = (ManagerPane) tabs.getWidget(selectedIndex);
         boolean livingStoriesEdited = (previousTab == livingStoryManager);
-        boolean atomsEdited = (previousTab == atomManager);
+        boolean contentItemsEdited = (previousTab == contentItemManager);
         for (int i = 0; i < tabs.getWidgetCount(); i++) {
           ManagerPane pane = (ManagerPane) tabs.getWidget(i);
           if (pane != previousTab) {
             if (livingStoriesEdited) {
               pane.onLivingStoriesChanged();
             }
-            if (atomsEdited) {
-              pane.onAtomsChanged();
+            if (contentItemsEdited) {
+              pane.onContentItemsChanged();
             }
 
             pane.onShow();

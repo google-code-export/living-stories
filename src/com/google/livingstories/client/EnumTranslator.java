@@ -23,8 +23,8 @@ public class EnumTranslator {
   private static ClientConstants consts = ClientMessageHolder.consts;
   private static ClientMessages msgs = ClientMessageHolder.msgs;
   
-  public static String translate(AtomType atomType, int count) {
-    switch (atomType) {
+  public static String translate(ContentItemType contentItemType, int count) {
+    switch (contentItemType) {
       case EVENT:
         return msgs.contentDisplayNameEvents(count);
       case PLAYER:
@@ -47,8 +47,8 @@ public class EnumTranslator {
     }
   }
 
-  public static String getNavLinkOverride(AtomType atomType) {
-    switch (atomType) {
+  public static String getNavLinkOverride(ContentItemType contentItemType) {
+    switch (contentItemType) {
       case EVENT:
         return consts.contentNavLinkStringEvents();
       case PLAYER:
@@ -66,8 +66,8 @@ public class EnumTranslator {
     }
   }
   
-  public static String getFilterStringOverride(AtomType atomType) {
-    switch (atomType) {
+  public static String getFilterStringOverride(ContentItemType contentItemType) {
+    switch (contentItemType) {
       case EVENT:
         return consts.contentFilterStringEvents();
       case PLAYER:

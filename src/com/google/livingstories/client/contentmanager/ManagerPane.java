@@ -23,6 +23,6 @@ import com.google.gwt.user.client.ui.Composite;
  */
 public abstract class ManagerPane extends Composite {
   public void onLivingStoriesChanged() {}
-  public void onAtomsChanged() {}
+  public void onContentItemsChanged() {}
   public void onShow() {}
 }

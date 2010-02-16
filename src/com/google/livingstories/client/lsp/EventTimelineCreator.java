@@ -19,7 +19,7 @@ package com.google.livingstories.client.lsp;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.livingstories.client.ClientCaches;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.ui.TimelineData;
 import com.google.livingstories.client.ui.TimelineWidget;
 import com.google.livingstories.client.util.AnalyticsUtil;
@@ -34,7 +34,7 @@ import java.util.Map;
 
 /**
  * Provides methods for attaching a timeline to a specific DOM element and for loading
- * it with eventAtom data when available.
+ * it with eventContentItem data when available.
  */
 public class EventTimelineCreator {
   
@@ -52,19 +52,19 @@ public class EventTimelineCreator {
           @Override
           public void onClick(ClickEvent event, Long data) {
             AnalyticsUtil.trackHorizontalTimelineClick(LivingStoryData.getLivingStoryUrl(), data);
-            LivingStoryControls.goToAtom(data);
+            LivingStoryControls.goToContentItem(data);
           }
         });
     timeline.setVisible(false);
 
     // Load the timeline data asynchronously.
-    ClientCaches.getImportantEvents(new AsyncCallback<List<EventAtom>>() {
+    ClientCaches.getImportantEvents(new AsyncCallback<List<EventContentItem>>() {
       @Override
       public void onFailure(Throwable caught) {
         // Ignore the error.
       }
       @Override
-      public void onSuccess(List<EventAtom> result) {
+      public void onSuccess(List<EventContentItem> result) {
         loadTimeline(timeline, result);
       }
     });
@@ -75,15 +75,15 @@ public class EventTimelineCreator {
   /**
    * Actually loads timeline data into the timeline widget.
    */
-  public static void loadTimeline(TimelineWidget<Long> timeline, List<EventAtom> importantEvents) {
+  public static void loadTimeline(TimelineWidget<Long> timeline, List<EventContentItem> importantEvents) {
     // TODO: implement policies other than "important events only".
     Map<Date, TimelineData<Long>> pointEvents = new LinkedHashMap<Date, TimelineData<Long>>();
     Map<TimelineWidget.Interval, TimelineData<Long>> rangeEvents =
       new LinkedHashMap<TimelineWidget.Interval, TimelineData<Long>>();
     Date earliest = null, latest = null;
     
-    for (EventAtom event : importantEvents) {
-      // TODO: very similar to code in DateTimeRangeWidget.makeForEventAtom. Refactor.
+    for (EventContentItem event : importantEvents) {
+      // TODO: very similar to code in DateTimeRangeWidget.makeForEventContentitem. Refactor.
       Date startDate = event.getEventStartDate();
       Date endDate = event.getEventEndDate();
 

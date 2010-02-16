@@ -19,14 +19,14 @@ package com.google.livingstories.server.rpcimpl;
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.AtomTypesBundle;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.ContentItemTypesBundle;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
-import com.google.livingstories.client.NarrativeAtom;
+import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.StartPageBundle;
@@ -125,7 +125,7 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   public synchronized void deleteLivingStory(long id) {
     livingStoryDataService.delete(id);
     Caches.clearLivingStories();
-    Caches.clearLivingStoryAtoms(id);
+    Caches.clearLivingStoryContentItems(id);
     Caches.clearLivingStoryThemes(id);
     Caches.clearLivingStoryThemeInfo(id);
     Caches.clearStartPageBundle();
@@ -142,47 +142,49 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   }
 
   /**
-   * Returns a map from theme id to AtomTypesBundles. It lists the published atom and asset types
-   * for the story, broken down by theme id. Each AtomTypeBundle includes an theme name field,
-   * so this call will give client-facing code all the information it needs to present
-   * themes and filters to the user.
+   * Returns a map from theme id to ContenItemTypesBundles. It lists the published content item
+   * type and asset types for the story, broken down by theme id. Each ContentItemTypeBundle
+   * includes an theme name field, so this call will give client-facing code all the information
+   * it needs to present themes and filters to the user.
    * @param livingStoryId living story id
-   * @return a map of AtomTypeBundles appropriately filled in.
+   * @return a map of ContentItemTypeBundles appropriately filled in.
    */
   @Override
-  public synchronized Map<Long, AtomTypesBundle> getThemeInfoForLivingStory(long livingStoryId) {
-    Map<Long, AtomTypesBundle> result = Caches.getLivingStoryThemeInfo(livingStoryId); 
+  public synchronized Map<Long, ContentItemTypesBundle> getThemeInfoForLivingStory(
+      long livingStoryId) {
+    Map<Long, ContentItemTypesBundle> result = Caches.getLivingStoryThemeInfo(livingStoryId); 
     if (result != null) {
       return result;
     }
 
     result = Maps.newHashMap();
-    AtomTypesBundle globalBundle = new AtomTypesBundle("");
+    ContentItemTypesBundle globalBundle = new ContentItemTypesBundle("");
     result.put(null, globalBundle);
 
-    // put an entry in the map for each theme, too. Since some themes may have no atoms,
-    // we should not do this on-demand.
+    // put an entry in the map for each theme, too. Since some themes may have no content items,
+    // we should do this up-front, not lazily.
     for (Theme theme : getThemesForLivingStory(livingStoryId)) {
-      result.put(theme.getId(), new AtomTypesBundle(theme.getName()));
+      result.put(theme.getId(), new ContentItemTypesBundle(theme.getName()));
     }
     
-    // In principle, we could try to track when we've found every atom type that we care about, in
-    // every possible theme, but it's such a micro-optimization at this point that it's not
-    // worthwhile.
-    List<BaseAtom> allAtoms = contentRpcService.getAtomsForLivingStory(livingStoryId, true);
+    // In principle, we could try to track when we've found every content item type that we care
+    // about, in every possible theme, terminating the loop early if our dance card is completely
+    // filled, but it's such a micro-optimization at this point that it's not worthwhile.
+    List<BaseContentItem> allContentItems =
+        contentRpcService.getContentItemsForLivingStory(livingStoryId, true);
     
-    for (BaseAtom atom : allAtoms) {
-      if (!addAtomToTypesBundle(atom, globalBundle)) {
+    for (BaseContentItem contentItem : allContentItems) {
+      if (!addContentItemToTypesBundle(contentItem, globalBundle)) {
         continue;
       }
       
-      for (Long themeId : atom.getThemeIds()) {
-        AtomTypesBundle themeBundle = result.get(themeId);
+      for (Long themeId : contentItem.getThemeIds()) {
+        ContentItemTypesBundle themeBundle = result.get(themeId);
         if (themeBundle == null) {
-          logger.warning("atom " + atom.getId() + " refers to themeId " + themeId + ", but this"
+          logger.warning("contentItem " + contentItem.getId() + " refers to themeId " + themeId + ", but this"
               + "theme does not appear to be in the story.");
         } else {
-          addAtomToTypesBundle(atom, themeBundle);
+          addContentItemToTypesBundle(contentItem, themeBundle);
         }
       }
     }
@@ -192,24 +194,27 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
   }      
 
   /**
-   * Adds information on BaseAtom atom to bundle.
-   * @return false if this is an atom that should be ignored completely. Handy to the caller,
-   * which can then avoid adding the atom to other, theme-specific types bundles.
+   * Adds information on contentItem to bundle.
+   * @return false if this is an contentItem that should be ignored completely. Handy to the caller,
+   * which can then avoid adding the contentItem to other, theme-specific types bundles.
    */
-  private boolean addAtomToTypesBundle(BaseAtom atom, AtomTypesBundle bundle) {
-    AtomType atomType = atom.getAtomType();
+  private boolean addContentItemToTypesBundle(BaseContentItem contentItem,
+      ContentItemTypesBundle bundle) {
+    ContentItemType contentItemType = contentItem.getContentItemType();
     
-    // We don't want to show background and reaction atoms in the filters, so skip those entirely
-    if (atomType == AtomType.BACKGROUND || atomType == AtomType.REACTION) {
+    // We don't want to show background and reaction items in the filters, so skip those entirely
+    if (contentItemType == ContentItemType.BACKGROUND
+        || contentItemType == ContentItemType.REACTION) {
       return false;
     }
     
-    if (atomType == AtomType.NARRATIVE && ((NarrativeAtom)atom).isOpinion()) {
+    if (contentItemType == ContentItemType.NARRATIVE
+        && ((NarrativeContentItem)contentItem).isOpinion()) {
       bundle.opinionAvailable = true;
     } else {
-      bundle.availableAtomTypes.add(atomType);
-      if (atomType == AtomType.ASSET) {
-        AssetType assetType = ((AssetAtom) atom).getAssetType();
+      bundle.availableContentItemTypes.add(contentItemType);
+      if (contentItemType == ContentItemType.ASSET) {
+        AssetType assetType = ((AssetContentItem) contentItem).getAssetType();
         if (assetType == AssetType.DOCUMENT) {
           assetType = AssetType.LINK;
         }
@@ -247,13 +252,13 @@ public class LivingStoryRpcImpl extends RemoteServiceServlet implements LivingSt
     StartPageBundle bundle = Caches.getStartPageBundle();
     if (bundle == null) {
       List<LivingStory> unsortedLivingStories = getAllLivingStories(true);
-      Map<Long, List<BaseAtom>> storyIdToUpdateMap = new HashMap<Long, List<BaseAtom>>();
+      Map<Long, List<BaseContentItem>> storyIdToUpdateMap = new HashMap<Long, List<BaseContentItem>>();
       List<LivingStoryAndLastUpdateTime> livingStoriesAndUpdateTimes = 
         new ArrayList<LivingStoryAndLastUpdateTime>();
       // For each living story, get the last 3 updates - the updates are sorted in reverse
       // chronological order
       for (LivingStory livingStory : unsortedLivingStories) {
-        List<BaseAtom> updates = contentRpcService.getUpdatesForStartPage(livingStory.getId());
+        List<BaseContentItem> updates = contentRpcService.getUpdatesForStartPage(livingStory.getId());
         storyIdToUpdateMap.put(livingStory.getId(), updates);
         livingStoriesAndUpdateTimes.add(
             new LivingStoryAndLastUpdateTime(livingStory,

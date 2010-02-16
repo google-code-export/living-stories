@@ -50,7 +50,7 @@
             <lsp:FilterWidget ui:field="filterList"/>
           </td>
           <td valign="top">
-            <lsp:LspAtomListWidget ui:field="atomList"/>
+            <lsp:LspContentItemListWidget ui:field="contentItemList"/>
           </td>
           <td rowspan="2" valign="top">
             <clientui:AnchoredPanel ui:field="rightPanel" width="250px" visible="false">

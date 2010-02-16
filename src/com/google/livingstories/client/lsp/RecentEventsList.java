@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.ClientCaches;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.ui.DateWidget;
 import com.google.livingstories.client.ui.Link;
 import com.google.livingstories.client.util.AnalyticsUtil;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Widget that displays a list of the 5 latest important events.
  * Clicking on an event should scroll the user to that event in the
- * main atom list and open it.
+ * main content item list and open it.
  */
 public class RecentEventsList extends Composite {
   private static final int MAX_EVENT_COUNT = 5;
@@ -54,7 +54,7 @@ public class RecentEventsList extends Composite {
   }
 
   public void load() {
-    ClientCaches.getImportantEvents(new ImportantAtomsCallback());
+    ClientCaches.getImportantEvents(new ImportantContentItemsCallback());
   }
   
   private Widget getHeader() {
@@ -63,14 +63,14 @@ public class RecentEventsList extends Composite {
     return header;
   }
   
-  private class ImportantAtomsCallback implements AsyncCallback<List<EventAtom>> {
+  private class ImportantContentItemsCallback implements AsyncCallback<List<EventContentItem>> {
     @Override
     public void onFailure(Throwable caught) {
       contentPanel.add(new Label(PROBLEM_TEXT));
     }
     
     @Override
-    public void onSuccess(List<EventAtom> result) {
+    public void onSuccess(List<EventContentItem> result) {
       if (result.isEmpty()) {
         contentPanel.setVisible(false);
       } else {
@@ -83,14 +83,14 @@ public class RecentEventsList extends Composite {
       }
     }
     
-    private Widget createEventWidget(final EventAtom event) {
+    private Widget createEventWidget(final EventContentItem event) {
       FlowPanel eventPanel = new FlowPanel();
       Link update = new Link(event.getEventUpdate()) {
         @Override
         protected void onClick(ClickEvent e) {
           AnalyticsUtil.trackVerticalTimelineClick(
               LivingStoryData.getLivingStoryUrl(), event.getId());
-          LivingStoryControls.goToAtom(event.getId());
+          LivingStoryControls.goToContentItem(event.getId());
         }
       };
       eventPanel.add(update);

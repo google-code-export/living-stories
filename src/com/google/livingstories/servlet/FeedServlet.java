@@ -17,13 +17,13 @@
 package com.google.livingstories.servlet;
 
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
-import com.google.livingstories.client.NarrativeAtom;
+import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.SnippetUtil;
 import com.google.livingstories.client.util.dom.JavaNodeAdapter;
@@ -58,11 +58,11 @@ public class FeedServlet extends HttpServlet {
   private static final int MAXIMUM_SNIPPET_LENGTH = 500;
   
   private LivingStoryRpcService livingStoryService;
-  private ContentRpcService atomService;
+  private ContentRpcService contentService;
 
   public FeedServlet() {
     livingStoryService = new LivingStoryRpcImpl();
-    atomService = new ContentRpcImpl();
+    contentService = new ContentRpcImpl();
   }
 
   @Override
@@ -97,9 +97,9 @@ public class FeedServlet extends HttpServlet {
       return null;
     }
     
-    List<BaseAtom> atoms = atomService.getUpdatesSinceTime(
+    List<BaseContentItem> updates = contentService.getUpdatesSinceTime(
         livingStory.getId(), twoWeeksAgo);
-    Collections.sort(atoms, BaseAtom.REVERSE_COMPARATOR);
+    Collections.sort(updates, BaseContentItem.REVERSE_COMPARATOR);
     
     SyndFeed feed = new SyndFeedImpl();
     feed.setTitle(livingStory.getTitle());
@@ -110,17 +110,17 @@ public class FeedServlet extends HttpServlet {
     feed.setDescriptionEx(feedDescription);
     
     List<SyndEntry> items = Lists.newArrayList();
-    for (BaseAtom atom : atoms) {
+    for (BaseContentItem update : updates) {
       SyndContent title = new SyndContentImpl();
       SyndContent content = new SyndContentImpl();
-      if (atom.getAtomType() == AtomType.EVENT) {
-        EventAtom event = (EventAtom) atom;
+      if (update.getContentItemType() == ContentItemType.EVENT) {
+        EventContentItem event = (EventContentItem) update;
         title.setType("text/html");
         title.setValue(event.getEventUpdate());
         content.setType("text/html");
         content.setValue(StringUtil.stripForExternalSites(event.getEventSummary()));
-      } else if (atom.getAtomType() == AtomType.NARRATIVE) {
-        NarrativeAtom narrative = (NarrativeAtom) atom;
+      } else if (update.getContentItemType() == ContentItemType.NARRATIVE) {
+        NarrativeContentItem narrative = (NarrativeContentItem) update;
         title.setType("text/html");
         title.setValue(narrative.getHeadline() + "&nbsp;-&nbsp;" 
             + narrative.getNarrativeType().toString());
@@ -135,8 +135,8 @@ public class FeedServlet extends HttpServlet {
         }
       }
       SyndEntry entry = new SyndEntryImpl();
-      entry.setLink(createAtomUrl(req, atom.getId()));
-      entry.setPublishedDate(atom.getDateSortKey());
+      entry.setLink(createContentItemUrl(req, update.getId()));
+      entry.setPublishedDate(update.getDateSortKey());
       entry.setTitleEx(title);
       entry.setDescription(content);
       items.add(entry);
@@ -150,7 +150,7 @@ public class FeedServlet extends HttpServlet {
     return req.getRequestURL().toString().replace("feeds", "lsps");
   }
   
-  private String createAtomUrl(HttpServletRequest req, long atomId) {
-    return createLspUrl(req) + "#OVERVIEW:false,false,false,n,n,n:" + atomId + ";";
+  private String createContentItemUrl(HttpServletRequest req, long contentItemId) {
+    return createLspUrl(req) + "#OVERVIEW:false,false,false,n,n,n:" + contentItemId + ";";
   }
 }

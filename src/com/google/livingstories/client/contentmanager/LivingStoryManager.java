@@ -158,7 +158,7 @@ public class LivingStoryManager extends ManagerPane {
   @UiHandler("deleteButton")
   void deleteLivingStory(ClickEvent event) {
     boolean delete = Window.confirm("Are you sure you want to delete this living story? " +
-        "Doing so will also delete all atoms that belong to it.");
+        "Doing so will also delete all content that belongs to it.");
     if (delete) {
       final String selectedStoryId = livingStorySelector.getSelectedItemValue();
       AsyncCallback<Void> callback = new AsyncCallback<Void>() {
