@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This is the client version of a {@link com.google.livingstories.server.BaseContentEntity}.
+ * This is the client version of a 
+ * {@link com.google.livingstories.server.dataservices.entities.BaseContentEntity}.
  * The {@link ContentRpcService} converts BaseContentEntities to
  * and from subtypes of this class, which are used by the client.
  * 

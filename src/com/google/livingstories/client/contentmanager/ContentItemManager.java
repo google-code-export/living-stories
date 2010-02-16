@@ -628,9 +628,14 @@ public class ContentItemManager extends ManagerPane {
     pickerPanel = new DockPanel();
     pickerPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 
-    Label title = new Label("Linked Entities");
+    Label title = new Label("Linked Items");
     title.setStylePrimaryName("header");
+    Label instructions = new Label("Select items from the left list and click on the arrow in the" +
+        " middle to move them to the right list. The items in the right list will be linked to" +
+        " the current item.");
+    instructions.setWidth("500px");
     pickerPanel.add(title, DockPanel.NORTH);
+    pickerPanel.add(instructions, DockPanel.NORTH);
 
     linkedContentItemSelector = new SuggestionAwareContentItemListBox(true);
     linkedContentItemSelector.setVisibleItemCount(10);
