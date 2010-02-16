@@ -17,7 +17,7 @@
 package com.google.livingstories.client;
 
 /**
- * Enum that specifies the different possible atom publish states.
+ * Enum that specifies the different possible content publish states.
  */
 public enum PublishState {
   DRAFT, PUBLISHED;

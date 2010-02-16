@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AtomTypesBundle;
+import com.google.livingstories.client.ContentItemTypesBundle;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.ThemeSelectedEvent;
 import com.google.livingstories.client.ui.ButtonListWidget;
@@ -55,9 +55,9 @@ public class ThemeListWidget extends Composite {
     setVisible(false);
   }
   
-  public void load(Map<Long, AtomTypesBundle> themesMap) {
+  public void load(Map<Long, ContentItemTypesBundle> themesMap) {
     if (themesMap.size() <= 1) {
-      // there will generally be 1 entry in the map which contains an AtomTypesBundle
+      // there will generally be 1 entry in the map which contains a ContentItemTypesBundle
       // for the story overall; all themes
       setVisible(false);
     } else {
@@ -66,16 +66,16 @@ public class ThemeListWidget extends Composite {
       // The themes map is ordered arbitrarily. (Previous implementation used a LinkedHashmap,
       // but this breaks in a production deployment.) Sort it based on the themeName (which is
       // "" for "All coverage", and thus will sort to the front, as we want.)
-      List<Map.Entry<Long, AtomTypesBundle>> entries =
-          new ArrayList<Map.Entry<Long, AtomTypesBundle>>(themesMap.entrySet());
-      Collections.sort(entries, new Comparator<Map.Entry<Long, AtomTypesBundle>>() {
+      List<Map.Entry<Long, ContentItemTypesBundle>> entries =
+          new ArrayList<Map.Entry<Long, ContentItemTypesBundle>>(themesMap.entrySet());
+      Collections.sort(entries, new Comparator<Map.Entry<Long, ContentItemTypesBundle>>() {
         @Override
-        public int compare(Entry<Long, AtomTypesBundle> o1, Entry<Long, AtomTypesBundle> o2) {
+        public int compare(Entry<Long, ContentItemTypesBundle> o1, Entry<Long, ContentItemTypesBundle> o2) {
           return o1.getValue().themeName.compareTo(o2.getValue().themeName);
         }
       });
           
-      for (Map.Entry<Long, AtomTypesBundle> entry : entries) {
+      for (Map.Entry<Long, ContentItemTypesBundle> entry : entries) {
         Long themeId = entry.getKey();
         String displayName = (themeId == null) ? ALL_THEMES : entry.getValue().themeName;
         String analyticsName = (themeId == null) ? "All" : displayName;

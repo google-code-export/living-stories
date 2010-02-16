@@ -28,15 +28,15 @@ public class PageCache {
   
   /**
    * Gets the current overviewPage instance, changes its filters according to
-   * the specified filter parameters, and highlights the specified atom.
+   * the specified filter parameters, and highlights the specified contentItem.
    * If the filter parameters are null, it just returns the page as-is.
    */
-  public static OverviewPage getOverviewPage(FilterSpec filterParams, Long focusedAtomId) {
+  public static OverviewPage getOverviewPage(FilterSpec filterParams, Long focusedContentItemId) {
     if (overviewPage == null) {
       overviewPage = new OverviewPage();
     }
     if (filterParams != null) {
-      overviewPage.update(filterParams, focusedAtomId);
+      overviewPage.update(filterParams, focusedContentItemId);
     }
     return overviewPage;    
   }

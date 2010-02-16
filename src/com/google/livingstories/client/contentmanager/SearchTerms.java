@@ -17,7 +17,7 @@
 package com.google.livingstories.client.contentmanager;
 
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.NarrativeType;
 import com.google.livingstories.client.PlayerType;
@@ -28,7 +28,7 @@ import java.util.Date;
 
 public class SearchTerms implements Serializable {
   public Long livingStoryId;
-  public AtomType atomType;
+  public ContentItemType contentItemType;
   public PlayerType playerType;
   public AssetType assetType;
   public NarrativeType narrativeType;

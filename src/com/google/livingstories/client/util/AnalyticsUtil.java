@@ -20,8 +20,8 @@ package com.google.livingstories.client.util;
  * Helper method to track specific events on the page in Analytics.
  */
 public class AnalyticsUtil {
-  public static void trackOpenEventAction(String url, Long atomId) {
-    trackEvent(url, "openEvent", String.valueOf(atomId));
+  public static void trackOpenEventAction(String url, Long contentItemId) {
+    trackEvent(url, "openEvent", String.valueOf(contentItemId));
   }
   
   public static void trackThemeClick(String url, String theme) {
@@ -36,12 +36,12 @@ public class AnalyticsUtil {
     trackEvent(url, "summaryExpansion", "");
   }
   
-  public static void trackHorizontalTimelineClick(String url, Long atomId) {
-    trackEvent(url, "horizontalTimeline", String.valueOf(atomId));
+  public static void trackHorizontalTimelineClick(String url, Long contentItemId) {
+    trackEvent(url, "horizontalTimeline", String.valueOf(contentItemId));
   }
   
-  public static void trackVerticalTimelineClick(String url, Long atomId) {
-    trackEvent(url, "verticalTimeline", String.valueOf(atomId));
+  public static void trackVerticalTimelineClick(String url, Long contentItemId) {
+    trackEvent(url, "verticalTimeline", String.valueOf(contentItemId));
   }
 
   private static native void trackEvent(String category, String action, String value) /*-{

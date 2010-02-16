@@ -28,14 +28,14 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
-import com.google.livingstories.client.DisplayAtomBundle;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.DisplayContentItemBundle;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.Page;
-import com.google.livingstories.client.lsp.PlayerPageAtomListWidget;
+import com.google.livingstories.client.lsp.PlayerPageContentItemListWidget;
 import com.google.livingstories.client.lsp.event.EventBus;
 import com.google.livingstories.client.lsp.event.ShowMoreEvent;
 import com.google.livingstories.client.util.LivingStoryControls;
@@ -50,15 +50,15 @@ public class PlayerPage extends Page {
   interface PlayerPageUiBinder extends UiBinder<Widget, PlayerPage> {
   }
 
-  private final ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private final ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
 
   @UiField Label name;
   @UiField Label backLink;
   @UiField SimplePanel photo;
   @UiField SimplePanel content;
-  @UiField PlayerPageAtomListWidget relatedContent;
+  @UiField PlayerPageContentItemListWidget relatedContent;
   
-  private PlayerAtom player;
+  private PlayerContentItem player;
   private Date nextCutoff = null;
   private HandlerRegistration showMoreHandler;
 
@@ -66,7 +66,7 @@ public class PlayerPage extends Page {
     initWidget(uiBinder.createAndBindUi(this));
   }
   
-  public void load(PlayerAtom player) {
+  public void load(PlayerContentItem player) {
     this.player = player;
     
     name.setText(player.getName());
@@ -78,29 +78,29 @@ public class PlayerPage extends Page {
     });
     
     if (player.hasPhoto()) {
-      Image photoWidget = new Image(player.getPhotoAtom().getContent());
+      Image photoWidget = new Image(player.getPhotoContentItem().getContent());
       photoWidget.addStyleName("playerPhoto");
       photo.add(photoWidget);
     }
     content.add(new ContentRenderer(player.getFullContentToRender(), false));
 
-    // For now, we don't attribute contributors to player atoms, though in principle we could
-    // (using them to describe the authorship of the bio.)
+    // For now, we don't attribute contributors to player content items, though in principle we
+    // could (using them to describe the authorship of the bio.)
     
     loadMore();
     
     onShow();
   }
 
-  public void load(Long atomId) {
-    atomService.getAtom(atomId, false, new AsyncCallback<BaseAtom>() {
+  public void load(Long contentItemId) {
+    contentService.getContentItem(contentItemId, false, new AsyncCallback<BaseContentItem>() {
       @Override
       public void onFailure(Throwable t) {
         LivingStoryControls.goToPage(new ErrorPage(t.getMessage()));
       }
       @Override
-      public void onSuccess(BaseAtom result) {
-        load((PlayerAtom) result);
+      public void onSuccess(BaseContentItem result) {
+        load((PlayerContentItem) result);
       }
     });
   }
@@ -118,12 +118,12 @@ public class PlayerPage extends Page {
     // TODO: this doesn't necessarily makes sense anymore if general players
     // (and not just contributors) also have null living story ids.
     boolean byContribution = player.getLivingStoryId() == null;
-    atomService.getRelatedAtoms(player.getId(), byContribution, nextCutoff,
-        new AsyncCallback<DisplayAtomBundle>() {
+    contentService.getRelatedContentItems(player.getId(), byContribution, nextCutoff,
+        new AsyncCallback<DisplayContentItemBundle>() {
           public void onFailure(Throwable t) {
             relatedContent.showError();
           }
-          public void onSuccess(DisplayAtomBundle bundle) {
+          public void onSuccess(DisplayContentItemBundle bundle) {
             relatedContent.finishLoading(bundle);
             nextCutoff = bundle.getNextDateInSequence();
           }

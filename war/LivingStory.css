@@ -160,7 +160,7 @@ p {
   padding-right: 10px;
 }
 
-.atomList {
+.contentItemList {
   padding: 0 16px;
 }
 
@@ -265,19 +265,19 @@ table.eventBlock {
   text-align: center;
 }
 
-/* Style for the different types of atoms.
-   The prefix has to match with that specified in AtomType.java
+/* Style for the different types of content items
+   The prefix has to match with that specified in ContentItemType.java
 */
 
-.atomHeader {
+.contentItemHeader {
   color: #333;
   font-weight: bold;
   margin-top: 0.9em;
   margin-bottom: 4px;
 }
 
-/* For simple atom presentation, no space above the atom header is necessary. */ 
-.bottomBorder .atomHeader {
+/* For simple content item presentation, no space above the header is necessary. */ 
+.bottomBorder .contentItemHeader {
   margin-top: 0;  
 }
 
@@ -315,12 +315,12 @@ table.eventBlock {
   filter: alpha(opacity = 70);
 }
 
-.baseAtomPanel {
+.baseContentItemPanel {
   padding-bottom: 5px;
 }
 
-/* Fixes regression in the appearance of non-complex-atom views: */
-.bottomBorder .baseAtomPanel {
+/* Fixes regression in the appearance of non-complex-content-item views: */
+.bottomBorder .baseContentItemPanel {
   padding: 5px 0;
   margin: 0;  
 }

@@ -43,19 +43,19 @@ public class NarrativeLinkClickedEvent extends GwtEvent<NarrativeLinkClickedEven
 
   // Custom data for the event
 
-  private Long containerAtomId;
-  private Long narrativeAtomId;
+  private Long containerContentItemId;
+  private Long narrativeContentItemId;
   
-  public NarrativeLinkClickedEvent(Long containerAtomId, Long narrativeAtomId) {
-    this.containerAtomId = containerAtomId;
-    this.narrativeAtomId = narrativeAtomId;
+  public NarrativeLinkClickedEvent(Long containerContentItemId, Long narrativeContentItemId) {
+    this.containerContentItemId = containerContentItemId;
+    this.narrativeContentItemId = narrativeContentItemId;
   }
   
-  public Long getContainerAtomId() {
-    return containerAtomId;
+  public Long getContainerContentItemId() {
+    return containerContentItemId;
   }
   
-  public Long getNarrativeAtomId() {
-    return narrativeAtomId;
+  public Long getNarrativeContentItemId() {
+    return narrativeContentItemId;
   }
 }

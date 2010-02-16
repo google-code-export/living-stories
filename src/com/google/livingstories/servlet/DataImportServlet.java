@@ -22,7 +22,7 @@ import com.google.appengine.repackaged.com.google.common.collect.ImmutableMapBui
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
-import com.google.livingstories.client.AtomType;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.server.AngleEntity;
 import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.HasSerializableLivingStoryId;
@@ -73,13 +73,25 @@ public class DataImportServlet extends HttpServlet {
   private static final long TIMEOUT_MILLIS = 2000; // 2 seconds
   private static final int SHARD_COUNT = 5;
   
-  private static final Pattern goToAtomPattern = Pattern.compile("(goToAtom\\()(\\d+)");
+  // legacy patterns that should be translated to a new form if they appear in an import
+  private static final String[][] SUBSTITUTIONS = {
+    { "\"lspId\":", "\"livingStoryId\":" },
+    { "\"angleId\":", "\"themeId\":" },
+    { "goToAtom", "goToContentItem" },
+    { "showLightboxForAtom", "showLightboxForContentItem" },
+    { "showAtomPopup", "showContentItemPopup" },
+    { "(atomid=", "contentItemId=" }
+  };
+  
+  private static final Pattern goToContentItemPattern =
+      Pattern.compile("(goToContentItem\\()(\\d+)");
   private static final Pattern lightboxPattern = 
-      Pattern.compile("(showLightboxForAtom\\([\"']\\w+[\"'], ?)(\\d+)");
-  private static final Pattern showAtomPopupPattern = Pattern.compile("(showAtomPopup\\()(\\d+)");
+      Pattern.compile("(showLightboxForContentItem\\([\"']\\w+[\"'], ?)(\\d+)");
+  private static final Pattern showContentItemPopupPattern =
+      Pattern.compile("(showContentItemPopup\\()(\\d+)");
   private static final Pattern showSourcePopupPattern =
       Pattern.compile("(showSourcePopup\\()[\"'].+?[\"'],\\s*(\\d+)");
-  private static final Pattern atomIdPattern = Pattern.compile("(atomid=\")(\\d+)");
+  private static final Pattern contentItemIdPattern = Pattern.compile("(contentItemId=\")(\\d+)");
   
   public static List<Class<? extends HasSerializableLivingStoryId>> EXPORTED_ENTITY_CLASSES = 
     ImmutableList.<Class<? extends HasSerializableLivingStoryId>>of(
@@ -206,8 +218,8 @@ public class DataImportServlet extends HttpServlet {
     workQueue.add(new CreateEntitiesFunction<BaseContentEntity>(
         BaseContentEntity.class, contentMap));
     workQueue.add(new MapIdsFunction());
-    workQueue.add(new MapAtomIdsFunction());
-    workQueue.add(new MapAtomInlineIdsFunction());
+    workQueue.add(new MapContentEntityIdsFunction());
+    workQueue.add(new MapContentEntityInlineIdsFunction());
     workQueue.add(new MapLivingStoryInlineIdsFunction());
     workQueue.add(new ClosePMsFuction());
     workQueue.add(new RemoveUnusedContributorsFunction());
@@ -351,76 +363,81 @@ public class DataImportServlet extends HttpServlet {
   }
   
   /**
-   * Maps the old atom ids to the new ones
+   * Maps the old content entity ids to the new ones
    */
-  private class MapAtomIdsFunction implements Function<Void, Boolean> {
+  private class MapContentEntityIdsFunction implements Function<Void, Boolean> {
     private Iterator<BaseContentEntity> iter = null;
     
     @Override
     public Boolean apply(Void arg0) {
-      message = "Mapping atom IDs";
+      message = "Mapping content entity IDs";
       
       if (iter == null) {
         iter = contentMap.values().iterator();
       }
       // Map all the ids in the BaseContentEntity objects to the new ones
       while (iter.hasNext()) {
-        BaseContentEntity content = iter.next();
+        BaseContentEntity contentEntity = iter.next();
         // Living Story ids
-        if (content.getLivingStoryId() != null) {
-          LivingStoryEntity livingStory = livingStoryMap.get(content.getLivingStoryId().toString());
+        if (contentEntity.getLivingStoryId() != null) {
+          LivingStoryEntity livingStory =
+              livingStoryMap.get(contentEntity.getLivingStoryId().toString());
           if (livingStory != null) {
-            content.setLivingStoryId(livingStory.getId());
+            contentEntity.setLivingStoryId(livingStory.getId());
           }
         }
         
         // Angle ids
         Set<Long> angleIds = Sets.newHashSet();
-        for (Long angleId : content.getThemeIds()) {
+        for (Long angleId : contentEntity.getThemeIds()) {
           AngleEntity angle = angleMap.get(angleId.toString());
           if (angle != null) {
             angleIds.add(angle.getId());
           }
         }
-        content.setThemeIds(angleIds);
+        contentEntity.setThemeIds(angleIds);
         
         // Contributor ids
         Set<Long> contributorIds = Sets.newHashSet();
-        for (Long contributorId : content.getContributorIds()) {
+        for (Long contributorId : contentEntity.getContributorIds()) {
           BaseContentEntity user = contentMap.get(contributorId.toString());
           if (user != null) {
             contributorIds.add(user.getId());
           }
         }
-        content.setContributorIds(contributorIds);
+        contentEntity.setContributorIds(contributorIds);
         
-        // Linked Atom ids
-        Set<Long> linkedAtomIds = Sets.newHashSet();
-        for (Long linkedAtomId : content.getLinkedAtomIds()) {
-          BaseContentEntity atom = contentMap.get(linkedAtomId.toString());
-          if (atom != null) {
-            linkedAtomIds.add(atom.getId());
+        // Linked content entity ids
+        Set<Long> linkedContentEntityIds = Sets.newHashSet();
+        for (Long linkedContentEntityId : contentEntity.getLinkedContentEntityIds()) {
+          BaseContentEntity linkedContentEntity = contentMap.get(linkedContentEntityId.toString());
+          if (linkedContentEntity != null) {
+            linkedContentEntityIds.add(linkedContentEntity.getId());
           }
         }
-        content.setLinkedAtomIds(linkedAtomIds);
+        contentEntity.setLinkedContentEntityIds(linkedContentEntityIds);
         
-        // Photo Atom id
-        if (content.getAtomType() == AtomType.PLAYER && content.getPhotoAtomId() != null) {
-          BaseContentEntity atom = contentMap.get(content.getPhotoAtomId().toString());
-          if (atom != null) {
-            content.setPhotoAtomId(atom.getId());
+        // Photo content entity id
+        if (contentEntity.getContentItemType() == ContentItemType.PLAYER
+            && contentEntity.getPhotoContentEntityId() != null) {
+          BaseContentEntity photoContentEntity =
+              contentMap.get(contentEntity.getPhotoContentEntityId().toString());
+          if (photoContentEntity != null) {
+            contentEntity.setPhotoContentEntityId(photoContentEntity.getId());
           } else {
-            content.setPhotoAtomId(null);
+            contentEntity.setPhotoContentEntityId(null);
           }
         }
         
-        // Parent player atom id
-        if (content.getAtomType() == AtomType.PLAYER && content.getParentPlayerAtomId() != null) {
-          BaseContentEntity atom = contentMap.get(content.getParentPlayerAtomId().toString());
-          if (atom == null) {
-            content.setParentPlayerAtomId(null);
+        // Parent player content entity id
+        if (contentEntity.getContentItemType() == ContentItemType.PLAYER
+            && contentEntity.getParentPlayerContentEntityId() != null) {
+          BaseContentEntity playerParentEntity =
+              contentMap.get(contentEntity.getParentPlayerContentEntityId().toString());
+          if (playerParentEntity == null) {
+            contentEntity.setParentPlayerContentEntityId(null);
           } else {
-            content.setParentPlayerAtomId(atom.getId());
+            contentEntity.setParentPlayerContentEntityId(playerParentEntity.getId());
           }
         }
         
@@ -433,25 +450,26 @@ public class DataImportServlet extends HttpServlet {
   }
   
   /**
-   * Maps atom ids in inline links in the rich content atom fields to the right values. 
+   * Maps content entity ids in inline links in rich content fields to the right
+   * values. 
    */
-  private class MapAtomInlineIdsFunction implements Function<Void, Boolean> {
+  private class MapContentEntityInlineIdsFunction implements Function<Void, Boolean> {
     private Iterator<BaseContentEntity> iter = null;
     
     public Boolean apply(Void ignore) {
-      message = "Mapping atom inline IDs";
+      message = "Mapping content entity inline IDs";
 
       if (iter == null) {
         iter = contentMap.values().iterator();
       }
       while (iter.hasNext()) {
-        BaseContentEntity atom = iter.next();
-        atom.setContent(matchAll(atom.getContent()));
-        if (atom.getAtomType() == AtomType.ASSET) {
-          atom.setCaption(matchAll(atom.getCaption()));
-        } else if (atom.getAtomType() == AtomType.EVENT) {
-          atom.setEventUpdate(matchAll(atom.getEventUpdate()));
-          atom.setEventSummary(matchAll(atom.getEventSummary()));
+        BaseContentEntity contentEntity = iter.next();
+        contentEntity.setContent(matchAll(contentEntity.getContent()));
+        if (contentEntity.getContentItemType() == ContentItemType.ASSET) {
+          contentEntity.setCaption(matchAll(contentEntity.getCaption()));
+        } else if (contentEntity.getContentItemType() == ContentItemType.EVENT) {
+          contentEntity.setEventUpdate(matchAll(contentEntity.getEventUpdate()));
+          contentEntity.setEventSummary(matchAll(contentEntity.getEventSummary()));
         }
         if (timeout()) {
           return true;
@@ -463,7 +481,7 @@ public class DataImportServlet extends HttpServlet {
   }
 
   /**
-   * Maps atom ids in inline links in the story summary to the right values. 
+   * Maps living story ids in inline links in the story summary to the right values. 
    */
   private class MapLivingStoryInlineIdsFunction implements Function<Void, Boolean> {
     public Boolean apply(Void ignore) {
@@ -480,11 +498,15 @@ public class DataImportServlet extends HttpServlet {
   
   private String matchAll(String content) {
     if (content != null) {
-      content = doMatch(content, goToAtomPattern);
+      for (String[] substitution : SUBSTITUTIONS) {
+        content = content.replace(substitution[0], substitution[1]);
+      }
+
+      content = doMatch(content, goToContentItemPattern);
       content = doMatch(content, lightboxPattern);
-      content = doMatch(content, showAtomPopupPattern);
+      content = doMatch(content, showContentItemPopupPattern);
       content = doMatch(content, showSourcePopupPattern);
-      content = doMatch(content, atomIdPattern);
+      content = doMatch(content, contentItemIdPattern);
     }
     return content;
   }
@@ -531,7 +553,7 @@ public class DataImportServlet extends HttpServlet {
    * the new entities won't be visible to the task.
    */
   private class RemoveUnusedContributorsFunction implements Function<Void, Boolean> {
-    private List<BaseContentEntity> allUnassignedAtoms = Lists.newArrayList();
+    private List<BaseContentEntity> allUnassignedContentEntities = Lists.newArrayList();
     private Set<Long> allUsedUnassignedIds = Sets.newHashSet();
     
     public Boolean apply(Void ignore) {
@@ -540,33 +562,33 @@ public class DataImportServlet extends HttpServlet {
       PersistenceManager pm = PMF.get().getPersistenceManager();
 
       try {
-        // Get all atoms
-        Extent<BaseContentEntity> atomEntities = pm.getExtent(BaseContentEntity.class);
-        for (BaseContentEntity atom : atomEntities) {
-          // Put the unassigned atoms in a list
-          if (atom.getLivingStoryId() == null) {
-            allUnassignedAtoms.add(atom);
+        // Get all content entities
+        Extent<BaseContentEntity> contentEntities = pm.getExtent(BaseContentEntity.class);
+        for (BaseContentEntity contentEntity : contentEntities) {
+          // Put the unassigned content entities in a list
+          if (contentEntity.getLivingStoryId() == null) {
+            allUnassignedContentEntities.add(contentEntity);
           }
           
           // Put the ids of the contributors, player parents and used photos in a set
-          Set<Long> contributorIds = atom.getContributorIds();
+          Set<Long> contributorIds = contentEntity.getContributorIds();
           if (contributorIds != null) {
             allUsedUnassignedIds.addAll(contributorIds);
           }
-          Long photoAtomId = atom.getPhotoAtomId();
-          if (photoAtomId != null) {
-            allUsedUnassignedIds.add(photoAtomId);
+          Long photoContentEntityId = contentEntity.getPhotoContentEntityId();
+          if (photoContentEntityId != null) {
+            allUsedUnassignedIds.add(photoContentEntityId);
           }
-          Long parentPlayerId = atom.getParentPlayerAtomId();
+          Long parentPlayerId = contentEntity.getParentPlayerContentEntityId();
           if (parentPlayerId != null) {
             allUsedUnassignedIds.add(parentPlayerId);
           }
         }
   
-        // Delete all unassigned atoms that weren't in the used set
-        for (BaseContentEntity unassignedAtom : allUnassignedAtoms) {
-          if (!allUsedUnassignedIds.contains(unassignedAtom.getId())) {
-            pm.deletePersistent(unassignedAtom);
+        // Delete all unassigned content entities that weren't in the used set
+        for (BaseContentEntity unassignedContentEntity : allUnassignedContentEntities) {
+          if (!allUsedUnassignedIds.contains(unassignedContentEntity.getId())) {
+            pm.deletePersistent(unassignedContentEntity);
           }
         }
       } finally {

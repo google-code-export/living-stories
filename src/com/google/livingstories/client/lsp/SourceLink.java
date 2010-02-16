@@ -19,15 +19,15 @@ package com.google.livingstories.client.lsp;
 import com.google.livingstories.client.ui.JavascriptLink;
 
 /**
- * Create an inline source atom link.
+ * Create an inline source content item link.
  */
 public class SourceLink extends JavascriptLink {
   private static String LINK_TEXT = LspMessageHolder.consts.sourceLinkText();
   
-  public SourceLink(String description, Long atomId) {
+  public SourceLink(String description, Long contentItemId) {
     super(LINK_TEXT);
     setStylePrimaryName("secondaryLink");
     addStyleName("sourceInfoLink");
-    setOnClick("showSourcePopup('" + description + "', " + atomId + ", this)");
+    setOnClick("showSourcePopup('" + description + "', " + contentItemId + ", this)");
   }
 }

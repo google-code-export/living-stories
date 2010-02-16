@@ -29,9 +29,9 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcServiceAsync;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ import java.util.Map;
  * or add a new one.
  */
 public class PlayerSuggestAndAddPanel extends Composite {
-  private Map<String, PlayerAtom> nameToPlayerMap;
+  private Map<String, PlayerContentItem> nameToPlayerMap;
   
   private MultiWordSuggestOracle oracle;
   private SuggestBox suggestBox;
@@ -50,9 +50,9 @@ public class PlayerSuggestAndAddPanel extends Composite {
   private Label problemLabel;
   private HorizontalPanel panel;
   
-  public PlayerSuggestAndAddPanel(ContentRpcServiceAsync atomService, boolean isContributor, 
-      AsyncCallback<BaseAtom> callbackWork) {
-    this.nameToPlayerMap = new HashMap<String, PlayerAtom>();
+  public PlayerSuggestAndAddPanel(ContentRpcServiceAsync contentService, boolean isContributor, 
+      AsyncCallback<BaseContentItem> callbackWork) {
+    this.nameToPlayerMap = new HashMap<String, PlayerContentItem>();
     
     this.oracle = new MultiWordSuggestOracle();
     this.suggestBox = new SuggestBox(oracle);
@@ -64,7 +64,7 @@ public class PlayerSuggestAndAddPanel extends Composite {
     problemLabel.setStylePrimaryName("serverResponseLabelError");
     problemLabel.setVisible(false);
     
-    addClickHandlerForButton(atomService, isContributor, callbackWork);
+    addClickHandlerForButton(contentService, isContributor, callbackWork);
     addEnterKeyHandlerForSuggestBox(callbackWork);
     
     this.panel = new HorizontalPanel();
@@ -80,19 +80,19 @@ public class PlayerSuggestAndAddPanel extends Composite {
    * returned to the caller. Or they entered a new name, in which case, they will be presented
    * with a popup to enter the information for the new player.
    */
-  private void addClickHandlerForButton(ContentRpcServiceAsync atomService, boolean isContributor, 
-      final AsyncCallback<BaseAtom> callbackWork) {
-    final OnTheFlyPlayerBox onTheFlyPlayerBox = new OnTheFlyPlayerBox(atomService, isContributor, 
-        new AsyncCallback<BaseAtom>() {
+  private void addClickHandlerForButton(ContentRpcServiceAsync contentService,
+      boolean isContributor, final AsyncCallback<BaseContentItem> callbackWork) {
+    final OnTheFlyPlayerBox onTheFlyPlayerBox = new OnTheFlyPlayerBox(contentService, isContributor, 
+        new AsyncCallback<BaseContentItem>() {
         @Override
         public void onFailure(Throwable caught) {
           problemLabel.setVisible(true);
         }
 
         @Override
-        public void onSuccess(BaseAtom result) {
+        public void onSuccess(BaseContentItem result) {
           problemLabel.setVisible(false);
-          addPlayer((PlayerAtom) result);
+          addPlayer((PlayerContentItem) result);
           callbackWork.onSuccess(result);
           clear();
         }
@@ -102,7 +102,7 @@ public class PlayerSuggestAndAddPanel extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         String playerName = textBox.getText();
-        PlayerAtom selectedPlayer = nameToPlayerMap.get(playerName);
+        PlayerContentItem selectedPlayer = nameToPlayerMap.get(playerName);
         if (selectedPlayer == null) {
           onTheFlyPlayerBox.open(playerName, addOrCreateButton);
         } else {
@@ -117,7 +117,7 @@ public class PlayerSuggestAndAddPanel extends Composite {
    * Pressing 'enter' after selecting an item from the suggest list or after entering a new name
    * in the text box acts the same as clicking on the button.
    */
-  private void addEnterKeyHandlerForSuggestBox(final AsyncCallback<BaseAtom> callbackWork) {
+  private void addEnterKeyHandlerForSuggestBox(final AsyncCallback<BaseContentItem> callbackWork) {
     textBox.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
@@ -128,7 +128,7 @@ public class PlayerSuggestAndAddPanel extends Composite {
     });
   }
 
-  public void addPlayer(PlayerAtom player) {
+  public void addPlayer(PlayerContentItem player) {
     nameToPlayerMap.put(player.getName(), player);
     oracle.add(player.getName());
   }

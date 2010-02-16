@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.NarrativeType;
 import com.google.livingstories.client.PlayerType;
@@ -41,7 +41,7 @@ import com.google.livingstories.client.util.LivingStoryData;
 import java.util.EnumSet;
 
 /**
- * Search interface for atoms.
+ * Search interface for content items.
  * To use this widget, add it to the page where you want it shown.
  * Then create and add a {@link com.google.livingstories.client.ui.SearchPanel.SearchHandler}
  * object that will get passed a QueryFilter.  This SearchHandler can then add
@@ -49,13 +49,13 @@ import java.util.EnumSet;
  * updating your UI however you like once the search results return.
  */
 public class SearchPanel extends Composite {
-  private static final EnumSet<AtomType> atomTypesWithSubtypes =
-      EnumSet.of(AtomType.PLAYER, AtomType.ASSET, AtomType.NARRATIVE);
+  private static final EnumSet<ContentItemType> CONTENT_TYPES_WITH_SUBTYPES =
+      EnumSet.of(ContentItemType.PLAYER, ContentItemType.ASSET, ContentItemType.NARRATIVE);
   
   private VerticalPanel contentPanel;
   private Grid filterGrid;
-  private EnumDropdown<AtomType> atomType;
-  private int atomSubtypeRow;
+  private EnumDropdown<ContentItemType> contentItemType;
+  private int contentItemSubtypeRow;
   private EnumDropdown<PlayerType> playerType;
   private EnumDropdown<AssetType> assetType;
   private EnumDropdown<NarrativeType> narrativeType;
@@ -72,8 +72,8 @@ public class SearchPanel extends Composite {
     
     filterGrid = new Grid(0, 2);
     createPublishStateFilter();
-    createAtomTypeFilter();
-    createAtomSubtypeFilters();
+    createContentItemTypeFilter();
+    createContentItemSubtypeFilters();
     createBeforeDateFilter();
     createAfterDateFilter();
     createImportanceFilter();
@@ -94,29 +94,29 @@ public class SearchPanel extends Composite {
     filterGrid.setWidget(row, 1, publishState);
   }
 
-  private void createAtomTypeFilter() {
-    atomType = EnumDropdown.newInstance(AtomType.class, "All");
-    atomType.addChangeHandler(new ChangeHandler() {
+  private void createContentItemTypeFilter() {
+    contentItemType = EnumDropdown.newInstance(ContentItemType.class, "All");
+    contentItemType.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
-        AtomType selectedType = atomType.getSelectedConstant();
-        if (atomTypesWithSubtypes.contains(selectedType)) {
-          filterGrid.getRowFormatter().setVisible(atomSubtypeRow, true);
-          playerType.setVisible(selectedType == AtomType.PLAYER);
-          assetType.setVisible(selectedType == AtomType.ASSET);
-          narrativeType.setVisible(selectedType == AtomType.NARRATIVE);
+        ContentItemType selectedType = contentItemType.getSelectedConstant();
+        if (CONTENT_TYPES_WITH_SUBTYPES.contains(selectedType)) {
+          filterGrid.getRowFormatter().setVisible(contentItemSubtypeRow, true);
+          playerType.setVisible(selectedType == ContentItemType.PLAYER);
+          assetType.setVisible(selectedType == ContentItemType.ASSET);
+          narrativeType.setVisible(selectedType == ContentItemType.NARRATIVE);
         } else {
-          filterGrid.getRowFormatter().setVisible(atomSubtypeRow, false);
+          filterGrid.getRowFormatter().setVisible(contentItemSubtypeRow, false);
         }
       }
     });
     
     int row = filterGrid.insertRow(filterGrid.getRowCount());
     filterGrid.setWidget(row, 0, new Label("Content entity type:"));
-    filterGrid.setWidget(row, 1, atomType);
+    filterGrid.setWidget(row, 1, contentItemType);
   }
 
-  private void createAtomSubtypeFilters() {
+  private void createContentItemSubtypeFilters() {
     playerType = EnumDropdown.newInstance(PlayerType.class, "All");
     playerType.setVisible(false);
     assetType = EnumDropdown.newInstance(AssetType.class, "All");
@@ -129,11 +129,11 @@ public class SearchPanel extends Composite {
     specialFiltersPanel.add(assetType);
     specialFiltersPanel.add(narrativeType);
 
-    atomSubtypeRow = filterGrid.getRowCount();
+    contentItemSubtypeRow = filterGrid.getRowCount();
     int row = filterGrid.insertRow(filterGrid.getRowCount());
     filterGrid.setWidget(row, 0, new Label("Content entity subtype:"));
     filterGrid.setWidget(row, 1, specialFiltersPanel);
-    filterGrid.getRowFormatter().setVisible(atomSubtypeRow, false);
+    filterGrid.getRowFormatter().setVisible(contentItemSubtypeRow, false);
   }
   
   private void createBeforeDateFilter() {
@@ -175,7 +175,7 @@ public class SearchPanel extends Composite {
   public SearchTerms getSearchTerms() {
     SearchTerms searchTerms = new SearchTerms();
     searchTerms.livingStoryId = LivingStoryData.getLivingStoryId();
-    searchTerms.atomType = atomType.getSelectedConstant();
+    searchTerms.contentItemType = contentItemType.getSelectedConstant();
     searchTerms.assetType = assetType.getSelectedConstant();
     if (!afterDate.getValue().isEmpty()) {
       DateUtil.parseShortDate(afterDate.getValue(), searchTerms.afterDate);

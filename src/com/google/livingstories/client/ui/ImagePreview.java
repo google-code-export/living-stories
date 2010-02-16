@@ -22,14 +22,14 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
 import com.google.livingstories.client.util.GlobalUtil;
 
 /**
- * Renders the preview for image atoms.
+ * Renders the preview for image content items.
  */
 public class ImagePreview extends Composite {
   public static String ZOOM_ICON = "/images/zoom_icon.png";
@@ -41,20 +41,20 @@ public class ImagePreview extends Composite {
   private FlowPanel contentPanel = new FlowPanel();
   private FocusPanel previewPanel = new FocusPanel();
   
-  public ImagePreview(AssetAtom atom, boolean alreadySeen, boolean hasFullView) {
-    assert atom.getAssetType() == AssetType.IMAGE
-        && !GlobalUtil.isContentEmpty(atom.getPreviewUrl());
+  public ImagePreview(AssetContentItem contentItem, boolean alreadySeen, boolean hasFullView) {
+    assert contentItem.getAssetType() == AssetType.IMAGE
+        && !GlobalUtil.isContentEmpty(contentItem.getPreviewUrl());
     
     BoundedImage image;
     
     if (hasFullView) {
       DecoratedBoundedImagePanel imagePanel = new DecoratedBoundedImagePanel(
-          atom.getPreviewUrl(), MAX_PREVIEW_SIZE,
+          contentItem.getPreviewUrl(), MAX_PREVIEW_SIZE,
           ZOOM_ICON, ZOOM_WIDTH, ZOOM_HEIGHT, DecoratedBoundedImagePanel.IconPlacement.LOWER_RIGHT);
       image = imagePanel.getBoundedImage();
       contentPanel.add(imagePanel);
     } else {
-      image = new BoundedImage(atom.getPreviewUrl(), MAX_PREVIEW_SIZE);
+      image = new BoundedImage(contentItem.getPreviewUrl(), MAX_PREVIEW_SIZE);
       contentPanel.add(image);
     }
     image.addStyleName(alreadySeen ? "assetPreviewImageSeen" : "assetPreviewImage");

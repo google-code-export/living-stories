@@ -49,7 +49,7 @@ public class HistoryManager {
       }
       @Override
       public String createToken(String... params) {
-        // name:filterParams:focusedAtomId (for filterParams see FilterSpec.java)
+        // name:filterParams:focusedContentItemId (for filterParams see FilterSpec.java)
         return name() + ":" + params[0] + ":" + params[1];
       }
       @Override
@@ -66,7 +66,7 @@ public class HistoryManager {
       }
       @Override
       public String createToken(String... params) {
-        // name:atomId
+        // name:contentItemId
         return name() + ":" + params[0];
       }
       @Override
@@ -207,9 +207,9 @@ public class HistoryManager {
     return href.concat("#" + getToken(page.createToken(params), page.getDefaultState()));
   }
   
-  public static String getTokenStringForFocusedAtom(Long focusedAtomId) {
+  public static String getTokenStringForFocusedContentItem(Long focusedContentItemId) {
     return "#" + HistoryPages.OVERVIEW.createToken(
-        getDefaultFilterSpec().getFilterParams(), focusedAtomId.toString())
+        getDefaultFilterSpec().getFilterParams(), focusedContentItemId.toString())
         + ";";
   }
   

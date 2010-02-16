@@ -26,14 +26,14 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AssetAtom;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.AssetContentItem;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
 import com.google.livingstories.client.Publisher;
-import com.google.livingstories.client.lsp.AtomPopupWidget;
+import com.google.livingstories.client.lsp.ContentItemPopupWidget;
 import com.google.livingstories.client.lsp.SourcePopupWidget;
-import com.google.livingstories.client.lsp.views.atoms.PopupViewFactory;
+import com.google.livingstories.client.lsp.views.contentitems.PopupViewFactory;
 import com.google.livingstories.client.ui.GlassPanel;
 import com.google.livingstories.client.ui.Lightbox;
 import com.google.livingstories.client.ui.Slideshow;
@@ -51,7 +51,7 @@ public class LivingStoryPage extends Composite {
   interface LivingStoryPageUiBinder extends UiBinder<Widget, LivingStoryPage> {
   }
 
-  private final ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private final ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
 
   @UiField Image logo;
   @UiField LivingStoryManagementLinks managementLinks;
@@ -59,7 +59,7 @@ public class LivingStoryPage extends Composite {
   @UiField GlassPanel glass;
 
   private Lightbox lightbox = new Lightbox();
-  private AtomPopupWidget atomPopup = new AtomPopupWidget();
+  private ContentItemPopupWidget contentItemPopup = new ContentItemPopupWidget();
   private SourcePopupWidget sourcePopup = new SourcePopupWidget();
   
   public LivingStoryPage() {
@@ -87,67 +87,69 @@ public class LivingStoryPage extends Composite {
     glass.setVisible(show);
   }
   
-  public void showLightbox(String title, BaseAtom atom) {
-    lightbox.showItem(title, PopupViewFactory.createView(atom));
+  public void showLightbox(String title, BaseContentItem contentItem) {
+    lightbox.showItem(title, PopupViewFactory.createView(contentItem));
   }
   
   // pass in an int ID because JSNI doesn't work with longs.
-  public void showLightboxForAtom(final String title, int atomId) {
+  public void showLightboxForContentItem(final String title, int contentItemId) {
     // TODO: Go through ClientCaches in some way rather than going right to
-    // the atomService.
-    atomService.getAtom((long)atomId, false, new AsyncCallback<BaseAtom>() {
+    // the contentService.
+    contentService.getContentItem((long)contentItemId, false, new AsyncCallback<BaseContentItem>() {
       @Override
       public void onFailure(Throwable t) {}
       
       @Override
-      public void onSuccess(final BaseAtom atom) {
-        showLightbox(title, atom);
+      public void onSuccess(final BaseContentItem contentItem) {
+        showLightbox(title, contentItem);
       }
     });
   }
   
   
-  public void showAtomPopup(int atomId, final Element showRelativeTo) {
+  public void showContentItemPopup(int contentItemId, final Element showRelativeTo) {
     // TODO: Go through ClientCaches in some way rather than going right to
-    // the atomService.
-    atomService.getAtom((long)atomId, false, new AsyncCallback<BaseAtom>() {
+    // the contentService.
+    contentService.getContentItem((long)contentItemId, false, new AsyncCallback<BaseContentItem>() {
       public void onFailure(Throwable t) {}
-      public void onSuccess(BaseAtom atom) {
-        atomPopup.show(atom, showRelativeTo);
+      public void onSuccess(BaseContentItem contentItem) {
+        contentItemPopup.show(contentItem, showRelativeTo);
       }
     });
   }
   
-  public void showSourcePopup(final String description, int atomId, final Element showRelativeTo) {
-    if (atomId <= 0) {
+  public void showSourcePopup(final String description, int contentItemId,
+      final Element showRelativeTo) {
+    if (contentItemId <= 0) {
       sourcePopup.show(description, null, showRelativeTo);
     } else {
       // TODO: Go through ClientCaches in some way rather than going right to
-      // the atomService.
-      atomService.getAtom((long)atomId, false, new AsyncCallback<BaseAtom>() {
-        public void onFailure(Throwable t) {}
-        public void onSuccess(BaseAtom atom) {
-          sourcePopup.show(description, atom, showRelativeTo);
-        }
-      });      
+      // the contentService.
+      contentService.getContentItem((long)contentItemId, false,
+          new AsyncCallback<BaseContentItem>() {
+            public void onFailure(Throwable t) {}
+            public void onSuccess(BaseContentItem contentItem) {
+              sourcePopup.show(description, contentItem, showRelativeTo);
+            }
+          });      
     }
   }
   
   //pass in int ids because JSNI doesn't work with longs.
-  public void showSlideshow(int[] atomIds) {
+  public void showSlideshow(int[] contentItemIds) {
     List<Long> imageIds = new ArrayList<Long>();
-    for (int atomId : atomIds) {
-      imageIds.add((long)atomId);
+    for (int contentItemId : contentItemIds) {
+      imageIds.add((long)contentItemId);
     }
-    atomService.getAtoms(imageIds, new AsyncCallback<List<BaseAtom>>() {
+    contentService.getContentItems(imageIds, new AsyncCallback<List<BaseContentItem>>() {
       @Override
       public void onFailure(Throwable t) {}
       
       @Override
-      public void onSuccess(List<BaseAtom> atoms) {
-        List<AssetAtom> images = new ArrayList<AssetAtom>(atoms.size());
-        for (BaseAtom atom : atoms) {
-          images.add((AssetAtom)atom);
+      public void onSuccess(List<BaseContentItem> contentItems) {
+        List<AssetContentItem> images = new ArrayList<AssetContentItem>(contentItems.size());
+        for (BaseContentItem contentItem : contentItems) {
+          images.add((AssetContentItem)contentItem);
         }
         new Slideshow(images).show(0);
       }
@@ -174,30 +176,34 @@ public class LivingStoryPage extends Composite {
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showGlass(Z)
           .call(instance, show);
     };    
-    $wnd.showLightbox = function(title, atom) {
+    $wnd.showLightbox = function(title, contentItem) {
       instance.
-          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightbox(Ljava/lang/String;Lcom/google/livingstories/client/BaseAtom;)
-          .call(instance, title, atom);
+          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightbox(Ljava/lang/String;Lcom/google/livingstories/client/BaseContentItem;)
+          .call(instance, title, contentItem);
     };
-    $wnd.showLightboxForAtom = function(title, atomId) {
+    $wnd.showLightboxForContentItem = function(title, contentItemId) {
       instance.
-          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightboxForAtom(Ljava/lang/String;I)
-          .call(instance, title, atomId);
+          @com.google.livingstories.client.lsp.views.LivingStoryPage::showLightboxForContentItem(Ljava/lang/String;I)
+          .call(instance, title, contentItemId);
     };
-    $wnd.showAtomPopup = function(atomId, showRelativeTo) {
+    // for legacy purposes:
+    $wnd.showLightboxForAtom = $wnd.showLightboxForContentItem;
+    $wnd.showContentItemPopup = function(contentItemId, showRelativeTo) {
       instance.
-          @com.google.livingstories.client.lsp.views.LivingStoryPage::showAtomPopup(ILcom/google/gwt/dom/client/Element;)
-          .call(instance, atomId, showRelativeTo);
+          @com.google.livingstories.client.lsp.views.LivingStoryPage::showContentItemPopup(ILcom/google/gwt/dom/client/Element;)
+          .call(instance, contentItemId, showRelativeTo);
     };
-    $wnd.showSourcePopup = function(description, atomId, showRelativeTo) {
+    // for legacy purposes:
+    $wnd.showAtomPopup = $wnd.showContentItemPopup;
+    $wnd.showSourcePopup = function(description, contentItemId, showRelativeTo) {
       instance.
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showSourcePopup(Ljava/lang/String;ILcom/google/gwt/dom/client/Element;)
-          .call(instance, description, atomId, showRelativeTo);
+          .call(instance, description, contentItemId, showRelativeTo);
     };
-    $wnd.showSlideshow = function(atomIds) {
+    $wnd.showSlideshow = function(contentItemIds) {
       instance.
           @com.google.livingstories.client.lsp.views.LivingStoryPage::showSlideshow([I)
-          .call(instance, atomIds);
+          .call(instance, contentItemIds);
     };
   }-*/;
 }

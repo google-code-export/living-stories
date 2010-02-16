@@ -64,6 +64,6 @@
         </td>
       </tr>
     </table>
-    <lsp:PlayerPageAtomListWidget ui:field="relatedContent"/>
+    <lsp:PlayerPageContentItemListWidget ui:field="relatedContent"/>
   </g:HTMLPanel>
 </ui:UiBinder> 

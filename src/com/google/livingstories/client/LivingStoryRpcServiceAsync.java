@@ -45,7 +45,7 @@ public interface LivingStoryRpcServiceAsync {
   void getThemesForLivingStory(long livingStoryId, AsyncCallback<List<Theme>> callback);
 
   void getThemeInfoForLivingStory(long livingStoryId,
-      AsyncCallback<Map<Long, AtomTypesBundle>> callback);
+      AsyncCallback<Map<Long, ContentItemTypesBundle>> callback);
   
   void getThemeById(long id, AsyncCallback<Theme> callback);
   

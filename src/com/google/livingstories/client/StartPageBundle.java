@@ -28,20 +28,20 @@ import java.util.Map;
 public class StartPageBundle implements Serializable {
   
   private List<LivingStory> stories;
-  private Map<Long, List<BaseAtom>> storyIdToUpdateMap;
+  private Map<Long, List<BaseContentItem>> storyIdToUpdateMap;
   
   public StartPageBundle() {}
   
-  public StartPageBundle(List<LivingStory> stories, Map<Long, List<BaseAtom>> storyIdToUpdateMap) {
+  public StartPageBundle(List<LivingStory> stories, Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
     this.stories = new ArrayList<LivingStory>(stories);
-    this.storyIdToUpdateMap = new HashMap<Long, List<BaseAtom>>(storyIdToUpdateMap);
+    this.storyIdToUpdateMap = new HashMap<Long, List<BaseContentItem>>(storyIdToUpdateMap);
   }
   
   public List<LivingStory> getStories() {
     return stories;
   }
 
-  public Map<Long, List<BaseAtom>> getStoryIdToUpdateMap() {
+  public Map<Long, List<BaseContentItem>> getStoryIdToUpdateMap() {
     return storyIdToUpdateMap;
   }
 

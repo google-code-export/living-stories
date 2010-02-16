@@ -31,7 +31,7 @@ import java.util.Set;
  * data without having to pass it around to each other or doing multiple requests.
  */
 public class ClientCaches {
-  private static final ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private static final ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
   
   private static class Request<T> implements AsyncCallback<T>{
     private Boolean succeeded;
@@ -73,36 +73,36 @@ public class ClientCaches {
     }
   }
   
-  private static Request<List<EventAtom>> importantEventsCache;
+  private static Request<List<EventContentItem>> importantEventsCache;
   
-  public static void getImportantEvents(AsyncCallback<List<EventAtom>> callback) {
+  public static void getImportantEvents(AsyncCallback<List<EventContentItem>> callback) {
     if (importantEventsCache == null) {
-      importantEventsCache = new Request<List<EventAtom>>(callback);
-      atomService.getImportantEventsForLivingStory(LivingStoryData.getLivingStoryId(),
+      importantEventsCache = new Request<List<EventContentItem>>(callback);
+      contentService.getImportantEventsForLivingStory(LivingStoryData.getLivingStoryId(),
           importantEventsCache);
     } else {
       importantEventsCache.getResult(callback);
     }
   }
   
-  private static Request<List<PlayerAtom>> importantPlayersCache;
+  private static Request<List<PlayerContentItem>> importantPlayersCache;
   
-  public static void getImportantPlayers(AsyncCallback<List<PlayerAtom>> callback) {
+  public static void getImportantPlayers(AsyncCallback<List<PlayerContentItem>> callback) {
     if (importantPlayersCache == null) {
-      importantPlayersCache = new Request<List<PlayerAtom>>(callback);
-      atomService.getImportantPlayersForLivingStory(LivingStoryData.getLivingStoryId(),
+      importantPlayersCache = new Request<List<PlayerContentItem>>(callback);
+      contentService.getImportantPlayersForLivingStory(LivingStoryData.getLivingStoryId(),
           importantPlayersCache);
     } else {
       importantPlayersCache.getResult(callback);
     }
   }
   
-  private static Request<Map<Long, PlayerAtom>> contributorsCache;
+  private static Request<Map<Long, PlayerContentItem>> contributorsCache;
   
-  public static void getContributors(AsyncCallback<Map<Long, PlayerAtom>> callback) {
+  public static void getContributors(AsyncCallback<Map<Long, PlayerContentItem>> callback) {
     if (contributorsCache == null) {
-      contributorsCache = new Request<Map<Long, PlayerAtom>>(callback);
-      atomService.getContributorsByIdForLivingStory(LivingStoryData.getLivingStoryId(),
+      contributorsCache = new Request<Map<Long, PlayerContentItem>>(callback);
+      contentService.getContributorsByIdForLivingStory(LivingStoryData.getLivingStoryId(),
           contributorsCache);
     } else {
       contributorsCache.getResult(callback);
@@ -110,18 +110,18 @@ public class ClientCaches {
   }
   
   public static void getContributorsById(final Set<Long> contributorIds,
-      final AsyncCallback<List<PlayerAtom>> callback) {
-    AsyncCallback<Map<Long, PlayerAtom>> contributorsCallback =
-      new AsyncCallback<Map<Long, PlayerAtom>>() {
+      final AsyncCallback<List<PlayerContentItem>> callback) {
+    AsyncCallback<Map<Long, PlayerContentItem>> contributorsCallback =
+      new AsyncCallback<Map<Long, PlayerContentItem>>() {
         @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
         @Override
-        public void onSuccess(Map<Long, PlayerAtom> result) {
-          List<PlayerAtom> contributors = new ArrayList<PlayerAtom>();
+        public void onSuccess(Map<Long, PlayerContentItem> result) {
+          List<PlayerContentItem> contributors = new ArrayList<PlayerContentItem>();
           for (Long contributorId : contributorIds) {
-            PlayerAtom contributor = result.get(contributorId);
+            PlayerContentItem contributor = result.get(contributorId);
             if (contributor != null) {
               contributors.add(contributor);
             }

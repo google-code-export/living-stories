@@ -30,7 +30,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * This class represents a grouping of atoms for a living story.
+ * This class represents a grouping of content items for a living story.
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class AngleEntity implements Serializable, JSONSerializable, HasSerializableLivingStoryId {

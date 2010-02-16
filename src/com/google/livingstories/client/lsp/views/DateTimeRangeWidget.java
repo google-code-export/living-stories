@@ -22,7 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.lsp.LspMessages;
 import com.google.livingstories.client.util.DateUtil;
 
@@ -88,7 +88,7 @@ public class DateTimeRangeWidget extends Composite {
     }
   }
   
-  public static DateTimeRangeWidget makeForEventAtom(EventAtom event) {
+  public static DateTimeRangeWidget makeForEventContentItem(EventContentItem event) {
     Date startDateTime = event.getEventStartDate();
     Date endDateTime = event.getEventEndDate();
     

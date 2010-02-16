@@ -41,10 +41,10 @@ public interface Resources extends ClientBundle {
     String clickable();
     String read();
     String error();
-    String atomHeader();
+    String contentItemHeader();
     String linkedItemSpacing();
     String substituteHeaderSpacing();
-    String linkedAtomsPanel();
+    String linkedContentItemsPanel();
     String hidden();
   }
 }

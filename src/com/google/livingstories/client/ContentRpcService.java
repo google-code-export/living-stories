@@ -26,36 +26,37 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RPC service for saving and retrieving atoms from the datastore.
+ * RPC service for saving and retrieving content items from the datastore.
  */
-@RemoteServiceRelativePath("atomservice")
+@RemoteServiceRelativePath("contentservice")
 public interface ContentRpcService extends RemoteService {
-  BaseAtom createOrChangeAtom(BaseAtom clientAtom);
+  BaseContentItem createOrChangeContentItem(BaseContentItem contentItem);
   
-  List<BaseAtom> getAtomsForLivingStory(Long livingStoryId, boolean onlyPublished);
+  List<BaseContentItem> getContentItemsForLivingStory(Long livingStoryId, boolean onlyPublished);
   
-  BaseAtom getAtom(Long id, boolean getLinkedAtoms);
+  BaseContentItem getContentItem(Long id, boolean getLinkedContentItems);
   
-  List<BaseAtom> getAtoms(Collection<Long> ids);
+  List<BaseContentItem> getContentItems(Collection<Long> ids);
   
-  List<PlayerAtom> getUnassignedPlayers();
+  List<PlayerContentItem> getUnassignedPlayers();
 
-  DisplayAtomBundle getRelatedAtoms(Long atomId, boolean byContribution, Date cutoff);
+  DisplayContentItemBundle getRelatedContentItems(Long contentItemId, boolean byContribution,
+      Date cutoff);
   
-  List<BaseAtom> executeSearch(SearchTerms searchTerms);
+  List<BaseContentItem> executeSearch(SearchTerms searchTerms);
   
-  void deleteAtom(Long id);
+  void deleteContentItem(Long id);
   
   Integer getUpdateCountSinceTime(Long livingStoryId, Date time);
   
-  List<BaseAtom> getUpdatesSinceTime(Long livingStoryId, Date time);
+  List<BaseContentItem> getUpdatesSinceTime(Long livingStoryId, Date time);
 
-  DisplayAtomBundle getDisplayAtomBundle(Long livingStoryId, FilterSpec filterSpec,
-      Long focusedAtomId, Date cutoff);  
+  DisplayContentItemBundle getDisplayContentItemBundle(Long livingStoryId, FilterSpec filterSpec,
+      Long focusedContentItemId, Date cutoff);  
   
-  List<EventAtom> getImportantEventsForLivingStory(Long livingStoryId);
+  List<EventContentItem> getImportantEventsForLivingStory(Long livingStoryId);
   
-  List<PlayerAtom> getImportantPlayersForLivingStory(Long livingStoryId);
+  List<PlayerContentItem> getImportantPlayersForLivingStory(Long livingStoryId);
   
-  Map<Long, PlayerAtom> getContributorsByIdForLivingStory(Long livingStoryId);
+  Map<Long, PlayerContentItem> getContributorsByIdForLivingStory(Long livingStoryId);
 }

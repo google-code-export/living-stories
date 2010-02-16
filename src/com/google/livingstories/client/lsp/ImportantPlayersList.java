@@ -22,7 +22,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.ClientCaches;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 
 import java.util.List;
 
@@ -49,14 +49,14 @@ public class ImportantPlayersList extends Composite {
     return header;
   }
   
-  private class ImportantPlayersCallback implements AsyncCallback<List<PlayerAtom>> {
+  private class ImportantPlayersCallback implements AsyncCallback<List<PlayerContentItem>> {
     @Override
     public void onFailure(Throwable caught) {
       contentPanel.add(new Label("Failed to load player list"));
     }
     
     @Override
-    public void onSuccess(List<PlayerAtom> result) {
+    public void onSuccess(List<PlayerContentItem> result) {
       if (result.isEmpty()) {
         contentPanel.setVisible(false);
       } else {

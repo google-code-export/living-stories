@@ -26,17 +26,17 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.AtomTypesBundle;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.ContentItemTypesBundle;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
-import com.google.livingstories.client.DisplayAtomBundle;
+import com.google.livingstories.client.DisplayContentItemBundle;
 import com.google.livingstories.client.FilterSpec;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.FilterWidget;
-import com.google.livingstories.client.lsp.LspAtomListWidget;
+import com.google.livingstories.client.lsp.LspContentItemListWidget;
 import com.google.livingstories.client.lsp.Page;
 import com.google.livingstories.client.lsp.RecentEventsList;
 import com.google.livingstories.client.lsp.ThemeListWidget;
@@ -62,7 +62,7 @@ public class OverviewPage extends Page {
 
   private static final String SCROLL_POSITION_STATE = "sp";
   
-  private final ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private final ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
   private final LivingStoryRpcServiceAsync livingStoryService =
     GWT.create(LivingStoryRpcService.class);
 
@@ -71,7 +71,7 @@ public class OverviewPage extends Page {
   @UiField SimplePanel summary;
   @UiField ThemeListWidget themeList;
   @UiField FilterWidget filterList;
-  @UiField LspAtomListWidget atomList;
+  @UiField LspContentItemListWidget contentItemList;
   @UiField AnchoredPanel rightPanel;
   @UiField RecentEventsList recentEvents;
   @UiField FCCommentsBox comments;
@@ -89,12 +89,12 @@ public class OverviewPage extends Page {
     recentEvents.load();
     
     livingStoryService.getThemeInfoForLivingStory(LivingStoryData.getLivingStoryId(),
-        new AsyncCallback<Map<Long, AtomTypesBundle>>() {
+        new AsyncCallback<Map<Long, ContentItemTypesBundle>>() {
           @Override
           public void onFailure(Throwable caught) {}
           
           @Override
-          public void onSuccess(Map<Long, AtomTypesBundle> results) {
+          public void onSuccess(Map<Long, ContentItemTypesBundle> results) {
             themeList.load(results);
             filterList.load(results, themeList.getSelectedThemeId());
           }
@@ -107,24 +107,24 @@ public class OverviewPage extends Page {
    * Sets off an asynchronous call that fills in data for the event list. In some circumstances,
    * can do its work synchronously.
    */
-  public void update(FilterSpec filter, Long focusedAtomId) {
+  public void update(FilterSpec filter, Long focusedContentItemId) {
     FilterSpec oldFilter = filterList.getFilter();
     if (!filter.equals(oldFilter)) {
-      boolean simpleReversal = !atomList.hasMore() && filter.isReverseOf(oldFilter);
+      boolean simpleReversal = !contentItemList.hasMore() && filter.isReverseOf(oldFilter);
       filterList.setFilter(filter);
       if (simpleReversal) {
-        atomList.doSimpleReversal(filter.oldestFirst);
+        contentItemList.doSimpleReversal(filter.oldestFirst);
       } else {
-        atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filter, focusedAtomId,
-            null, new AtomCallback(focusedAtomId));
-        atomList.clear();
-        atomList.setIsImageList(filter.atomType == AtomType.ASSET
+        contentService.getDisplayContentItemBundle(LivingStoryData.getLivingStoryId(), filter,
+            focusedContentItemId, null, new ContentItemCallback(focusedContentItemId));
+        contentItemList.clear();
+        contentItemList.setIsImageList(filter.contentItemType == ContentItemType.ASSET
             && filter.assetType == AssetType.IMAGE);
-        atomList.beginLoading();
+        contentItemList.beginLoading();
         beginLoading();
       }
-    } else if (focusedAtomId != null) {
-      highlightEvent(focusedAtomId, false);
+    } else if (focusedContentItemId != null) {
+      highlightEvent(focusedContentItemId, false);
     }
   }
   
@@ -149,12 +149,12 @@ public class OverviewPage extends Page {
           @Override
           public void onToggle(BlockToggledEvent e) {
             if (e.isOpened() && e.shouldSetHistory()) {
-              // Set this atom as the focused atom in the history.
-              // When the user navigates away from this and then clicks back, this atom will
+              // Set this content item as the focused contentitem in the history.
+              // When the user navigates away from this and then clicks back, this item will
               // appear expanded, and the viewport will be scrolled to its position.
               HistoryManager.newToken(HistoryPages.OVERVIEW,
                   LivingStoryControls.getCurrentFilterSpec().getFilterParams(),
-                  String.valueOf(e.getAtomId()));
+                  String.valueOf(e.getContentItemId()));
             }
           }
         });
@@ -169,73 +169,75 @@ public class OverviewPage extends Page {
     }
   }
 
-  private class AtomCallback implements AsyncCallback<DisplayAtomBundle> {
-    private Long focusedAtomId;
+  private class ContentItemCallback implements AsyncCallback<DisplayContentItemBundle> {
+    private Long focusedContentItemId;
 
-    public AtomCallback() {
+    public ContentItemCallback() {
       this(null);
     }
     
-    public AtomCallback(Long focusedAtomId) {
-      this.focusedAtomId = focusedAtomId;
+    public ContentItemCallback(Long focusedContentItemId) {
+      this.focusedContentItemId = focusedContentItemId;
     }
     
     public void onFailure(Throwable t) {
-      atomList.showError();
+      contentItemList.showError();
     }
     
-    public void onSuccess(DisplayAtomBundle bundle) {
+    public void onSuccess(DisplayContentItemBundle bundle) {
       themeList.setSelectedThemeId(bundle.getAdjustedFilterSpec().themeId);
       if (!filterList.getFilter().equals(bundle.getAdjustedFilterSpec())) {
         filterList.setFilter(bundle.getAdjustedFilterSpec());
-        atomList.clear();
+        contentItemList.clear();
       }
-      atomList.finishLoading(bundle);
-      if (focusedAtomId != null) {
-        atomList.goToAtom(focusedAtomId);
+      contentItemList.finishLoading(bundle);
+      if (focusedContentItemId != null) {
+        contentItemList.goToContentItem(focusedContentItemId);
       }
       finishLoading();
-      comments.loadCommentsBox("LSP:" + LivingStoryData.getLivingStoryId());
+      comments.loadCommentsBox("LSID:" + LivingStoryData.getLivingStoryId());
       rightPanel.setVisible(true);
     }
   }
   
   /**
-   * "Jumps to" the event indicated by atomId, scrolling it into view and opening its contents.
-   * Only works for event and standalone narrative atoms. 
+   * "Jumps to" the event indicated by contentItemId, scrolling it into view and opening its
+   * contents.
+   * Only works for event and standalone narrative content items. 
    * Sets a history token when called.
    */
-  public void highlightEvent(int atomId) {
+  public void highlightEvent(int contentItemId) {
     // Save the current scroll position in the history so that when the user clicks 'back',
     // they're scrolled back here.
     HistoryManager.changeState(SCROLL_POSITION_STATE, String.valueOf(Window.getScrollTop()));
-    highlightEvent(atomId, true);
+    highlightEvent(contentItemId, true);
   }
   
   /**
    * Internal version of highlightEvent.  Lets the update() method above select an
    * event without setting an extra history token.
    */
-  private void highlightEvent(long atomId, boolean setHistoryToken) {
-    boolean finished = atomList.goToAtom(atomId);
+  private void highlightEvent(long contentItemId, boolean setHistoryToken) {
+    boolean finished = contentItemList.goToContentItem(contentItemId);
     if (!finished) {
-      atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
-          atomId, atomList.getNextDateInSequence(), new AtomCallback(atomId));
+      contentService.getDisplayContentItemBundle(LivingStoryData.getLivingStoryId(),
+          filterList.getFilter(), contentItemId, contentItemList.getNextDateInSequence(),
+          new ContentItemCallback(contentItemId));
     }
     
     if (setHistoryToken) {
-      // Set this atom as the focused atom in the history.
-      // When the user navigates away from this and then clicks back, this atom will
+      // Set this content item as the focused item in the history.
+      // When the user navigates away from this and then clicks back, this content item will
       // appear expanded, and the viewport will be scrolled to its position.
       HistoryManager.newToken(HistoryPages.OVERVIEW,
-          LivingStoryControls.getCurrentFilterSpec().getFilterParams(), String.valueOf(atomId));
+          LivingStoryControls.getCurrentFilterSpec().getFilterParams(), String.valueOf(contentItemId));
     }
   }
   
-  public void getMoreAtoms() {
-    atomService.getDisplayAtomBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
-        null, atomList.getNextDateInSequence(), new AtomCallback());
-    atomList.beginLoading();
+  public void getMoreContentItems() {
+    contentService.getDisplayContentItemBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
+        null, contentItemList.getNextDateInSequence(), new ContentItemCallback());
+    contentItemList.beginLoading();
   }
   
   public void repositionAnchoredPanel() {
@@ -248,16 +250,18 @@ public class OverviewPage extends Page {
   
   private native void exportMethods() /*-{
     var instance = this;
-    $wnd.goToAtom = function(atomId) {
+    $wnd.goToContentItem = function(contentItemId) {
       instance.@com.google.livingstories.client.lsp.views.OverviewPage::highlightEvent(I)
-          .call(instance, atomId);
+          .call(instance, contentItemId);
     }
-    $wnd.repositionAnchoredPanel = function(atomId) {
+    // for legacy purposes:
+    $wnd.goToAtom = $wnd.goToContentItem;
+    $wnd.repositionAnchoredPanel = function(contentItemId) {
       instance.@com.google.livingstories.client.lsp.views.OverviewPage::repositionAnchoredPanel()
           .call(instance);
     }
-    $wnd.getMoreAtoms = function() {
-      instance.@com.google.livingstories.client.lsp.views.OverviewPage::getMoreAtoms()
+    $wnd.getMoreContentItems = function() {
+      instance.@com.google.livingstories.client.lsp.views.OverviewPage::getMoreContentItems()
           .call(instance);
     }
     $wnd.getCurrentFilterSpec = function() {

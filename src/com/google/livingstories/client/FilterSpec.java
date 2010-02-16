@@ -19,15 +19,16 @@ package com.google.livingstories.client;
 import java.io.Serializable;
 
 /**
- * Class for storing the state of the various filter selections to fetch atoms from the server. 
+ * Class for storing the state of the various filter selections to fetch content items from the
+ * server. 
  */
 public class FilterSpec implements Serializable {
   public boolean importantOnly = false;
   public boolean oldestFirst = false;
-  public boolean opinion = false;       // filter for 'Editorial' and 'Op-Ed' narratives.
-                                        // Meaningful only if atomType = AtomType.NARRATIVE
-  public AtomType atomType;             // null means filter to "display"-mode atoms
-  public AssetType assetType;           // filter on asset type. Used if atomType = AtomType.ASSET
+  public boolean opinion = false;  // filter for 'Editorial' and 'Op-Ed' narratives.
+                                   // Meaningful only if contentItemType is NARRATIVE
+  public ContentItemType contentItemType;     // null means filter to "display"-mode content items
+  public AssetType assetType;           // filter on asset type. Used if contentItemType is ASSET
   public Long themeId = null;                  // 0 means no filter
   
   // Filters that will appear in isolation from the above filter, generally speaking:
@@ -41,7 +42,7 @@ public class FilterSpec implements Serializable {
     importantOnly = Boolean.valueOf(params[0]);
     oldestFirst = Boolean.valueOf(params[1]);
     opinion = Boolean.valueOf(params[2]);
-    atomType = params[3].equals("n") ? null : AtomType.valueOf(params[3]);
+    contentItemType = params[3].equals("n") ? null : ContentItemType.valueOf(params[3]);
     assetType = params[4].equals("n") ? null : AssetType.valueOf(params[4]);
     themeId = params[5].equals("n") ? null : Long.valueOf(params[5]);
   }
@@ -50,7 +51,7 @@ public class FilterSpec implements Serializable {
     importantOnly = other.importantOnly;
     oldestFirst = other.oldestFirst;
     opinion = other.opinion;
-    atomType = other.atomType;
+    contentItemType = other.contentItemType;
     assetType = other.assetType;
     themeId = other.themeId;
     contributorId = other.contributorId;
@@ -59,13 +60,13 @@ public class FilterSpec implements Serializable {
   
   /**
    * Used to get a string representation of the filter, for the history manager. Doesn't,
-   * at present, put anything in the string for the contributorId and linkedAtomId
+   * at present, put anything in the string for the contributorId and linkedContentItemId
    * parameters, which are put into the history via another method.
    * @return the string to put into the URL
    */
   public String getFilterParams() {
     return importantOnly + "," + oldestFirst + "," + opinion + "," +
-        (atomType == null ? "n" : atomType.name()) + "," +
+        (contentItemType == null ? "n" : contentItemType.name()) + "," +
         (assetType == null ? "n" : assetType.name()) + "," +
         (themeId == null ? "n" : themeId);
   }
@@ -78,29 +79,33 @@ public class FilterSpec implements Serializable {
     return getFilterParams() + "," + contributorId + "," + playerId;
   }
   
-  public boolean doesAtomMatch(BaseAtom atom) {
-    AtomType specificAtomType = atom.getAtomType();
+  public boolean doesContentItemMatch(BaseContentItem contentItem) {
+    ContentItemType specificType = contentItem.getContentItemType();
 
-    if (specificAtomType == AtomType.BACKGROUND || specificAtomType == AtomType.REACTION) {
+    if (specificType == ContentItemType.BACKGROUND
+        || specificType == ContentItemType.REACTION) {
       return false;
     } else {
       // check each relevant condition in turn.
-      return (atomType == null ? atom.displayTopLevel() : atomType == specificAtomType)
-          && ((specificAtomType != AtomType.ASSET || assetType == null
-             || matchesAssetType((AssetAtom) atom)))
-          && (atomType != AtomType.NARRATIVE || matchesOpinion((NarrativeAtom)atom))
-          && (atomType != AtomType.PLAYER || matchesPlayerType((PlayerAtom)atom))
-          && (themeId == null || atom.getThemeIds().contains(themeId))
-          && (importantOnly == false || atom.getImportance() == Importance.HIGH);
+      return (contentItemType == null
+          ? contentItem.displayTopLevel() : contentItemType == specificType)
+          && ((specificType != ContentItemType.ASSET || assetType == null
+             || matchesAssetType((AssetContentItem) contentItem)))
+          && (contentItemType != ContentItemType.NARRATIVE
+              || matchesOpinion((NarrativeContentItem)contentItem))
+          && (contentItemType != ContentItemType.PLAYER
+              || matchesPlayerType((PlayerContentItem)contentItem))
+          && (themeId == null || contentItem.getThemeIds().contains(themeId))
+          && (importantOnly == false || contentItem.getImportance() == Importance.HIGH);
     }
   }
   
-  private boolean matchesOpinion(NarrativeAtom narrativeAtom) {
-    return opinion == narrativeAtom.isOpinion();
+  private boolean matchesOpinion(NarrativeContentItem narrativeContentItem) {
+    return opinion == narrativeContentItem.isOpinion();
   }
   
-  private boolean matchesAssetType(AssetAtom assetAtom) {
-    AssetType specificAssetType = assetAtom.getAssetType();
+  private boolean matchesAssetType(AssetContentItem assetContentItem) {
+    AssetType specificAssetType = assetContentItem.getAssetType();
     // We want to group links/resources and documents together in the same filter. So assets
     // of both types should match if the asset type in the current FilterSpec is "LINK"
     if (assetType == AssetType.LINK) {
@@ -110,8 +115,8 @@ public class FilterSpec implements Serializable {
     }
   }
   
-  private boolean matchesPlayerType(PlayerAtom playerAtom) {
-    PlayerType playerType = playerAtom.getPlayerType();
+  private boolean matchesPlayerType(PlayerContentItem playerContentItem) {
+    PlayerType playerType = playerContentItem.getPlayerType();
     return playerType == PlayerType.PERSON || playerType == PlayerType.ORGANIZATION;
   }
 
@@ -122,7 +127,7 @@ public class FilterSpec implements Serializable {
     int result = 1;
     result = prime * result + ((themeId == null) ? 0 : themeId.hashCode());
     result = prime * result + ((assetType == null) ? 0 : assetType.hashCode());
-    result = prime * result + ((atomType == null) ? 0 : atomType.hashCode());
+    result = prime * result + ((contentItemType == null) ? 0 : contentItemType.hashCode());
     result = prime * result + ((contributorId == null) ? 0 : contributorId.hashCode());
     result = prime * result + (importantOnly ? 1231 : 1237);
     result = prime * result + ((playerId == null) ? 0 : playerId.hashCode());
@@ -142,7 +147,7 @@ public class FilterSpec implements Serializable {
       if (other.themeId != null) return false;
     } else if (!themeId.equals(other.themeId)) return false;
     if (assetType != other.assetType) return false;
-    if (atomType != other.atomType) return false;
+    if (contentItemType != other.contentItemType) return false;
     if (contributorId == null) {
       if (other.contributorId != null) return false;
     } else if (!contributorId.equals(other.contributorId)) return false;

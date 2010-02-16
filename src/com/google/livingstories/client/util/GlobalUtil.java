@@ -62,7 +62,7 @@ public class GlobalUtil {
   
   public static boolean isContentEmpty(String content) {
     // Sometimes the rich-text editor puts line breaks into the content if you click into it
-    // and don't type anything. We don't want to display the atom in this case.
+    // and don't type anything. We don't want to display the contentItem in this case.
     return content == null || content.isEmpty() || content.equals("\n") || content.equals("<br>");
   }
   

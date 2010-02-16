@@ -29,14 +29,14 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ClientMessageHolder;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
-import com.google.livingstories.client.NarrativeAtom;
+import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.lsp.views.ManagementLinks;
 import com.google.livingstories.client.util.DateUtil;
@@ -84,14 +84,14 @@ public class StartPage implements EntryPoint {
     });
   }
   
-  private void populate(List<LivingStory> stories, Map<Long, List<BaseAtom>> storyIdToUpdateMap) {
+  private void populate(List<LivingStory> stories, Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
     for (LivingStory story : stories) {
       GlobalUtil.addIfNotNull(startPageWidget,
           createStoryWidget(story, storyIdToUpdateMap.get(story.getId())));
     }
   }
   
-  private Widget createStoryWidget(LivingStory story, List<BaseAtom> updates) {
+  private Widget createStoryWidget(LivingStory story, List<BaseContentItem> updates) {
     if (updates.isEmpty()) {
       return null;
     }
@@ -134,15 +134,15 @@ public class StartPage implements EntryPoint {
     header.setCellHorizontalAlignment(updateCount, HorizontalPanel.ALIGN_RIGHT);
     panel.add(header);
     
-    for (BaseAtom update : updates) {
+    for (BaseContentItem update : updates) {
       Anchor headline = null;
-      if (update.getAtomType() == AtomType.NARRATIVE) {
-        NarrativeAtom narrative = (NarrativeAtom)update;
+      if (update.getContentItemType() == ContentItemType.NARRATIVE) {
+        NarrativeContentItem narrative = (NarrativeContentItem)update;
         headline = new Anchor(narrative.getHeadline() + "<span class=\"greyFont\">&nbsp;-&nbsp;" 
             + narrative.getNarrativeType().toString(),
             true, getStoryUrl(story) + getUpdateUrl(narrative));
       } else {
-        EventAtom event = (EventAtom)update;
+        EventContentItem event = (EventContentItem)update;
         headline = new Anchor(event.getEventUpdate(), true, 
             getStoryUrl(story) + getUpdateUrl(event));
       }
@@ -168,8 +168,8 @@ public class StartPage implements EntryPoint {
     return "lsps/" + story.getUrl();
   }
   
-  private String getUpdateUrl(BaseAtom update) {
-    return HistoryManager.getTokenStringForFocusedAtom(update.getId());
+  private String getUpdateUrl(BaseContentItem update) {
+    return HistoryManager.getTokenStringForFocusedContentItem(update.getId());
   }
   
   private Label getUpdateRecencyLabel(Date lastUpdateTime) {

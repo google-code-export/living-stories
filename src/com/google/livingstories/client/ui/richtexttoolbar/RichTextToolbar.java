@@ -39,12 +39,12 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.EventAtom;
-import com.google.livingstories.client.NarrativeAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.EventContentItem;
+import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.lsp.SourceLink;
-import com.google.livingstories.client.ui.SingleAtomSelectionPanel;
+import com.google.livingstories.client.ui.SingleContentItemSelectionPanel;
 import com.google.livingstories.client.util.RichTextUtil;
 
 import java.util.EnumSet;
@@ -133,8 +133,8 @@ public class RichTextToolbar extends Composite {
   private PushButton ol;
   private PushButton ul;
   private PushButton insertImage;
-  private PushButton insertGoToAtom;
-  private PushButton insertAtom;
+  private PushButton insertGoToContentItem;
+  private PushButton insertContentItem;
   private PushButton insertSource;
   private PushButton insertLightbox;
   private PushButton createLink;
@@ -317,15 +317,17 @@ public class RichTextToolbar extends Composite {
         hasTopPanel = true;
       }
 
-      if (controls.contains(Control.INSERT_GO_TO_ATOM_BUTTON)) {
-        insertGoToAtom = createPushButton(images.insertGoToAtom(), MESSAGES.insertGoToAtom());
-        addControlToToolbar(topPanel, insertGoToAtom, "gwt-InsertGoToAtomButton");
+      if (controls.contains(Control.INSERT_GO_TO_CONTENT_ITEM_BUTTON)) {
+        insertGoToContentItem =
+            createPushButton(images.insertGoToContentItem(), MESSAGES.insertGoToContentItem());
+        addControlToToolbar(topPanel, insertGoToContentItem, "gwt-InsertGoToContentItemButton");
         hasTopPanel = true;
       }
 
-      if (controls.contains(Control.INSERT_ATOM_BUTTON)) {
-        insertAtom = createPushButton(images.insertAtom(), MESSAGES.insertAtom());
-        addControlToToolbar(topPanel, insertAtom, "gwt-InsertAtomButton");
+      if (controls.contains(Control.INSERT_CONTENT_ITEM_BUTTON)) {
+        insertContentItem =
+            createPushButton(images.insertContentItem(), MESSAGES.insertContentItem());
+        addControlToToolbar(topPanel, insertContentItem, "gwt-InsertContentItemButton");
         hasTopPanel = true;
       }
 
@@ -526,8 +528,8 @@ public class RichTextToolbar extends Composite {
     ORDERED_LIST_BUTTON,
     UNORDERED_LIST_BUTTON,
     INSERT_IMAGE_BUTTON,
-    INSERT_GO_TO_ATOM_BUTTON,
-    INSERT_ATOM_BUTTON,
+    INSERT_GO_TO_CONTENT_ITEM_BUTTON,
+    INSERT_CONTENT_ITEM_BUTTON,
     INSERT_SOURCE_BUTTON,
     INSERT_LIGHTBOX_BUTTON,
     CREATE_LINK_BUTTON,
@@ -569,49 +571,50 @@ public class RichTextToolbar extends Composite {
         if (url != null) {
           extended.insertImage(url);
         }
-      } else if (sender == insertGoToAtom) {
+      } else if (sender == insertGoToContentItem) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
-        final SingleAtomSelectionPanel selectionPanel = new SingleAtomSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel = new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
-        contentPanel.add(createButtonPanel(popup, new AtomSelectionHandler() {
+        contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
           public void onSelect() {
-            BaseAtom atom = selectionPanel.getSelection();
+            BaseContentItem contentItem = selectionPanel.getSelection();
             String headline = null;
-            if (atom.getAtomType() == AtomType.EVENT) {
-              headline = ((EventAtom) atom).getEventUpdate();
-            } else if (atom.getAtomType() == AtomType.NARRATIVE) {
-              headline = ((NarrativeAtom) atom).getHeadline();
+            if (contentItem.getContentItemType() == ContentItemType.EVENT) {
+              headline = ((EventContentItem) contentItem).getEventUpdate();
+            } else if (contentItem.getContentItemType() == ContentItemType.NARRATIVE) {
+              headline = ((NarrativeContentItem) contentItem).getHeadline();
             } else {
               Window.alert("You must link to an event or top level narrative!");
-              atom = null;
+              contentItem = null;
             }
-            if (atom != null && atom.displayTopLevel()) {
+            if (contentItem != null && contentItem.displayTopLevel()) {
               richTextUtil.createJavascriptLink(richText.getElement(),
-                  "goToAtom(" + atom.getId() + ")", "Jump to: " + headline.replace("\"", "'"));
+                  "goToContentItem(" + contentItem.getId() + ")",
+                  "Jump to: " + headline.replace("\"", "'"));
             }
           }
         }));
         popup.add(contentPanel);
-        popup.showRelativeTo(insertAtom);
-      } else if (sender == insertAtom) {
+        popup.showRelativeTo(insertContentItem);
+      } else if (sender == insertContentItem) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
-        final SingleAtomSelectionPanel selectionPanel = new SingleAtomSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel = new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
-        contentPanel.add(createButtonPanel(popup, new AtomSelectionHandler() {
+        contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
           public void onSelect() {
-            BaseAtom atom = selectionPanel.getSelection();
-            if (atom != null) {
+            BaseContentItem contentItem = selectionPanel.getSelection();
+            if (contentItem != null) {
               richTextUtil.createJavascriptLink(richText.getElement(),
-                  "showAtomPopup(" + atom.getId() + ", this)");
+                  "showContentItemPopup(" + contentItem.getId() + ", this)");
             }
           }
         }));
         popup.add(contentPanel);
-        popup.showRelativeTo(insertAtom);
+        popup.showRelativeTo(insertContentItem);
       } else if (sender == insertSource) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
@@ -620,17 +623,19 @@ public class RichTextToolbar extends Composite {
         descriptionPanel.add(new Label("Source description:"));
         descriptionPanel.add(descriptionBox);
         contentPanel.add(descriptionPanel);
-        final SingleAtomSelectionPanel selectionPanel = new SingleAtomSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel =
+            new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
-        contentPanel.add(createButtonPanel(popup, new AtomSelectionHandler() {
+        contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
           public void onSelect() {
             String description = descriptionBox.getText();
-            BaseAtom atom = selectionPanel.getSelection();
-            if (!description.isEmpty() || atom != null) {
+            BaseContentItem contentItem = selectionPanel.getSelection();
+            if (!description.isEmpty() || contentItem != null) {
               String selectedText = richTextUtil.getSelection(richText.getElement());
               richTextUtil.insertHTML(richText.getElement(), selectedText + " " +
-                  new SourceLink(description, atom == null ? -1 : atom.getId()).getOuterHTML());
+                  new SourceLink(description, contentItem == null ? -1
+                      : contentItem.getId()).getOuterHTML());
             }
           }
         }));
@@ -639,15 +644,17 @@ public class RichTextToolbar extends Composite {
       } else if (sender == insertLightbox) {
         PopupPanel popup = new PopupPanel();
         FlowPanel contentPanel = new FlowPanel();
-        final SingleAtomSelectionPanel selectionPanel = new SingleAtomSelectionPanel();
+        final SingleContentItemSelectionPanel selectionPanel =
+            new SingleContentItemSelectionPanel();
         contentPanel.add(selectionPanel);
-        contentPanel.add(createButtonPanel(popup, new AtomSelectionHandler() {
+        contentPanel.add(createButtonPanel(popup, new ContentItemSelectionHandler() {
           @Override
           public void onSelect() {
-            BaseAtom atom = selectionPanel.getSelection();
-            if (atom != null) {
+            BaseContentItem contentItem = selectionPanel.getSelection();
+            if (contentItem != null) {
               richTextUtil.createJavascriptLink(richText.getElement(),
-                  "showLightboxForAtom('" + atom.getTypeString() + "', " + atom.getId() + ")");
+                  "showLightboxForContentItem('" + contentItem.getTypeString()
+                  + "', " + contentItem.getId() + ")");
             }
           }
         }));
@@ -676,7 +683,7 @@ public class RichTextToolbar extends Composite {
       }
     }
 
-    private Widget createButtonPanel(final PopupPanel popup, final AtomSelectionHandler handler) {
+    private Widget createButtonPanel(final PopupPanel popup, final ContentItemSelectionHandler handler) {
       Button okButton = new Button("Ok");
       okButton.addClickHandler(new ClickHandler() {
         @Override
@@ -730,7 +737,7 @@ public class RichTextToolbar extends Composite {
     }
   }
 
-  private interface AtomSelectionHandler {
+  private interface ContentItemSelectionHandler {
     void onSelect();
   }
 
@@ -745,8 +752,8 @@ public class RichTextToolbar extends Composite {
     AbstractImagePrototype hr();
     AbstractImagePrototype indent();
     AbstractImagePrototype insertImage();
-    AbstractImagePrototype insertGoToAtom();
-    AbstractImagePrototype insertAtom();
+    AbstractImagePrototype insertGoToContentItem();
+    AbstractImagePrototype insertContentItem();
     AbstractImagePrototype insertSource();
     AbstractImagePrototype insertLightbox();
     AbstractImagePrototype italic();

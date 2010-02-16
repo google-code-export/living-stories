@@ -21,10 +21,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
-import com.google.livingstories.client.atomlist.AtomClickHandler;
+import com.google.livingstories.client.contentitemlist.ContentItemClickHandler;
 import com.google.livingstories.client.contentmanager.SearchResultsList;
 import com.google.livingstories.client.contentmanager.SearchTerms;
 import com.google.livingstories.client.ui.SearchPanel.SearchHandler;
@@ -32,22 +32,22 @@ import com.google.livingstories.client.ui.SearchPanel.SearchHandler;
 import java.util.List;
 
 /**
- * Page that hooks up a search panel to an atom list, allowing search
- * over the entire corpus of atoms.
+ * Page that hooks up a search panel to a content item list, allowing search
+ * over the entire corpus of content items.
  */
 public class SearchWidget extends Composite {
-  private final ContentRpcServiceAsync atomService = GWT.create(ContentRpcService.class);
+  private final ContentRpcServiceAsync contentService = GWT.create(ContentRpcService.class);
   
   private VerticalPanel contentPanel;
   private SearchPanel searchPanel;
-  private SearchResultsList atomList;
+  private SearchResultsList contentItemList;
   
-  public SearchWidget(AtomClickHandler handler) {
+  public SearchWidget(ContentItemClickHandler handler) {
     contentPanel = new VerticalPanel();
     contentPanel.add(createSearchPanel());
-    atomList = new SearchResultsList(handler);
+    contentItemList = new SearchResultsList(handler);
     
-    contentPanel.add(atomList);
+    contentPanel.add(contentItemList);
     initWidget(contentPanel);
   }
   
@@ -55,12 +55,12 @@ public class SearchWidget extends Composite {
     searchPanel = new SearchPanel();
     searchPanel.addSearchHandler(new SearchHandler() {
       public void onSearch(SearchTerms searchTerms) {
-        atomService.executeSearch(searchTerms, new AsyncCallback<List<BaseAtom>>() {
+        contentService.executeSearch(searchTerms, new AsyncCallback<List<BaseContentItem>>() {
           public void onFailure(Throwable t) {
             // Ignore;
           }
-          public void onSuccess(List<BaseAtom> atoms) {
-            atomList.load(atoms);
+          public void onSuccess(List<BaseContentItem> contentItems) {
+            contentItemList.load(contentItems);
           }
         });
       }
@@ -69,6 +69,6 @@ public class SearchWidget extends Composite {
   }
   
   public void clear() {
-    atomList.clear();
+    contentItemList.clear();
   }
 }

@@ -45,15 +45,15 @@ public class BlockToggledEvent extends GwtEvent<BlockToggledEvent.Handler> {
   // Custom data for the event
   
   private boolean opened;
-  private Long atomId;
+  private Long contentItemId;
   private boolean animate = true;
   private boolean setHistory = true;
   private boolean scrollOnClose = true;
   private Command onFinish;
   
-  public BlockToggledEvent(boolean opened, Long atomId) {
+  public BlockToggledEvent(boolean opened, Long contentItemId) {
     this.opened = opened;
-    this.atomId = atomId;
+    this.contentItemId = contentItemId;
   }
 
   public BlockToggledEvent skipAnimation() {
@@ -80,8 +80,8 @@ public class BlockToggledEvent extends GwtEvent<BlockToggledEvent.Handler> {
     return opened;
   }
   
-  public Long getAtomId() {
-    return atomId;
+  public Long getContentItemId() {
+    return contentItemId;
   }
   
   public boolean shouldAnimate() {

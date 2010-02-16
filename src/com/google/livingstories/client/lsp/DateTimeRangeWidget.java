@@ -19,7 +19,7 @@ package com.google.livingstories.client.lsp;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.livingstories.client.EventAtom;
+import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.util.DateUtil;
 import com.google.livingstories.client.util.GlobalUtil;
 
@@ -73,7 +73,7 @@ public class DateTimeRangeWidget extends Composite {
     initWidget(panel);
   }
   
-  public static DateTimeRangeWidget makeForEventAtom(EventAtom event) {
+  public static DateTimeRangeWidget makeForEventContentItem(EventContentItem event) {
     Date startDateTime = event.getEventStartDate();
     Date endDateTime = event.getEventEndDate();
     

@@ -16,8 +16,8 @@
 
 package com.google.livingstories.server.dataservices;
 
-import com.google.livingstories.client.AtomType;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.ContentItemType;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.PublishState;
 
@@ -39,7 +39,7 @@ public interface ContentDataService {
    * @param baseContent the content entity to save. It can have various optional properties
    * depending on the type of content.
    */
-  BaseAtom save(BaseAtom baseContent);
+  BaseContentItem save(BaseContentItem baseContent);
   
   /**
    * Delete a content object from the datastore.
@@ -66,7 +66,7 @@ public interface ContentDataService {
    * entity should also be fetched and populated. If false, only the ids of the linked entities
    * need to be returned.  
    */
-  BaseAtom retrieveById(Long id, boolean populateLinkedEntities);
+  BaseContentItem retrieveById(Long id, boolean populateLinkedEntities);
   
   /**
    * Fetch all content objects that belong to a living story from the datastore. 
@@ -75,19 +75,19 @@ public interface ContentDataService {
    * should be returned. If null, all content objects belonging to the living story should be
    * returned.
    */
-  List<BaseAtom> retrieveByLivingStory(Long livingStoryId, PublishState publishState);
+  List<BaseContentItem> retrieveByLivingStory(Long livingStoryId, PublishState publishState);
   
   /**
    * Fetch a list of content objects given a list of their ids.
    * @param ids list of database ids of content entities
    */
-  List<BaseAtom> retrieveByIds(Collection<Long> ids);
+  List<BaseContentItem> retrieveByIds(Collection<Long> ids);
   
   /**
    * Retrieve all the published content objects that link to the content object with the given id.
    * @param entityId id of the content object that each of the returned objects should link to
    */
-  List<BaseAtom> retrieveEntitiesThatLinkTo(Long entityId);
+  List<BaseContentItem> retrieveEntitiesThatLinkTo(Long entityId);
   
   /**
    * Retrieve all the published content objects that have been contributed by the object with the
@@ -95,14 +95,14 @@ public interface ContentDataService {
    * @param contributorId database id of the content object that should be present in the
    * contributorIds field of all the return content objects
    */
-  List<BaseAtom> retrieveEntitiesContributedBy(Long contributorId);
+  List<BaseContentItem> retrieveEntitiesContributedBy(Long contributorId);
   
   /**
    * Retrieve all content objects from the datastore that satisfy the given search parameters. If
    * any of the parameters is null, it should be ignored and the results should be based on the
    * others.
    * @param livingStoryId database id of the living story that the content object should belong to
-   * @param atomType type of content object such as "Event", "Narrative", "Asset", "Quote", etc.
+   * @param contentItemType type of content object such as "Event", "Narrative", "Asset", "Quote", etc.
    * @param afterDate the returned content objects should have their last modified time after this
    * time
    * @param beforeDate the returned content objects should have their last modified time before
@@ -110,7 +110,7 @@ public interface ContentDataService {
    * @param importance the importance level of the returned content objects eg. High, Medium, etc.
    * @param publishState whether the returned objects should be in 'published' or 'draft' state
    */
-  List<BaseAtom> search(Long livingStoryId, AtomType atomType, Date afterDate, Date beforeDate, 
+  List<BaseContentItem> search(Long livingStoryId, ContentItemType contentItemType, Date afterDate, Date beforeDate, 
       Importance importance, PublishState publishState);
   
   /**
@@ -123,6 +123,6 @@ public interface ContentDataService {
    * @param afterDate date after which the objects should have been modified. Should be non-null.
    * @throws IllegalArgumentException thrown if any of the arguments are null
    */
-  Integer getNumberOfEntitiesUpdatedSinceTime(Long livingStoryId, AtomType entityType, 
+  Integer getNumberOfEntitiesUpdatedSinceTime(Long livingStoryId, ContentItemType entityType, 
       Date afterDate) throws IllegalArgumentException;
 }

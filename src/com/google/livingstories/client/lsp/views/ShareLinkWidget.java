@@ -38,11 +38,11 @@ public class ShareLinkWidget extends Composite {
   @UiField
   InlineLabel label;
   
-  private Long atomId;
+  private Long contentItemId;
   private ShareLinkWidgetPopup shareLinkWidgetPopup;
 
-  public ShareLinkWidget(final Long atomId) {
-    this.atomId = atomId;
+  public ShareLinkWidget(final Long contentItemId) {
+    this.contentItemId = contentItemId;
     initWidget(uiBinder.createAndBindUi(this));
     shareLinkWidgetPopup = new ShareLinkWidgetPopup();
   }
@@ -54,6 +54,6 @@ public class ShareLinkWidget extends Composite {
     shareLinkWidgetPopup.showRelativeTo(label, HistoryManager.getLink(
         HistoryPages.OVERVIEW,
         LivingStoryControls.getCurrentFilterSpec().getFilterParams(),
-        String.valueOf(atomId)));
+        String.valueOf(contentItemId)));
   }
 }

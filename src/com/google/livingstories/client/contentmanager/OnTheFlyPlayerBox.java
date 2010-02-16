@@ -31,13 +31,13 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.AssetAtom;
+import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcServiceAsync;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.Location;
-import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PlayerType;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.client.ui.EnumDropdown;
@@ -58,8 +58,8 @@ public class OnTheFlyPlayerBox extends PopupPanel {
   private static final String PLAYER_TEXT = "player";
   private static final String CONTRIBUTOR_TEXT = "contributor";
   
-  private ContentRpcServiceAsync atomService;
-  private AsyncCallback<BaseAtom> callbackWork;
+  private ContentRpcServiceAsync contentService;
+  private AsyncCallback<BaseContentItem> callbackWork;
   private boolean isContributor = false;
   
   private TextBox nameBox;
@@ -74,17 +74,17 @@ public class OnTheFlyPlayerBox extends PopupPanel {
   
   /**
    * Constructor
-   * @param atomService a reference to an existing atomRpcServiceAsync handle
-   * @param isContributor set to true if the atom being saved is a contributor and false if
-   * it is a general player atom
+   * @param contentService a reference to an existing ContentRpcServiceAsync handle
+   * @param isContributor set to true if the content item being saved is a contributor and false if
+   * it is a general player
    * @param callbackWork work to be executed in the parent UI on the successful (or failed)
-   * creation of a new contributor atom
+   * creation of a new contributor content item
    */
-  public OnTheFlyPlayerBox(ContentRpcServiceAsync atomService, boolean isContributor,
-      AsyncCallback<BaseAtom> callbackWork) {
+  public OnTheFlyPlayerBox(ContentRpcServiceAsync contentService, boolean isContributor,
+      AsyncCallback<BaseContentItem> callbackWork) {
     super(true /* allows autohide */, true /*modal*/);
   
-    this.atomService = atomService;
+    this.contentService = contentService;
     this.isContributor = isContributor;
     this.callbackWork = callbackWork;
 
@@ -189,17 +189,17 @@ public class OnTheFlyPlayerBox extends PopupPanel {
           photoUrl = previewPhotoUrl;
         }
         
-        // If a photo URL is provided, we first have to save the photo atom via an RPC call, and
-        // then save the player atom via another RPC. If there is no photo URL provided, the player
-        // can be saved via 1 RPC call directly.
+        // If a photo URL is provided, we first have to save the photo content item via an RPC call,
+        // and then save the player content item via another RPC. If there is no photo URL provided,
+        // the player can be saved via 1 RPC call directly.
         if (GlobalUtil.isContentEmpty(photoUrl)) {
           savePlayer(null);
         } else {
-          AssetAtom photo = new AssetAtom(null, new Date(), new HashSet<Long>(), photoUrl, 
+          AssetContentItem photo = new AssetContentItem(null, new Date(), new HashSet<Long>(), photoUrl, 
               Importance.MEDIUM, null, AssetType.IMAGE, name, previewPhotoUrl);
           photo.setLocation(new Location(null, null, ""));
           photo.setPublishState(PublishState.PUBLISHED);
-          atomService.createOrChangeAtom(photo, new AsyncCallback<BaseAtom>() {
+          contentService.createOrChangeContentItem(photo, new AsyncCallback<BaseContentItem>() {
             @Override
             public void onFailure(Throwable caught) {
               problemLabel.setVisible(true);
@@ -208,8 +208,8 @@ public class OnTheFlyPlayerBox extends PopupPanel {
             }
 
             @Override
-            public void onSuccess(BaseAtom result) {
-              savePlayer((AssetAtom)result);
+            public void onSuccess(BaseContentItem result) {
+              savePlayer((AssetContentItem)result);
             }
           });
         }
@@ -217,7 +217,7 @@ public class OnTheFlyPlayerBox extends PopupPanel {
         
       }
       
-      private void savePlayer(AssetAtom photo) {
+      private void savePlayer(AssetContentItem photo) {
         List<String> aliasList = new ArrayList<String>();
         for (String alias : aliasesBox.getText().split(",")) {
           String trimmed = alias.trim();
@@ -227,14 +227,14 @@ public class OnTheFlyPlayerBox extends PopupPanel {
         }
         
         // Collections.emptySet() and Collections.emptyList() don't serialize properly.
-        PlayerAtom player = new PlayerAtom(null, new Date(), new HashSet<Long>(),
+        PlayerContentItem player = new PlayerContentItem(null, new Date(), new HashSet<Long>(),
             bioArea.getText(), Importance.MEDIUM, nameBox.getText(), aliasList, 
             typeSelector.getSelectedConstant(), photo);
         // Kinda broken, but this isn't done automatically:
         player.setLocation(new Location(null, null, ""));
         player.setPublishState(PublishState.PUBLISHED);
         problemLabel.setVisible(false);
-        atomService.createOrChangeAtom(player, new AsyncCallback<BaseAtom>() {
+        contentService.createOrChangeContentItem(player, new AsyncCallback<BaseContentItem>() {
           @Override
           public void onFailure(Throwable caught) {
             problemLabel.setVisible(true);
@@ -243,7 +243,7 @@ public class OnTheFlyPlayerBox extends PopupPanel {
           }
 
           @Override
-          public void onSuccess(BaseAtom result) {
+          public void onSuccess(BaseContentItem result) {
             callbackWork.onSuccess(result);
             hide();
             resetButtons();

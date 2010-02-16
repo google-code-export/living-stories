@@ -24,53 +24,53 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.livingstories.client.BaseAtom;
-import com.google.livingstories.client.atomlist.AtomClickHandler;
+import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.contentitemlist.ContentItemClickHandler;
 
 import java.util.List;
 
 public class SearchResultsList extends Composite {
-  private FlowPanel atomList;
+  private FlowPanel contentItemList;
 
-  private AtomClickHandler handler;
+  private ContentItemClickHandler handler;
   
   private static ContentManagerConstants consts = GWT.create(ContentManagerConstants.class);
   
-  public SearchResultsList(AtomClickHandler handler) {
+  public SearchResultsList(ContentItemClickHandler handler) {
     this.handler = handler;
     
-    atomList = new FlowPanel();
+    contentItemList = new FlowPanel();
     
-    initWidget(atomList);
+    initWidget(contentItemList);
   }
   
-  public void load(List<BaseAtom> atoms) {
-    atomList.clear();
-    if (atoms.isEmpty()) {
-      atomList.add(new Label(consts.noSearchResults()));
+  public void load(List<BaseContentItem> contentItems) {
+    contentItemList.clear();
+    if (contentItems.isEmpty()) {
+      contentItemList.add(new Label(consts.noSearchResults()));
     } else {
-      for (final BaseAtom atom : atoms) {
-        Label displayString = new Label(atom.getAtomType().toString());
-        displayString.setStylePrimaryName("atomHeader");
+      for (final BaseContentItem contentItem : contentItems) {
+        Label displayString = new Label(contentItem.getContentItemType().toString());
+        displayString.setStylePrimaryName("contentItemHeader");
   
-        FlowPanel atomPanel = new FlowPanel();
-        atomPanel.add(displayString);
-        atomPanel.add(atom.renderTiny());
+        FlowPanel contentItemPanel = new FlowPanel();
+        contentItemPanel.add(displayString);
+        contentItemPanel.add(contentItem.renderTiny());
         
-        FocusPanel clickPanel = new FocusPanel(atomPanel);
+        FocusPanel clickPanel = new FocusPanel(contentItemPanel);
         clickPanel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
-            handler.onClick(atom);
+            handler.onClick(contentItem);
           }
         });
-        atomList.add(clickPanel);
-        atomList.add(new HTML("<hr/>"));
+        contentItemList.add(clickPanel);
+        contentItemList.add(new HTML("<hr/>"));
       }
     }
   }
   
   public void clear() {
-    atomList.clear();
+    contentItemList.clear();
   }
 }
