@@ -29,12 +29,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.PlayerAtom;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.Page;
+import com.google.livingstories.client.lsp.views.PlayerPage;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.HistoryManager.HistoryPages;
-
-import java.util.Collections;
 
 /**
  * Basic preview implementation for a player atom.
@@ -90,7 +89,7 @@ public class BasePlayerPreview extends Composite {
     // The right way to do this would probably be to store all atoms in the
     // ClientCache and fire a history change event here to load the page, instead
     // of trying to hack around the history system.
-    Page page = (Page) atom.renderContent(Collections.<Long>emptySet());
+    Page page = new PlayerPage(atom);
     HistoryManager.newToken(page, HistoryPages.PLAYER, String.valueOf(atom.getId()));
     LivingStoryControls.goToPage(page);
   }

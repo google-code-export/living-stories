@@ -82,6 +82,7 @@ import com.google.livingstories.client.QuoteAtom;
 import com.google.livingstories.client.ReactionAtom;
 import com.google.livingstories.client.StoryPlayerAtom;
 import com.google.livingstories.client.Theme;
+import com.google.livingstories.client.lsp.views.atoms.BasePlayerPreview;
 import com.google.livingstories.client.lsp.views.atoms.StreamViewFactory;
 import com.google.livingstories.client.ui.AtomListBox;
 import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
@@ -943,7 +944,7 @@ public class AtomManager extends ManagerPane {
     boolean isParentNull = parentPlayer == null;
     parentPlayerDisplayPanel.clear();
     if (!isParentNull) {
-      parentPlayerDisplayPanel.add(parentPlayer.renderPreview());
+      parentPlayerDisplayPanel.add(new BasePlayerPreview(parentPlayer));
     }
     parentPlayerDisplayPanel.setVisible(!isParentNull);
     changeParentLink.setVisible(!isParentNull);

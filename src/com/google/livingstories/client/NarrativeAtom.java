@@ -16,13 +16,8 @@
 
 package com.google.livingstories.client;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.lsp.BylineWidget;
-import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.util.GlobalUtil;
 
 import java.util.Date;
 import java.util.Set;
@@ -78,49 +73,6 @@ public class NarrativeAtom extends BaseAtom {
   @Override
   public Widget renderTiny() {
     return new HTML(headline);
-  }
-  
-  @Override
-  public Widget renderPreview() {
-    FlowPanel panel = renderCommon();
-
-    String summary = getNarrativeSummary();
-    
-    if (GlobalUtil.isContentEmpty(summary)) {
-      panel.add(super.renderContent(null));  // don't want to render the byline.
-    } else {
-      panel.add(new ContentRenderer(summary, false));
-    }
-    
-    return panel;
-  }
-  
-  @Override
-  public Widget renderContent(Set<Long> containingContributorIds) {
-    FlowPanel panel = renderCommon();
-    
-    GlobalUtil.addIfNotNull(
-        panel, BylineWidget.makeContextSensitive(this, containingContributorIds));
-
-    String summary = getNarrativeSummary();
-    
-    if (!GlobalUtil.isContentEmpty(summary)) {
-      panel.add(new ContentRenderer(summary, false));
-      panel.add(new Label("--"));
-    }
-    panel.add(super.renderContent(null));  // We pass null here; otherwise we'd re-render the byline
-    return panel;
-  }
-
-  private FlowPanel renderCommon() {
-    FlowPanel panel = new FlowPanel();
-    
-    Label headlineLabel = new Label(getHeadline());
-    headlineLabel.addStyleName("narrativeHeadline");
-    
-    panel.add(headlineLabel);
-
-    return panel;
   }
   
   @Override

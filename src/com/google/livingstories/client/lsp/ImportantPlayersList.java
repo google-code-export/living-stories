@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.ClientCaches;
 import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.lsp.views.atoms.BasePlayerPreview;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ImportantPlayersList extends Composite {
           if (i == MAX_PLAYER_COUNT) {
             break;
           }
-          Widget playerElement = result.get(i).renderPreview();
+          Widget playerElement = new BasePlayerPreview(result.get(i));
           playerElement.setStylePrimaryName("rightColumnElement");
           contentPanel.add(playerElement);
         }

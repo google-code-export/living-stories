@@ -16,7 +16,6 @@
 
 package com.google.livingstories.client;
 
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.util.SnippetUtil;
@@ -40,47 +39,6 @@ public class QuoteAtom extends BaseAtom {
   public Widget renderTiny() {
     return new HTML(SnippetUtil.createSnippet(GwtNodeAdapter.fromHtml(getContent()),
         TINY_SNIPPET_LENGTH));
-  }
-
-  // gets the first non-all-whitespace text node in the DOM tree rooted at node,
-  // found depth-first.
-  public Node getFirstTextNode(Node node) {
-    if (node == null) {
-      return null;
-    }
-    
-    if (node.getNodeType() == Node.TEXT_NODE && !node.getNodeValue().trim().isEmpty()) {
-      return node;
-    }
-    Node childResult = getFirstTextNode(node.getFirstChild());
-    return (childResult == null) ? getFirstTextNode(node.getNextSibling()) : childResult;
-  }
-  
-  @Override
-  public Widget renderContent(Set<Long> containingContributorIds) {
-    // if the rendered HTML content leads with a double-quote character, we replace the underlying
-    // text with 2 non-breaking spaces.
-    HTML detachedHTML = new HTML(getContent());
-
-    // walk through the content looking for the first text node:
-    Node firstTextNode = getFirstTextNode(detachedHTML.getElement().getFirstChild());
-    
-    if (firstTextNode != null) {
-      // replace check the first text node to see if there's quotiness to replace.
-      String firstText = firstTextNode.getNodeValue();
-      // replace leading whitespace plus a quote character with two &nbsp;s.
-      // \u201C is the opening-double-quote codepoint; \u00A0 is a non-breaking space.
-      String replacedText = firstText.replaceFirst("^\\s*[\"\u201C]", "\u00A0\u00A0");
-      if (!replacedText.equals(firstText)) {
-        firstTextNode.setNodeValue(replacedText);
-      }
-    }
-    
-    Widget ret = renderContentImpl(containingContributorIds,
-        detachedHTML.getElement().getInnerHTML());
-    ret.setStylePrimaryName("quote");
-    
-    return ret;
   }
 
   @Override

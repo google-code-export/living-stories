@@ -28,11 +28,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseAtom;
 import com.google.livingstories.client.ClientCaches;
 import com.google.livingstories.client.PlayerAtom;
+import com.google.livingstories.client.lsp.views.PlayerPage;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.HistoryManager.HistoryPages;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -123,7 +123,7 @@ public class BylineWidget extends Composite {
             // The right way to do this would probably be to store all atoms in the
             // ClientCache and fire a history change event here to load the page, instead
             // of trying to hack around the history system.
-            Page page = (Page) contributor.renderContent(new HashSet<Long>());
+            Page page = new PlayerPage(contributor);
             HistoryManager.newToken(page, HistoryPages.PLAYER, String.valueOf(contributor.getId()));
             LivingStoryControls.goToPage(page);
           }
