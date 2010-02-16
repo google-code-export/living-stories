@@ -17,8 +17,8 @@
 package com.google.livingstories.server.dataservices.impl;
 
 import com.google.livingstories.client.Theme;
-import com.google.livingstories.server.ThemeEntity;
 import com.google.livingstories.server.dataservices.ThemeDataService;
+import com.google.livingstories.server.dataservices.entities.ThemeEntity;
 
 import java.util.ArrayList;
 import java.util.List;

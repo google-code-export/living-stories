@@ -78,7 +78,7 @@ public class SearchPanel extends Composite {
     createAfterDateFilter();
     createImportanceFilter();
 
-    contentPanel.add(new Label("Search content entities:"));
+    contentPanel.add(new Label("Search for content items:"));
     contentPanel.add(filterGrid);
     contentPanel.add(createSubmitButton());
     
@@ -112,7 +112,7 @@ public class SearchPanel extends Composite {
     });
     
     int row = filterGrid.insertRow(filterGrid.getRowCount());
-    filterGrid.setWidget(row, 0, new Label("Content entity type:"));
+    filterGrid.setWidget(row, 0, new Label("Content item type:"));
     filterGrid.setWidget(row, 1, contentItemType);
   }
 

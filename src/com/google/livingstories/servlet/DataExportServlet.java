@@ -16,10 +16,10 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.livingstories.server.BaseContentEntity;
-import com.google.livingstories.server.JSONSerializable;
-import com.google.livingstories.server.LivingStoryEntity;
-import com.google.livingstories.server.ThemeEntity;
+import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
+import com.google.livingstories.server.dataservices.entities.JSONSerializable;
+import com.google.livingstories.server.dataservices.entities.LivingStoryEntity;
+import com.google.livingstories.server.dataservices.entities.ThemeEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 
 import org.json.JSONArray;
