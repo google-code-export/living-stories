@@ -16,24 +16,9 @@
 
 package com.google.livingstories.client;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.lsp.ContentRenderer;
-import com.google.livingstories.client.lsp.Page;
-import com.google.livingstories.client.lsp.views.PlayerPage;
 import com.google.livingstories.client.util.Constants;
-import com.google.livingstories.client.util.HistoryManager;
-import com.google.livingstories.client.util.LivingStoryControls;
-import com.google.livingstories.client.util.HistoryManager.HistoryPages;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -100,55 +85,6 @@ public class PlayerContentItem extends BaseContentItem {
   
   public String getFullContentToRender() {
     return getContent();
-  }
-  
-  @Override
-  public Widget renderPreview() {
-    DockPanel panel = new DockPanel();
-    panel.setVerticalAlignment(DockPanel.ALIGN_TOP);
-    
-    if (photoContentItem != null) {
-      Image photoWidget = new Image();
-      photoWidget.setUrl(photoContentItem.getPreviewUrl());
-      photoWidget.addStyleName("playerPhoto");
-      panel.add(photoWidget, DockPanel.WEST);
-    }
-
-    Label nameLabel = new Label(getName());
-    nameLabel.addStyleName("primaryLink");
-    DOM.setStyleAttribute(nameLabel.getElement(), "fontWeight", "bold");
-    panel.add(nameLabel, DockPanel.NORTH);
-    
-    // Only show the first chunk of the text description
-    panel.add(new ContentRenderer(getPreviewContentToRender(), false), 
-        DockPanel.CENTER);
-    
-    FocusPanel focusPanel = new FocusPanel(panel);
-    focusPanel.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent e) {
-        // TODO: this isn't great, but it works.
-        // The right way to do this would probably be to store all content items in the
-        // ClientCache and fire a history change event here to load the page, instead
-        // of trying to hack around the history system.
-        Page page = (Page) renderContent(Collections.<Long>emptySet());
-        HistoryManager.newToken(page, HistoryPages.PLAYER, String.valueOf(getId()));
-        LivingStoryControls.goToPage(page);
-      }
-    });
-    focusPanel.setStylePrimaryName("clickableArea");
-    focusPanel.addStyleName("wholeRenderIsLink");
-    
-    return focusPanel;
-  }
-  
-  @Override
-  public Widget renderContent(Set<Long> eventBlockContributorIds) {
-    // For now, we don't attribute contributors to players, though in principle we could
-    // (using them to describe the authorship of the bio.)
-    PlayerPage playerPage = new PlayerPage();
-    playerPage.load(this);
-    return playerPage;
   }
   
   @Override

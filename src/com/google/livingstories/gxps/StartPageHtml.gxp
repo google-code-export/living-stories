@@ -23,7 +23,6 @@
               xmlns:call="http://google.com/2001/gxp/call"
               xmlns:expr="http://google.com/2001/gxp/expressions">
   <gxp:import class="com.google.livingstories.client.FilterSpec"/>
-  <gxp:import class="com.google.livingstories.client.LivingStory"/>
   <gxp:import class="org.json.JSONObject"/>
   
   <gxp:param name="currentUrl" type="String"/>
@@ -32,6 +31,7 @@
   <gxp:param name="logoutUrl" type="String" />
   <gxp:param name="lastVisitTimes" type="JSONObject"/>
   <gxp:param name="defaultStoryView" type="FilterSpec"/>
+  <gxp:param name="logoLocation" type="String"/>
   <gxp:param name="analyticsAccountId" type="String"/>
   
   <gxp:nomsg>
@@ -57,7 +57,7 @@
         <table width="100%">
           <tr>
             <td>
-              <img src="images/livingstories_logo.gif" alt="Living Stories"/>
+              <img expr:src='logoLocation' alt="Living Stories"/>
             </td>
             <td style="vertical-align: top;">
               <div class="loginPane" id="managementLinks"></div>
@@ -65,74 +65,7 @@
           </tr>
         </table>
         
-        <table width="100%" style="padding-top: 10px;">
-          <tr>
-            <td width="60%" style="vertical-align: top; padding-right: 16px;">
-              <div id="storyList"></div>
-            </td>
-            <td style="vertical-align: top;">
-              <div class="sectionHeader">
-                News, made for the Web.
-              </div>
-              <div style="padding: 0 0 5px 5px;">
-                <p>
-                  The Living Stories project is an experiment in presenting news, one designed
-                  specifically for the online environment. The project was developed by Google in
-                  collaboration with two of the country's leading newspapers, The New York Times
-                  and The Washington Post.
-                </p>
-                <p>
-                  <b>All in one place</b><br/>
-                  Complete coverage of an on-going story is gathered together and prioritized on
-                  one URL. You can now quickly navigate between news articles, opinion pieces and
-                  features without long waits for pages to load.
-                </p>
-                <p>
-                  <b>Easy to explore</b><br/>
-                  Each story has an evolving summary of current developments as a well as an
-                  interactive timeline of critical events. Stories can be explored by themes,
-                  significant participants or multimedia.
-                </p>
-                <p>
-                  <b>Smarter reading</b><br/>
-                  Updates to the story are highlighted each time you come back, and older news
-                  is summarized.
-                </p>
-              </div>
-              <div class="sectionHeader">
-                Get started
-              </div>
-              <div style="padding: 0px 0px 5px 5px;">
-                <p>
-                  Just click on one of the headlines to the left to begin reading Living Stories.
-                </p>
-              </div>
-              <div class="sectionHeader">
-                What's behind Living Stories?
-              </div>
-              <div style="padding: 0px 0px 5px 5px;">
-                <p>
-                  Read more about the partnership behind Living Stories <a href="http://googleblog.blogspot.com/2009/12/exploring-new-more-dynamic-way-of.html" style="text-decoration: underline;" target="_blank">here</a>.
-                </p>
-              </div>
-              <div class="sectionHeader">
-                Have a question?
-              </div>
-              <div style="padding-left: 5px;">
-                <p>
-                  Find the answer <a href="http://www.google.com/support/News/bin/answer.py?answer=167087" style="text-decoration: underline;" target="_blank">here</a>.
-                </p>
-                <p>
-                  To learn more about Living Stories, check out the video below.
-                </p>
-                <p>
-                  <object width="380" height="228" type="application/x-shockwave-flash" data="http://www.youtube.com/v/1ZhCY9FF608&amp;hl=en_US&amp;fs=1&amp;rel=0"><param name="movie" value="http://www.youtube.com/v/1ZhCY9FF608&amp;hl=en_US&amp;fs=1&amp;rel=0"/></object>
-                </p>
-              </div>
-            </td>
-          </tr>
-        </table>
-        <call:Footer/>
+        <div style="width: 60%;" id="storyList"></div>
       </body>
     </html>
   </gxp:nomsg>

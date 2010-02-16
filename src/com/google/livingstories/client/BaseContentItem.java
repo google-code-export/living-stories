@@ -16,9 +16,7 @@
 
 package com.google.livingstories.client;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.lsp.BylineWidget;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.util.GlobalUtil;
 
@@ -234,45 +232,11 @@ public abstract class BaseContentItem implements Serializable {
   }
   
   public Widget renderTiny() {
-    return renderPreview();
+    return new ContentRenderer(content, false);
   }
   
   /**
-   * Give a preview of the content in a Widget.
-   * The default implementation displays nearly the same thing as the main renderer (the byline,
-   * if any, will generally be skipped.)
-   */
-  public Widget renderPreview() {
-    return renderContent(null);
-  }
-
-  /**
-   * Display the entire contents of the content in a Widget.
-   * As a default implementation, just render the content field with a ContentRenderer, put the
-   * result in a VerticalPanel, and add a BylineWidget at the end if appropriate.
-   * Subclasses should override this method to display content differently.
-   * @param containingContributorIds The contributors to the containing block, if any.
-   */
-  public Widget renderContent(Set<Long> containingContributorIds) {
-    return renderContentImpl(containingContributorIds, getContent());
-  }
-  
-  protected Widget renderContentImpl(Set<Long> containingContributorIds, String content) {
-    ContentRenderer contentRenderer = new ContentRenderer(content, false);
-
-    Widget byline = BylineWidget.makeContextSensitive(this, containingContributorIds);
-    if (byline == null) {
-      return contentRenderer;
-    } else {
-      FlowPanel panel = new FlowPanel();
-      panel.add(contentRenderer);
-      panel.add(byline);
-      return panel;
-    }
-  }
-
-  /**
-   * The string to use when introducing a byline for this content.
+   * The string to use when introducing a byline for this atom.
    * @return the string to use
    */
   public String getBylineLeadin() {

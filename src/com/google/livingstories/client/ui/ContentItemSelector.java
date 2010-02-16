@@ -145,7 +145,7 @@ public class ContentItemSelector extends PopupPanel {
   }
   
   private Widget createCart() {
-    cart = ContentItemList.createWithHandler(true, new ContentItemClickHandler() {
+    cart = ContentItemList.createClickable(new ContentItemClickHandler() {
       public void onClick(BaseContentItem contentItem) {
         cart.removeContentItem(contentItem.getId());
         submitButton.setEnabled(cart.getContentItemCount() != 0);

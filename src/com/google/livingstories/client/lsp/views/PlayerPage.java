@@ -66,6 +66,11 @@ public class PlayerPage extends Page {
     initWidget(uiBinder.createAndBindUi(this));
   }
   
+  public PlayerPage(PlayerContentItem player) {
+    this();
+    load(player);
+  }
+  
   public void load(PlayerContentItem player) {
     this.player = player;
     

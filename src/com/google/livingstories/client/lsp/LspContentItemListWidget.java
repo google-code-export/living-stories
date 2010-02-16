@@ -25,11 +25,11 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.livingstories.client.AssetContentItem;
+import com.google.livingstories.client.AssetType;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.DisplayContentItemBundle;
-import com.google.livingstories.client.contentitemlist.ContentItemClickHandler;
 import com.google.livingstories.client.contentitemlist.ContentItemList;
-import com.google.livingstories.client.ui.Slideshow;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.LivingStoryControls;
 
@@ -59,7 +59,6 @@ public class LspContentItemListWidget extends Composite {
   private Label moreLink;
   private Image loadingImage;
   private Label problemLabel;
-  private ImageClickHandler imageClickHandler = new ImageClickHandler();
   
   private static String VIEW_MORE = LspMessageHolder.consts.viewMore();
   private static String PROBLEM_TEXT = LspMessageHolder.consts.viewMoreProblem();
@@ -70,7 +69,7 @@ public class LspContentItemListWidget extends Composite {
     panel = new VerticalPanel();
     panel.addStyleName("contentItemList");
     
-    contentItemList = createContentItemList();
+    contentItemList = ContentItemList.create();
 
     moreLink = new Label(VIEW_MORE);
     moreLink.setStylePrimaryName("primaryLink");
@@ -96,10 +95,6 @@ public class LspContentItemListWidget extends Composite {
     initWidget(panel);
   }
   
-  protected ContentItemList createContentItemList() {
-    return ContentItemList.create(false);
-  }
-  
   protected void addMoreLinkHandler(HasClickHandlers moreLink) {
     moreLink.addClickHandler(new ClickHandler() {
       @Override
@@ -113,33 +108,7 @@ public class LspContentItemListWidget extends Composite {
     contentItemList.clear();
     this.idToContentItemMap = new HashMap<Long, BaseContentItem>();
   }
-  
-  public void setIsImageList(boolean isImageList) {
-    contentItemList.setContentItemClickHandler(isImageList ? imageClickHandler : null);
-  }
-  
-  private class ImageClickHandler implements ContentItemClickHandler {
-    @Override
-    public void onClick(BaseContentItem clickedContentItem) {
-      int clickedIndex = -1, i = 0;
-      List<BaseContentItem> imagesAsBase = contentItemList.getContentItemList();
-      List<AssetContentItem> images = new ArrayList<AssetContentItem>(imagesAsBase.size());
-      for (BaseContentItem contentItem : imagesAsBase) {
-        if (!GlobalUtil.isContentEmpty(contentItem.getContent())) {
-          images.add((AssetContentItem) contentItem);
-          if (contentItem.equals(clickedContentItem)) {
-            clickedIndex = i;
-          }
-          i++;
-        }
-      }
-      
-      if (clickedIndex != -1) {
-        new Slideshow(images).show(clickedIndex);
-      }
-    }
-  }
-  
+    
   public void beginLoading() {
     moreLink.setVisible(false);
     loadingImage.setVisible(true);
@@ -162,6 +131,24 @@ public class LspContentItemListWidget extends Composite {
       idToContentItemMap.put(contentItem.getId(), contentItem);
     }
 
+    // Get all the image atoms in the core atoms list.  If it has a full view,
+    // Then add it to the 'slideshowImages' list and set that list as the related
+    // assets list on each of its members.  This allows us to pop up to slideshow
+    // view for images in the atom stream.
+    List<AssetContentItem> slideshowImages = new ArrayList<AssetContentItem>();
+    for (BaseContentItem coreContentItem : coreContentItems) {
+      if (coreContentItem.getContentItemType() == ContentItemType.ASSET) {
+        AssetContentItem asset = (AssetContentItem) coreContentItem;
+        if (asset.getAssetType() == AssetType.IMAGE
+            && !GlobalUtil.isContentEmpty(asset.getContent())) {
+          slideshowImages.add(asset);
+        }
+      }
+    }
+    for (AssetContentItem image : slideshowImages) {
+      image.setRelatedAssets(slideshowImages);
+    }
+    
     contentItemList.adjustTimeOrdering(bundle.getAdjustedFilterSpec().oldestFirst);
 
     contentItemList.appendContentItems(coreContentItems, idToContentItemMap);

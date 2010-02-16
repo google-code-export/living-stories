@@ -40,10 +40,8 @@ import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
-import com.google.livingstories.client.ui.EnumDropdown;
 import com.google.livingstories.client.ui.RichTextEditor;
 import com.google.livingstories.client.util.LivingStoryData;
 
@@ -64,7 +62,6 @@ public class LivingStoryManager extends ManagerPane {
   @UiField Label livingStoryIdLabel;
   @UiField TextBox urlTextBox;
   @UiField TextBox titleTextBox;
-  @UiField EnumDropdown<Publisher> publisherSelector;
   @UiField RichTextEditor summaryEditor;
   @UiField Label publishStateLabel;
   @UiField Button updatePreviewButton;
@@ -213,14 +210,10 @@ public class LivingStoryManager extends ManagerPane {
 
     updatePreview(null);
     livingStoryService.saveLivingStory(Long.valueOf(livingStorySelector.getSelectedItemValue()),
-        urlTextBox.getText(), titleTextBox.getText(), publisherSelector.getSelectedConstant(), 
-        publishState, summaryEditor.getContent(), callback);
+        urlTextBox.getText(), titleTextBox.getText(), publishState, summaryEditor.getContent(), 
+        callback);
   }
 
-  @UiFactory EnumDropdown<Publisher> createPublisherDropdown() {
-    return EnumDropdown.newInstance(Publisher.class);
-  }
-  
   @UiFactory CoordinatedLivingStorySelector createLivingStoryList() {
     return new CoordinatedLivingStorySelector(livingStoryService);
   }
@@ -251,8 +244,6 @@ public class LivingStoryManager extends ManagerPane {
     livingStoryIdLabel.setText(Long.toString(story.getId()));
     urlTextBox.setText(story.getUrl());
     titleTextBox.setText(story.getTitle());
-    Publisher publisher = story.getPublisher();
-    publisherSelector.selectConstant(publisher == null ? Publisher.NYT : publisher);
     summaryEditor.setContent(story.getSummary());
     publishStateLabel.setText(story.getPublishState().toString());
     statusMessage.setText("");

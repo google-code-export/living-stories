@@ -108,7 +108,7 @@ public class BaseContentEntity
   private Set<Long> linkedContentEntityIds;
   
   @Persistent
-  private Set<Long> angleIds;
+  private Set<Long> themeIds;
   
   @Persistent
   @Embedded
@@ -367,16 +367,16 @@ public class BaseContentEntity
   }
 
   public Set<Long> getThemeIds() {
-    return GlobalUtil.copySet(angleIds);
+    return GlobalUtil.copySet(themeIds);
   }
   
   public void setThemeIds(Set<Long> themeIds) {
-    this.angleIds = GlobalUtil.copySet(themeIds);
+    this.themeIds = GlobalUtil.copySet(themeIds);
   }
   
   public void removeThemeId(long themeId) {
-    if (angleIds != null) {
-      angleIds.remove(themeId);
+    if (themeIds != null) {
+      themeIds.remove(themeId);
     }
   }
   
@@ -644,7 +644,7 @@ public class BaseContentEntity
   public BaseContentItem toClientObject() {
     BaseContentItem ret = toClientObjectImpl();
     ret.setPublishState(publishState);
-    ret.setThemeIds(angleIds);
+    ret.setThemeIds(themeIds);
     ret.setLinkedContentItemIds(linkedContentEntityIds);
     ret.setLocation(location.toClientObject());
     ret.setTimeElapsedSinceLastUpdate(TimeUtil.getElapsedTimeString(this.timestamp));

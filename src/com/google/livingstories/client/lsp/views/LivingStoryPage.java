@@ -30,7 +30,6 @@ import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.ContentRpcServiceAsync;
-import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.lsp.ContentItemPopupWidget;
 import com.google.livingstories.client.lsp.SourcePopupWidget;
 import com.google.livingstories.client.lsp.views.contentitems.PopupViewFactory;
@@ -65,7 +64,10 @@ public class LivingStoryPage extends Composite {
   public LivingStoryPage() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    logo.setUrl(Publisher.fromString(LivingStoryData.getLivingStoryPublisher()).getLogoPath());
+    String logoLocation = LivingStoryData.getLogoLocation();
+    if (logoLocation != null) {
+      logo.setUrl(logoLocation);
+    }
     
     exportMethods();
   }

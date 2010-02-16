@@ -24,6 +24,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
@@ -41,6 +42,7 @@ public class DocumentAssetPreview extends Composite {
 
   private static final String DOCUMENT_ICON = "/images/document_icon.gif";
 
+  @UiField Label header;
   @UiField SimplePanel iconPanel;
   @UiField HTML content;
   
@@ -57,6 +59,11 @@ public class DocumentAssetPreview extends Composite {
     if (contentItem.getRenderAsSeen()) {
       addStyleName(Resources.INSTANCE.css().read());
     }
+  }
+  
+  public DocumentAssetPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
   
   @UiHandler("content")

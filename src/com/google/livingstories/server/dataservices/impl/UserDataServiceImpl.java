@@ -19,8 +19,6 @@ package com.google.livingstories.server.dataservices.impl;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.livingstories.client.FilterSpec;
-import com.google.livingstories.client.Publisher;
-import com.google.livingstories.server.AdminUserEntity;
 import com.google.livingstories.server.UserEntity;
 import com.google.livingstories.server.UserLivingStoryEntity;
 import com.google.livingstories.server.dataservices.UserDataService;
@@ -174,27 +172,6 @@ public class UserDataServiceImpl implements UserDataService {
       List<UserLivingStoryEntity> userEntities =
           (List<UserLivingStoryEntity>) query.execute(livingStoryId);
       pm.deletePersistentAll(userEntities);
-    } finally {
-      query.closeAll();
-      pm.close();
-    }
-  }
-  
-  @Override
-  public synchronized Publisher getPublisherForAdminUser(String adminUserId) {
-    PersistenceManager pm = PMF.get().getPersistenceManager();
-    Query query = pm.newQuery(AdminUserEntity.class);
-    query.setFilter("email == emailParam");
-    query.declareParameters("String emailParam");
-
-    try {
-      @SuppressWarnings("unchecked")
-      List<AdminUserEntity> results = (List<AdminUserEntity>) query.execute(adminUserId);
-      if (results.isEmpty()) {
-        return null;
-      } else {
-        return results.get(0).getPublisher();
-      }
     } finally {
       query.closeAll();
       pm.close();

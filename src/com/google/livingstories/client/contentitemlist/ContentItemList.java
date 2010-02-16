@@ -20,9 +20,9 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.lsp.LspMessageHolder;
+import com.google.livingstories.client.lsp.views.contentitems.StreamViewFactory;
 import com.google.livingstories.client.ui.WindowScroll;
 import com.google.livingstories.client.util.LivingStoryControls;
 
@@ -43,8 +43,8 @@ import java.util.Map.Entry;
  * day and time.
  */
 public class ContentItemList extends Composite {
-  private Map<BaseContentItem, ContentItemListRow> currentContentItemToRowMap;
-  private Set<Long> contentItemIdsInPanel;
+  private Map<BaseContentItem, ContentItemListElement> currentContentItemToElementMap;
+  private Set<Long> atomIdsInPanel;
   private Map<Long, BaseContentItem> idToContentItemMap;
   
   private Label statusLabel;
@@ -52,26 +52,19 @@ public class ContentItemList extends Composite {
   
   private static final String NO_ITEMS_TEXT = LspMessageHolder.consts.contentItemListNoItemsText();
   
-  private boolean includeName;
-  private ContentItemClickHandler handler;
-  private boolean noHistoryOnToggle;
-  
+  private ContentItemClickHandler clickHandler;
   private boolean chronological = false;
   
-  private ContentItemList(boolean includeName, ContentItemClickHandler handler,
-      boolean noHistoryOnToggle) {
+  private ContentItemList(ContentItemClickHandler handler) {
     super();
-    this.includeName = includeName;
-    this.handler = handler;
-    this.noHistoryOnToggle = noHistoryOnToggle;
-    contentItemIdsInPanel = new HashSet<Long>();
-    currentContentItemToRowMap = new TreeMap<BaseContentItem, ContentItemListRow>(
-        new Comparator<BaseContentItem>() {
-          public int compare(BaseContentItem a1, BaseContentItem a2) {
-            int ret = a1.getDateSortKey().compareTo(a2.getDateSortKey());
-            return ret == 0 ? ((int) Math.signum(a1.getId() - a2.getId())) : ret;
-          }
-        });
+    this.clickHandler = handler;
+    atomIdsInPanel = new HashSet<Long>();
+    currentContentItemToElementMap = new TreeMap<BaseContentItem, ContentItemListElement>(new Comparator<BaseContentItem>() {
+      public int compare(BaseContentItem a1, BaseContentItem a2) {
+        int ret = a1.getDateSortKey().compareTo(a2.getDateSortKey());
+        return ret == 0 ? ((int) Math.signum(a1.getId() - a2.getId())) : ret;
+      }
+    });
     statusLabel = new Label("");
     statusLabel.setStylePrimaryName("greyFont");
     
@@ -86,28 +79,14 @@ public class ContentItemList extends Composite {
     initWidget(container);
   }
   
-  public static ContentItemList create(boolean includeName) {
-    return new ContentItemList(includeName, null, false);
+  public static ContentItemList create() {
+    return new ContentItemList(null);
   }
   
-  public static ContentItemList createWithHandler(
-      boolean includeName, ContentItemClickHandler handler) {
-    return new ContentItemList(includeName, handler, false);
+  public static ContentItemList createClickable(ContentItemClickHandler handler) {
+    return new ContentItemList(handler);
   }
   
-  public static ContentItemList createNoHistoryOnToggle(boolean includeName) {
-    return new ContentItemList(includeName, null, true);
-  }
-  
-  /**
-   * Sets the content item click handler object, separately from the construction-time handler.
-   * Should only be called on an list that is presently empty
-   */
-  public void setContentItemClickHandler(ContentItemClickHandler handler) {
-    assert currentContentItemToRowMap.isEmpty();
-    this.handler = handler;
-  }
-
   /**
    * @param contentItems content items that this list was created to display
    * @param idToContentItemMap Map from content items ids to the content items. It should include
@@ -134,7 +113,7 @@ public class ContentItemList extends Composite {
       addContentItem(contentItem);
     }
 
-    if (currentContentItemToRowMap.isEmpty()) {
+    if (currentContentItemToElementMap.isEmpty()) {
       statusLabel.setText(NO_ITEMS_TEXT);
     } else {
       statusLabel.setText("");
@@ -150,16 +129,16 @@ public class ContentItemList extends Composite {
     ContentItemListElement previousElement = null;
         
     int insertionPosition = 0;
-    for (BaseContentItem contentItem : getContentItemList()) {
-      ContentItemListRow row = currentContentItemToRowMap.get(contentItem);
-      if (!contentItemIdsInPanel.contains(contentItem.getId())) {
+    for (BaseContentItem atom : getContentItemList()) {
+      ContentItemListElement element = currentContentItemToElementMap.get(atom);
+      if (!atomIdsInPanel.contains(atom.getId())) {
         // the appropriate widget is not in the contentPanel. Add it!
-        contentPanel.insert(row.elementWidget, insertionPosition);
-        contentItemIdsInPanel.add(contentItem.getId());
+        contentPanel.insert(element, insertionPosition);
+        atomIdsInPanel.add(atom.getId());
       }
       
-      setTimeVisibility(row.contentItemListElement, previousElement);
-      previousElement = row.contentItemListElement;
+      setTimeVisibility(element, previousElement);
+      previousElement = element;
       insertionPosition++;
     }
   }
@@ -168,40 +147,41 @@ public class ContentItemList extends Composite {
    * Adds a new content item to currentContentItemToRowMap, if it's not already there.
    * Doesn't alter contentItemIdsInPanel.
    */
-  public void addContentItem(BaseContentItem contentItem) {
-    if (!currentContentItemToRowMap.containsKey(contentItem)) {
-      ContentItemListElement element = ContentItemListElementFactory.createContentItemListElement(
-          contentItem, idToContentItemMap, handler, noHistoryOnToggle);
-      currentContentItemToRowMap.put(contentItem, new ContentItemListRow(
-          element, element.render(includeName)));
+  public void addContentItem(BaseContentItem atom) {
+    if (!currentContentItemToElementMap.containsKey(atom)) {
+      ContentItemListElement element = StreamViewFactory.createView(atom, idToContentItemMap);
+      if (clickHandler != null) {
+        element = new ClickableContentItemListElement(element, clickHandler);
+      }
+      currentContentItemToElementMap.put(atom, element);
     }
   }
   
   /**
    * Removes a content item from the list if it is currently present.
    */
-  public void removeContentItem(Long contentItemId) {
-    for (Entry<BaseContentItem, ContentItemListRow> entry : currentContentItemToRowMap.entrySet()) {
-      if (entry.getKey().getId() == contentItemId) {
-        contentPanel.remove(entry.getValue().elementWidget);
-        currentContentItemToRowMap.remove(entry.getKey());
-        contentItemIdsInPanel.remove(entry.getKey().getId());
+  public void removeContentItem(Long atomId) {
+    for (Entry<BaseContentItem, ContentItemListElement> entry : currentContentItemToElementMap.entrySet()) {
+      if (entry.getKey().getId() == atomId) {
+        contentPanel.remove(entry.getValue());
+        currentContentItemToElementMap.remove(entry.getKey());
+        atomIdsInPanel.remove(entry.getKey().getId());
         break;
       }
     }
   }
   
   public Set<BaseContentItem> getContentItemSet() {
-    return currentContentItemToRowMap.keySet();
+    return currentContentItemToElementMap.keySet();
   }
   
   public int getContentItemCount() {
-    return currentContentItemToRowMap.size();
+    return currentContentItemToElementMap.size();
   }
   
   public List<BaseContentItem> getContentItemList() {
     // This would be simpler if GWT emulated TreeMap.descendingKeySet().
-    List<BaseContentItem> ret = new ArrayList<BaseContentItem>(currentContentItemToRowMap.keySet());
+    List<BaseContentItem> ret = new ArrayList<BaseContentItem>(currentContentItemToElementMap.keySet());
     if (!chronological) {
       Collections.reverse(ret);
     }
@@ -210,8 +190,8 @@ public class ContentItemList extends Composite {
   
   public void clear() {
     contentPanel.clear();
-    currentContentItemToRowMap.clear();
-    contentItemIdsInPanel.clear();
+    currentContentItemToElementMap.clear();
+    atomIdsInPanel.clear();
   }
   
   public void adjustTimeOrdering(boolean chronological) {
@@ -220,11 +200,11 @@ public class ContentItemList extends Composite {
     }
     this.chronological = chronological;
     contentPanel.clear();
-    for (ContentItemListRow row : currentContentItemToRowMap.values()) {
+    for (ContentItemListElement row : currentContentItemToElementMap.values()) {
       if (chronological) {
-        contentPanel.add(row.elementWidget);
+        contentPanel.add(row);
       } else {
-        contentPanel.insert(row.elementWidget, 0);
+        contentPanel.insert(row, 0);
       }
     }
   }
@@ -248,16 +228,16 @@ public class ContentItemList extends Composite {
      *   due to contractions elsewhere in the list, we save the relevant ContentItemListRow in the
      *   loop, but actually act on this knowledge only after the loop is done. */
     int countFound = 0;
-    ContentItemListRow singleRowToScrollTo = null;
+    ContentItemListElement singleRowToScrollTo = null;
 
-    for (Entry<BaseContentItem, ContentItemListRow> entry : currentContentItemToRowMap.entrySet()) {
-      ContentItemListRow row = entry.getValue();
-      ContentItemListElement listElement = row.contentItemListElement;
+    for (Entry<BaseContentItem, ContentItemListElement> entry
+        : currentContentItemToElementMap.entrySet()) {
+      ContentItemListElement listElement = entry.getValue();
 
       if (contentItemIds.contains(entry.getKey().getId())) {
         listElement.setExpansion(true);
         if (contentItemIds.size() == 1) {
-          singleRowToScrollTo = row;
+          singleRowToScrollTo = listElement;
         }
         countFound++;
       } else {
@@ -266,7 +246,7 @@ public class ContentItemList extends Composite {
     }
     
     if (singleRowToScrollTo != null) {
-      WindowScroll.scrollTo(singleRowToScrollTo.elementWidget.getAbsoluteTop(),
+      WindowScroll.scrollTo(singleRowToScrollTo.getAbsoluteTop(),
           new Command() {
             @Override
             public void execute() {
@@ -286,16 +266,6 @@ public class ContentItemList extends Composite {
       currentElement.setTimeVisible(true);
     } else {
       currentElement.setTimeVisible(false);
-    }
-  }
-  
-  private class ContentItemListRow {
-    public ContentItemListElement contentItemListElement;
-    public Widget elementWidget;
-    
-    public ContentItemListRow(ContentItemListElement contentItemListElement, Widget elementWidget) {
-      this.contentItemListElement = contentItemListElement;
-      this.elementWidget = elementWidget;
     }
   }
 }

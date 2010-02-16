@@ -79,10 +79,6 @@ public class EventContentItem extends BaseContentItem {
     return new HTML(update);
   }
 
-  // superclass renderContent() implementation is fine here. As presently structured, the code
-  // will generally call it with a null containingContributorIds argument and explicitly take
-  // care of bylining appropriately elsewhere.
-  
   /**
    * Returns the date to use when sorting events by date, or filtering based on date
    */

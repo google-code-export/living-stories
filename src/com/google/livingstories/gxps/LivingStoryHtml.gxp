@@ -41,6 +41,7 @@
   <gxp:param name="friendConnectSiteId" type="String"/>
   <gxp:param name="mapsKey" type="String"/>
   <gxp:param name="analyticsAccountId" type="String"/>
+  <gxp:param name="logoLocation" type="String" />
   <gxp:param name="otherStories" type="List{LivingStory}"/>
   
   <html>
@@ -62,7 +63,6 @@
           ID: <gxp:eval expr='livingStory.getId()'/>,
           TITLE: <gxp:eval expr='livingStory.getTitle()'/>,
           STORY_URL: <gxp:eval expr='livingStory.getUrl()'/>,
-          PUBLISHER: <gxp:eval expr='livingStory.getPublisher().toString()'/>,
           SUMMARY: <gxp:eval expr='SummaryDiffUtil.getDiffedSummary(livingStory, lastVisitDate)'/>,
           LAST_VISIT_DATE: <gxp:eval expr='lastVisitDate == null ? null : lastVisitDate.toString()'/>,
           SUBSCRIPTION_STATUS: <gxp:eval expr='subscriptionStatus'/>,
@@ -73,6 +73,7 @@
           LOGOUT_URL: <gxp:eval expr='logoutUrl'/>,
           FRIEND_CONNECT_SITE_ID: <gxp:eval expr='friendConnectSiteId'/>,
           MAPS_KEY: <gxp:eval expr='mapsKey'/>,
+          LOGO_LOCATION: <gxp:eval expr='logoLocation'/>
         };
       </script>
 
@@ -95,7 +96,7 @@
             <tr>
               <td id="readOtherStories" style="color: #777; vertical-align: top;"/>
               <!--  content of the above td is set client-side, equivalent to:
-                Read other Living Stories by <gxp:eval expr='livingStory.getPublisher().toString()'/>:
+                Read other Living Stories:
               -->
               <td style="text-align: left; vertical-align: top;">
                 <gxp:abbr name='itr' type='LivingStoryIterator'
@@ -115,9 +116,6 @@
             </tr>
           </table>
         </div>
-
-        <!-- Footer -->
-        <call:Footer/>
       </div>
     </body>
   </html>

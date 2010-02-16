@@ -33,15 +33,6 @@ public interface LspMessages extends com.google.gwt.i18n.client.Messages {
   String dateRange(String arg0,  String arg1);
 
   /**
-   * Translated "Read other Living Stories by {0}".
-   * 
-   * @return translated "Read other Living Stories by {0}"
-   */
-  @DefaultMessage("Read other Living Stories by {0}")
-  @Key("otherStoriesText")
-  String otherStoriesText(String arg0);
-
-  /**
    * Translated "RSS Feed for {0}".
    * 
    * @return translated "RSS Feed for {0}"

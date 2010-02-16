@@ -18,7 +18,6 @@ package com.google.livingstories.server.rpcimpl;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.livingstories.client.FilterSpec;
-import com.google.livingstories.client.Publisher;
 import com.google.livingstories.client.UserRpcService;
 import com.google.livingstories.server.dataservices.UserDataService;
 import com.google.livingstories.server.dataservices.UserLoginService;
@@ -86,13 +85,5 @@ public class UserRpcImpl extends RemoteServiceServlet implements UserRpcService 
   @Override
   public void setDefaultStoryView(FilterSpec defaultStoryView) {
     userDataService.setDefaultStoryView(getLoggedInUserId(), defaultStoryView);
-  }
-  
-  public Publisher getPublisherForAdminUser() {
-    if (userLoginService.isAdmin()) {
-      return userDataService.getPublisherForAdminUser(getLoggedInUserId());
-    } else {
-      return null;
-    }
   }
 }

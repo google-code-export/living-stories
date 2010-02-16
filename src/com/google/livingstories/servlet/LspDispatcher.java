@@ -116,8 +116,8 @@ public class LspDispatcher extends HttpServlet {
         keyChain.getFriendConnectSiteId(req.getServerName()),
         keyChain.getMapsKey(),
         keyChain.getAnalyticsAccountId(),
-        livingStoryDataService.retrieveByPublisher(livingStory.getPublisher(),
-            PublishState.PUBLISHED, true));
+        keyChain.getLogoFileLocation(),
+        livingStoryDataService.retrieveAll(PublishState.PUBLISHED, true));
     
     // After the page has been created, update the stored value for the time the user
     // last visited the page to the current value

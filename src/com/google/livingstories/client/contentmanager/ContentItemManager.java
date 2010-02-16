@@ -82,8 +82,8 @@ import com.google.livingstories.client.QuoteContentItem;
 import com.google.livingstories.client.ReactionContentItem;
 import com.google.livingstories.client.StoryPlayerContentItem;
 import com.google.livingstories.client.Theme;
-import com.google.livingstories.client.contentitemlist.ContentItemListElement;
-import com.google.livingstories.client.contentitemlist.ContentItemListElementFactory;
+import com.google.livingstories.client.lsp.views.contentitems.BasePlayerPreview;
+import com.google.livingstories.client.lsp.views.contentitems.StreamViewFactory;
 import com.google.livingstories.client.ui.ContentItemListBox;
 import com.google.livingstories.client.ui.CoordinatedLivingStorySelector;
 import com.google.livingstories.client.ui.EnumDropdown;
@@ -944,7 +944,7 @@ public class ContentItemManager extends ManagerPane {
     boolean isParentNull = parentPlayer == null;
     parentPlayerDisplayPanel.clear();
     if (!isParentNull) {
-      parentPlayerDisplayPanel.add(parentPlayer.renderPreview());
+      parentPlayerDisplayPanel.add(new BasePlayerPreview(parentPlayer));
     }
     parentPlayerDisplayPanel.setVisible(!isParentNull);
     changeParentLink.setVisible(!isParentNull);
@@ -1846,10 +1846,8 @@ public class ContentItemManager extends ManagerPane {
     if (contentItem.getDisplayString().equals("New Content Item")) {
       previewPanel.clear();
     } else {
-      ContentItemListElement contentItemListElement =
-          ContentItemListElementFactory.createContentItemListElement(
-              contentItem, contentItemListBox.getLoadedContentItemsMap(), null, true);
-      previewPanel.setWidget(contentItemListElement.render(false));
+      previewPanel.setWidget(StreamViewFactory.createView(contentItem,
+          contentItemListBox.getLoadedContentItemsMap()));
     }
   }
   

@@ -29,12 +29,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.lsp.ContentRenderer;
 import com.google.livingstories.client.lsp.Page;
+import com.google.livingstories.client.lsp.views.PlayerPage;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.HistoryManager;
 import com.google.livingstories.client.util.LivingStoryControls;
 import com.google.livingstories.client.util.HistoryManager.HistoryPages;
-
-import java.util.Collections;
 
 /**
  * Basic preview implementation for a player contentItem.
@@ -53,6 +52,7 @@ public class BasePlayerPreview extends Composite {
   interface BasePlayerPreviewUiBinder extends UiBinder<Widget, BasePlayerPreview> {
   }
 
+  @UiField Label header;
   @UiField SimplePanel image;
   @UiField Label name;
   @UiField SimplePanel description;
@@ -79,13 +79,18 @@ public class BasePlayerPreview extends Composite {
   protected void bind() {
     initWidget(uiBinder.createAndBindUi(this));
   }
+
+  public BasePlayerPreview hideHeader() {
+    header.setVisible(false);
+    return this;
+  }
   
   @UiHandler("name") void goToPlayerPage(ClickEvent e) {
     // TODO: this isn't great, but it works.
     // The right way to do this would probably be to store all content items in the
     // ClientCache and fire a history change event here to load the page, instead
     // of trying to hack around the history system.
-    Page page = (Page) contentItem.renderContent(Collections.<Long>emptySet());
+    Page page = new PlayerPage(contentItem);
     HistoryManager.newToken(page, HistoryPages.PLAYER, String.valueOf(contentItem.getId()));
     LivingStoryControls.goToPage(page);
   }

@@ -18,6 +18,8 @@ package com.google.livingstories.client.lsp.views.contentitems;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
@@ -38,6 +40,9 @@ public class VideoAssetPreview extends ImageAssetPreview {
   private static final int PLAY_HEIGHT = 22;
   private static final int MAX_PREVIEW_WIDTH = 200;
 
+  @SuppressWarnings("hiding")
+  @UiField Label header;
+  
   public VideoAssetPreview(AssetContentItem contentItem) {
     super(contentItem);
   }
@@ -45,6 +50,12 @@ public class VideoAssetPreview extends ImageAssetPreview {
   @Override
   protected void bind() {
     initWidget(uiBinder.createAndBindUi(this));    
+  }
+  
+  @Override
+  public VideoAssetPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
   
   @Override

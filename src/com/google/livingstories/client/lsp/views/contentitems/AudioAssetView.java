@@ -22,6 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
@@ -39,6 +40,7 @@ public class AudioAssetView extends Composite {
 
   private static final String AUDIO_ICON = "/images/audio_icon.gif";
 
+  @UiField Label header;
   @UiField SimplePanel iconPanel;
   @UiField HTML content;
   @UiField HTML caption;
@@ -51,5 +53,10 @@ public class AudioAssetView extends Composite {
     if (!GlobalUtil.isContentEmpty(captionText)) {
       caption.setHTML(captionText);
     }
+  }
+  
+  public AudioAssetView hideHeader() {
+    header.setVisible(false);
+    return this;
   }
 }

@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.lsp.views.Resources;
@@ -43,6 +44,7 @@ public class SlideshowPreview extends Composite {
   interface SlideshowPreviewUiBinder extends UiBinder<Widget, SlideshowPreview> {
   }
 
+  @UiField Label header;
   @UiField FocusPanel previewImage;
   
   private AssetContentItem contentItem;
@@ -58,6 +60,11 @@ public class SlideshowPreview extends Composite {
         IconPlacement.LOWER_RIGHT);
     imagePanel.addStyleName(Resources.INSTANCE.css().clickable());
     previewImage.add(imagePanel);
+  }
+  
+  public SlideshowPreview hideHeader() {
+    header.setVisible(false);
+    return this;
   }
   
   @UiHandler("previewImage")
