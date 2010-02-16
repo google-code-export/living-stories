@@ -21,8 +21,8 @@ import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.server.BaseContentEntity;
 import com.google.livingstories.server.dataservices.ContentDataService;
+import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;

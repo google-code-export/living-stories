@@ -24,7 +24,7 @@ import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BackgroundContentItem;
 import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PlayerType;
-import com.google.livingstories.server.BaseContentEntity;
+import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
 
 import java.util.Iterator;
 import java.util.List;
