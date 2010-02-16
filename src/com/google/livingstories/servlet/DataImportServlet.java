@@ -23,11 +23,11 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import com.google.appengine.repackaged.com.google.common.collect.Maps;
 import com.google.appengine.repackaged.com.google.common.collect.Sets;
 import com.google.livingstories.client.ContentItemType;
-import com.google.livingstories.server.BaseContentEntity;
-import com.google.livingstories.server.HasSerializableLivingStoryId;
-import com.google.livingstories.server.JSONSerializable;
-import com.google.livingstories.server.LivingStoryEntity;
-import com.google.livingstories.server.ThemeEntity;
+import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
+import com.google.livingstories.server.dataservices.entities.HasSerializableLivingStoryId;
+import com.google.livingstories.server.dataservices.entities.JSONSerializable;
+import com.google.livingstories.server.dataservices.entities.LivingStoryEntity;
+import com.google.livingstories.server.dataservices.entities.ThemeEntity;
 import com.google.livingstories.server.dataservices.impl.PMF;
 import com.google.livingstories.server.rpcimpl.Caches;
 
