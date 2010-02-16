@@ -18,8 +18,6 @@ package com.google.livingstories.client.lsp.views.contentitems;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 
@@ -32,9 +30,6 @@ public class GraphicAssetPreview extends ImageAssetPreview {
   interface GraphicAssetPreviewUiBinder extends UiBinder<Widget, GraphicAssetPreview> {
   }
 
-  @SuppressWarnings("hiding")
-  @UiField Label header;
-  
   public GraphicAssetPreview(AssetContentItem contentItem) {
     super(contentItem);
   }
@@ -42,11 +37,5 @@ public class GraphicAssetPreview extends ImageAssetPreview {
   @Override
   protected void bind() {
     initWidget(uiBinder.createAndBindUi(this));
-  }
-  
-  @Override
-  public GraphicAssetPreview hideHeader() {
-    header.setVisible(false);
-    return this;
   }
 }
