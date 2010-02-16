@@ -18,8 +18,8 @@ package com.google.livingstories.server.dataservices.impl;
 
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
-import com.google.livingstories.server.LivingStoryEntity;
 import com.google.livingstories.server.dataservices.LivingStoryDataService;
+import com.google.livingstories.server.dataservices.entities.LivingStoryEntity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -65,7 +65,7 @@ public class SingleContentItemSelectionPanel extends Composite {
   }
   
   private Widget createButtonPanel() {
-    Button selectionButton = new Button("Select contentItem");
+    Button selectionButton = new Button("Select item");
     selectionButton.addClickHandler(new ClickHandler() {
       public void onClick(ClickEvent e) {
         contentItemSelector.show(new SingleSelectionHandler() {

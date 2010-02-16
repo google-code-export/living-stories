@@ -19,9 +19,9 @@ package com.google.livingstories.server.dataservices.impl;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.livingstories.client.FilterSpec;
-import com.google.livingstories.server.UserEntity;
-import com.google.livingstories.server.UserLivingStoryEntity;
 import com.google.livingstories.server.dataservices.UserDataService;
+import com.google.livingstories.server.dataservices.entities.UserEntity;
+import com.google.livingstories.server.dataservices.entities.UserLivingStoryEntity;
 
 import java.util.Date;
 import java.util.HashMap;
