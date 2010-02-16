@@ -252,8 +252,6 @@ public class OverviewPage extends Page {
       instance.@com.google.livingstories.client.lsp.views.OverviewPage::highlightEvent(I)
           .call(instance, contentItemId);
     }
-    // for legacy purposes:
-    $wnd.goToAtom = $wnd.goToContentItem;
     $wnd.repositionAnchoredPanel = function(contentItemId) {
       instance.@com.google.livingstories.client.lsp.views.OverviewPage::repositionAnchoredPanel()
           .call(instance);

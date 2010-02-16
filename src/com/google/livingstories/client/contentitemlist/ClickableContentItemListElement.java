@@ -25,7 +25,7 @@ import com.google.livingstories.client.Importance;
 import java.util.Set;
 
 /**
- * Wraps an AtomListElement in a FocusPanel and fires AtomClickedEvents whenever
+ * Wraps an ContentItemListElement in a FocusPanel and fires ContentItemClickedEvents whenever
  * they are clicked.
  */
 public class ClickableContentItemListElement extends ContentItemListElement {

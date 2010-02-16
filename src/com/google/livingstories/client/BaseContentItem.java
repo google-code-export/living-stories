@@ -236,7 +236,7 @@ public abstract class BaseContentItem implements Serializable {
   }
   
   /**
-   * The string to use when introducing a byline for this atom.
+   * The string to use when introducing a byline for this content item.
    * @return the string to use
    */
   public String getBylineLeadin() {
