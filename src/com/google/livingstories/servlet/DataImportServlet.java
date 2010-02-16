@@ -282,14 +282,10 @@ public class DataImportServlet extends HttpServlet {
     private Class<T> entityClass;
     private Map<String, T> entityMap;
     private int startValue = 0;
-    private List<String> possibleClassNames;
     
-    public CreateEntitiesFunction(Class<T> entityClass, Map<String, T> entityMap,
-        String... obsoleteClassNames) {
+    public CreateEntitiesFunction(Class<T> entityClass, Map<String, T> entityMap) {
       this.entityClass = entityClass;
       this.entityMap = entityMap;
-      possibleClassNames = Lists.newLinkedList(obsoleteClassNames);
-      possibleClassNames.add(0, entityClass.getSimpleName());
     }
     
     public Boolean apply(Void ignore) {
@@ -300,18 +296,11 @@ public class DataImportServlet extends HttpServlet {
       }
       
       try {
-        JSONArray json = null;
+        JSONArray json;
         try {
-          for (String className : possibleClassNames) {
-            if (inputData.has(className)) {
-              json = inputData.getJSONArray(className);
-            }
-          }
-          // if the export was for story-specific data, some entity classes won't be mentioned.
-          if (json == null) {
-            return false;
-          }
+          json = inputData.getJSONArray(entityClass.getSimpleName());
         } catch (JSONException allowable) {
+          // if the export was for story-specific data, some entity classes won't be mentioned.
           return false;
         }
         for (int i = startValue; i < json.length(); i++) {
