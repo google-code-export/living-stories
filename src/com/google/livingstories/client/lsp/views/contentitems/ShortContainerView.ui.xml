@@ -19,7 +19,7 @@
   Renders the collapsed view for events and narratives. 
  -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
-  <ui:with field="res" type="com.google.fourthestate.client.lsp.views.Resources" />
+  <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
   <ui:style>
     /* Add CSS here. See the GWT docs on UI Binder for more details */
     .important {
@@ -30,7 +30,7 @@
     }
   </ui:style>
   <g:HTMLPanel ui:field="block" styleName="{style.container}">
-    <div class="{res.css.linkedAtomsPanel}">
+    <div class="{res.css.linkedContentItemsPanel}">
       <g:FlowPanel ui:field="importantImages"/>
       <g:FlowPanel ui:field="importantAssets"/>
     </div>
