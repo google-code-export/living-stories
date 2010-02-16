@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.livingstories.client.BaseAtom;
+import com.google.livingstories.client.lsp.views.atoms.PopupViewFactory;
 import com.google.livingstories.client.ui.AutoHidePopupPanel;
 import com.google.livingstories.client.util.GlobalUtil;
 
@@ -43,7 +44,7 @@ public class SourcePopupWidget extends Composite {
       sourcePanel.add(new HTML(description));
     }
     if (atom != null) {
-      sourcePanel.add(new AtomRenderer(atom, true, false));
+      sourcePanel.add(PopupViewFactory.createView(atom));
     }
     
     popup.setWidget(sourcePanel);
