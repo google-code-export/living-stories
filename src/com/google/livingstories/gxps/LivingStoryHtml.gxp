@@ -79,7 +79,6 @@
 
       <link rel="stylesheet" href="/LivingStoryPage/gwt/standard/standard.css"/>
       <link rel="stylesheet" href="/Timeline.css"/>
-      <link rel="stylesheet" href="/LivingStory.css"/>
       
       <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
       

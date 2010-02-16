@@ -22,7 +22,13 @@
     ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
     ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
     ui:generateLocales="default">
-  <g:FlowPanel>
+  <ui:style>
+    .popup {
+      padding: 3px;
+      margin-left: -4px;
+    }
+  </ui:style>
+  <g:FlowPanel styleName="{style.popup}">
     <g:Label>
       <ui:msg description="Instructions on what to do with the link text">Paste link in email or IM</ui:msg>
     </g:Label>

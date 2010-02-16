@@ -14,8 +14,35 @@
  * limitations under the License.
  */
 
+/** Default font styles used on the page **/
+@def defaultFontFamily arial, sans-serif;
+@def defaultFontSize 13px;
+@def defaultLineHeight 17px;
+
+/** Default background colors **/
+@def primaryBackgroundColor none;
+/** Secondary background color used for things like headers, etc. **/
+@def secondaryBackgroundColor #F2F7F9;
+/** Color used to highlight changes in the summary text **/
+@def highlightColor #FFFFCC;
+
+/** Default border colors for popups and separators **/
+@def defaultBorderColor #CCD5F1;
+/** Border color used for a selected item.  Currently only used by the slideshow widget **/
+@def selectedBorderColor #FF0000;
+
+/** Default link colors **/
 @def primaryLinkColor #2200cc;
+/** Color used for less important links ('Read more', 'Show less', etc.) **/
 @def secondaryLinkColor #7777cc;
+/** Color used for primary links that were previously visited **/
+@def fadedLinkColor #7777cc;
+
+/** Default text colors **/ 
 @def primaryTextColor #000000;
-@def fadedTextColor #333333;
+/** Color used for less important text (page status labels, etc.) **/
 @def secondaryTextColor #777777;
+/** Color used for primary text that were previously visited **/
+@def fadedTextColor #333333;
+/** Color used for error text **/
+@def errorTextColor #FF0000;

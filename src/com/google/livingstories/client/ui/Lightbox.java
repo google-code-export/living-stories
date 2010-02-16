@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -67,7 +68,7 @@ public class Lightbox extends AutoHidePopupPanel {
    */
   public void showItem(String title, Widget item) {
     VerticalPanel canvas = new VerticalPanel();
-    canvas.addStyleName("padding10");
+    DOM.setStyleAttribute(canvas.getElement(), "padding", "10px");
     if (title != null) {
       canvas.add(createHeaderPanel(title));
     }

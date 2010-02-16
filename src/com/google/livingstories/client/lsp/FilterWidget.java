@@ -465,7 +465,6 @@ public class FilterWidget extends Composite {
     public FilterRow(String labelName, ClickHandler handler) {
       super();
       arrow = new HTML("&nbsp;&nbsp;");
-      arrow.addStyleName("bold");
       
       label = new Label(labelName);
       label.setStylePrimaryName("unselectedToolbeltFilter");

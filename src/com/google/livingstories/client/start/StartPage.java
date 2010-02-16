@@ -36,6 +36,7 @@ import com.google.livingstories.client.LivingStoryRpcServiceAsync;
 import com.google.livingstories.client.NarrativeContentItem;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.lsp.views.ManagementLinks;
+import com.google.livingstories.client.lsp.views.Resources;
 import com.google.livingstories.client.util.DateUtil;
 import com.google.livingstories.client.util.GlobalUtil;
 import com.google.livingstories.client.util.HistoryManager;
@@ -63,6 +64,11 @@ public class StartPage implements EntryPoint {
   
   @Override
   public void onModuleLoad() {
+    // Inject the contents of the CSS file
+    // TODO: extract start page styles into its own resource so this doesn't import
+    // from the client/lsp/views package.
+    Resources.INSTANCE.css().ensureInjected();
+    
     RootPanel.get("managementLinks").add(new ManagementLinks());
     startPageWidget = new VerticalPanel();
     startPageWidget.setWidth("100%");

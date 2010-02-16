@@ -112,9 +112,9 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
 
   private static final String STYLENAME_SUFFIX_CLOSED = "closed";
 
-  private static final String STYLENAME_HEADER = "header";
+  private static final String STYLENAME_HEADER = "gwt-header";
 
-  private static final String STYLENAME_CONTENT = "content";
+  private static final String STYLENAME_CONTENT = "gwt-content";
 
   private final VerticalPanel mainPanel = new VerticalPanel();
   private final ClickableHeader header = new ClickableHeader();

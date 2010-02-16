@@ -50,7 +50,6 @@
           };
         </script>
         
-        <link rel="stylesheet" href="/LivingStory.css"/>
         <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
       </head>
       <body>

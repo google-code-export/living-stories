@@ -47,11 +47,6 @@ public class DateTimeRangeWidget extends Composite {
   
   public DateTimeRangeWidget() {
     initWidget(uiBinder.createAndBindUi(this));
-    
-    // TODO: this is temporary; remove this once we have a
-    // narrative stream view.
-    date.setStyleName("dateLabel");
-    time.setStyleName("timeLabel");
   }
   
   public DateTimeRangeWidget(Date startDateTime, Date endDateTime) {

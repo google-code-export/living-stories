@@ -24,6 +24,10 @@ public final class Constants {
   public static int ANIMATION_DURATION = 350;
   public static final int MAX_IMAGE_PREVIEW_WIDTH = 200;
 
+  public static String ZOOM_ICON = "/images/zoom_icon.png";
+  public static int ZOOM_WIDTH = 16;
+  public static int ZOOM_HEIGHT = 16;
+  
   public static final String BREAK_TAG = "<break></break>";
 
   public static String CLOSE_IMAGE_URL = "/images/lightbox-close.gif";

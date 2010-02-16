@@ -23,6 +23,7 @@ import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.livingstories.client.lsp.views.Resources;
 
 /**
  * Entry point for the content manager to create and update documents and updates. 
@@ -37,6 +38,9 @@ public class ContentManager implements EntryPoint {
   private Widget importManager = new ImportManager();
   
   public void onModuleLoad() {
+    // Inject the contents of the living story page CSS file
+    Resources.INSTANCE.css().ensureInjected();
+    
     AjaxLoader.init();
     
     tabs = new TabPanel();

@@ -29,7 +29,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.lsp.views.Resources;
-import com.google.livingstories.client.ui.ImagePreview;
 import com.google.livingstories.client.ui.Slideshow;
 import com.google.livingstories.client.util.BoundedImage;
 import com.google.livingstories.client.util.Constants;
@@ -99,7 +98,7 @@ public class ImageAssetPreview extends Composite {
       // Should result in cleaner and nicer code.
       return new DecoratedBoundedImagePanel(
           contentItem.getPreviewUrl(), Constants.MAX_IMAGE_PREVIEW_WIDTH, Integer.MAX_VALUE,
-          ImagePreview.ZOOM_ICON, ImagePreview.ZOOM_WIDTH, ImagePreview.ZOOM_HEIGHT,
+          Constants.ZOOM_ICON, Constants.ZOOM_WIDTH, Constants.ZOOM_HEIGHT,
           IconPlacement.LOWER_RIGHT);      
     } else {
       return new BoundedImage(contentItem.getPreviewUrl(), Constants.MAX_IMAGE_PREVIEW_WIDTH);

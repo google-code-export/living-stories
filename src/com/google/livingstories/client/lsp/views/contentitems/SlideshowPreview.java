@@ -27,7 +27,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.lsp.views.Resources;
-import com.google.livingstories.client.ui.ImagePreview;
 import com.google.livingstories.client.ui.Slideshow;
 import com.google.livingstories.client.util.Constants;
 import com.google.livingstories.client.util.DecoratedBoundedImagePanel;
@@ -56,7 +55,7 @@ public class SlideshowPreview extends Composite {
 
     DecoratedBoundedImagePanel imagePanel = new DecoratedBoundedImagePanel(
         contentItem.getPreviewUrl(), Constants.MAX_IMAGE_PREVIEW_WIDTH, Integer.MAX_VALUE,
-        ImagePreview.ZOOM_ICON, ImagePreview.ZOOM_WIDTH, ImagePreview.ZOOM_HEIGHT,
+        Constants.ZOOM_ICON, Constants.ZOOM_WIDTH, Constants.ZOOM_HEIGHT,
         IconPlacement.LOWER_RIGHT);
     imagePanel.addStyleName(Resources.INSTANCE.css().clickable());
     previewImage.add(imagePanel);

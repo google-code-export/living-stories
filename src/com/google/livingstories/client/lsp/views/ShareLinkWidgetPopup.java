@@ -39,7 +39,6 @@ public class ShareLinkWidgetPopup extends PopupPanel {
   public ShareLinkWidgetPopup() {
     super(true /* autohide */);
     setWidget(uiBinder.createAndBindUi(this));
-    addStyleName("sharePopup");
   }
   
   public void showRelativeTo(Widget widget, String shareBoxText) {
