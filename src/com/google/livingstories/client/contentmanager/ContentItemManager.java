@@ -1084,7 +1084,8 @@ public class ContentItemManager extends ManagerPane {
       public void onChange(ChangeEvent event) {
         contentPanel.showWidget(0);
         if (livingStorySelector.hasSelection()) {
-          contentItemListBox.loadItemsForLivingStory(livingStorySelector.getSelectedLivingStoryId());
+          contentItemListBox.loadItemsForLivingStory(
+              livingStorySelector.getSelectedLivingStoryId());
           linkedContentItemSelector.loadItemsForLivingStory(
               livingStorySelector.getSelectedLivingStoryId());
           themeListBox.refresh();
@@ -1184,7 +1185,8 @@ public class ContentItemManager extends ManagerPane {
               playerTypeSelector.selectConstant(playerContentItem.getPlayerType());
               photoSelector.setSelection(playerContentItem.getPhotoContentItem());
             } else {
-              parentPlayer = ((StoryPlayerContentItem) selectedContentItem).getParentPlayerContentItem();
+              parentPlayer =
+                  ((StoryPlayerContentItem) selectedContentItem).getParentPlayerContentItem();
               formatParentPlayerDisplay();
             }
             break;
@@ -1208,7 +1210,8 @@ public class ContentItemManager extends ManagerPane {
             narrativeSummaryTextArea.setContent(narrativeContentItem.getNarrativeSummary());
             break;
           case BACKGROUND:
-            BackgroundContentItem backgroundContentItem = (BackgroundContentItem) selectedContentItem;
+            BackgroundContentItem backgroundContentItem =
+                (BackgroundContentItem) selectedContentItem;
             if (backgroundContentItem.isConcept()) {
               conceptNameTextBox.setText(backgroundContentItem.getConceptName());
             }
@@ -1376,7 +1379,8 @@ public class ContentItemManager extends ManagerPane {
         themeIds.add(Long.valueOf(id));
       }
 
-      if (publish && contentItemType == ContentItemType.EVENT && currentContributorIdsToNamesMap.isEmpty()) {
+      if (publish && contentItemType == ContentItemType.EVENT
+          && currentContributorIdsToNamesMap.isEmpty()) {
         showInputError("Must select at least one contributor for publishing.");
         return;
       }
@@ -1500,8 +1504,8 @@ public class ContentItemManager extends ManagerPane {
               narrativeDateBox.getValue(), narrativeSummaryTextArea.getContent());
           break;
         case REACTION:
-          contentItem = new ReactionContentItem(contentItemId, creationDate, currentContributorIds, content, importance,
-              livingStoryId);
+          contentItem = new ReactionContentItem(contentItemId, creationDate, currentContributorIds,
+              content, importance, livingStoryId);
           break;
         default:
           throw new IllegalStateException("Unknown Content Item Type");
@@ -1750,7 +1754,8 @@ public class ContentItemManager extends ManagerPane {
           summaryEditor.setContent(((EventContentItem)returnedContentItem).getEventSummary());
         }
         if (returnedContentItem.getContentItemType() == ContentItemType.NARRATIVE) {
-          narrativeSummaryTextArea.setContent(((NarrativeContentItem) returnedContentItem).getNarrativeSummary());
+          narrativeSummaryTextArea.setContent(
+              ((NarrativeContentItem) returnedContentItem).getNarrativeSummary());
         }
 
         // remember which linked content items were suggested, but fix up the returned content
@@ -1841,8 +1846,9 @@ public class ContentItemManager extends ManagerPane {
     if (contentItem.getDisplayString().equals("New Content Item")) {
       previewPanel.clear();
     } else {
-      ContentItemListElement contentItemListElement = ContentItemListElementFactory.createContentItemListElement(
-          contentItem, contentItemListBox.getLoadedContentItemsMap(), null, true);
+      ContentItemListElement contentItemListElement =
+          ContentItemListElementFactory.createContentItemListElement(
+              contentItem, contentItemListBox.getLoadedContentItemsMap(), null, true);
       previewPanel.setWidget(contentItemListElement.render(false));
     }
   }

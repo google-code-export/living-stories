@@ -102,7 +102,7 @@ public interface ContentDataService {
    * any of the parameters is null, it should be ignored and the results should be based on the
    * others.
    * @param livingStoryId database id of the living story that the content object should belong to
-   * @param contentItemType type of content object such as "Event", "Narrative", "Asset", "Quote", etc.
+   * @param contentItemType type of content object such as "Event", "Narrative", "Asset", etc.
    * @param afterDate the returned content objects should have their last modified time after this
    * time
    * @param beforeDate the returned content objects should have their last modified time before
@@ -110,8 +110,8 @@ public interface ContentDataService {
    * @param importance the importance level of the returned content objects eg. High, Medium, etc.
    * @param publishState whether the returned objects should be in 'published' or 'draft' state
    */
-  List<BaseContentItem> search(Long livingStoryId, ContentItemType contentItemType, Date afterDate, Date beforeDate, 
-      Importance importance, PublishState publishState);
+  List<BaseContentItem> search(Long livingStoryId, ContentItemType contentItemType, Date afterDate,
+      Date beforeDate, Importance importance, PublishState publishState);
   
   /**
    * Return the number of published content objects that have been changed since the given time. 

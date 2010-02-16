@@ -42,7 +42,8 @@ public class NarrativeContentItem extends BaseContentItem {
   public NarrativeContentItem(Long id, Date timestamp, Set<Long> contributorIds, String content,
       Importance importance, Long livingStoryId, String headline, NarrativeType narrativeType,
       boolean isStandalone, Date narrativeDate, String narrativeSummary) {
-    super(id, timestamp, ContentItemType.NARRATIVE, contributorIds, content, importance, livingStoryId);
+    super(id, timestamp, ContentItemType.NARRATIVE, contributorIds, content, importance,
+        livingStoryId);
     this.headline = headline;
     this.narrativeType = narrativeType;
     this.isStandalone = isStandalone;

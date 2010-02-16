@@ -254,8 +254,9 @@ public class ContentDataServiceImpl implements ContentDataService {
   }
 
   @Override
-  public synchronized List<BaseContentItem> search(Long livingStoryId, ContentItemType contentItemType, Date afterDate,
-      Date beforeDate, Importance importance, PublishState publishState) {
+  public synchronized List<BaseContentItem> search(Long livingStoryId,
+      ContentItemType contentItemType, Date afterDate, Date beforeDate, Importance importance,
+      PublishState publishState) {
     StringBuilder queryFilters = new StringBuilder("livingStoryId == " + livingStoryId);
     if (contentItemType != null) {
       queryFilters.append(" && contentItemType == '" + contentItemType.name() + "'");

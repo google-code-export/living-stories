@@ -79,16 +79,17 @@ public class SourceInfoWidget extends Composite {
     @Override
     public void onClick(ClickEvent e) {
       if (sourceContentItem == null && sourceContentItemId != null) {
-        contentService.getContentItem(sourceContentItemId, false, new AsyncCallback<BaseContentItem>() {
-          public void onFailure(Throwable t) {
-            // Do nothing
-          }
+        contentService.getContentItem(sourceContentItemId, false,
+            new AsyncCallback<BaseContentItem>() {
+              public void onFailure(Throwable t) {
+                // Do nothing
+              }
           
-          public void onSuccess(BaseContentItem contentItem) {
-            sourceContentItem = contentItem;
-            createPopUpAndShow();
-          }
-        });
+              public void onSuccess(BaseContentItem contentItem) {
+                sourceContentItem = contentItem;
+                createPopUpAndShow();
+              }
+            });
       } else {
         createPopUpAndShow();
       }

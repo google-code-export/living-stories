@@ -72,7 +72,8 @@ public class BasePlayerPreview extends Composite {
     }
 
     name.setText(contentItem.getName());
-    description.add(new ContentRenderer(contentItem.getContent().split(Constants.BREAK_TAG)[0], false));
+    description.add(
+        new ContentRenderer(contentItem.getContent().split(Constants.BREAK_TAG)[0], false));
   }
 
   protected void bind() {

@@ -229,14 +229,16 @@ public class OverviewPage extends Page {
       // Set this content item as the focused item in the history.
       // When the user navigates away from this and then clicks back, this content item will
       // appear expanded, and the viewport will be scrolled to its position.
-      HistoryManager.newToken(HistoryPages.OVERVIEW,
-          LivingStoryControls.getCurrentFilterSpec().getFilterParams(), String.valueOf(contentItemId));
+      HistoryManager.newToken(
+          HistoryPages.OVERVIEW, LivingStoryControls.getCurrentFilterSpec().getFilterParams(),
+          String.valueOf(contentItemId));
     }
   }
   
   public void getMoreContentItems() {
-    contentService.getDisplayContentItemBundle(LivingStoryData.getLivingStoryId(), filterList.getFilter(),
-        null, contentItemList.getNextDateInSequence(), new ContentItemCallback());
+    contentService.getDisplayContentItemBundle(
+        LivingStoryData.getLivingStoryId(), filterList.getFilter(), null,
+        contentItemList.getNextDateInSequence(), new ContentItemCallback());
     contentItemList.beginLoading();
   }
   

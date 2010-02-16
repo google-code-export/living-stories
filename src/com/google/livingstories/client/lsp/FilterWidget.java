@@ -100,7 +100,8 @@ public class FilterWidget extends Composite {
     });
   }
     
-  public void load(Map<Long, ContentItemTypesBundle> contentItemTypesBundles, Long selectedThemeId) {
+  public void load(Map<Long, ContentItemTypesBundle> contentItemTypesBundles,
+      Long selectedThemeId) {
     this.contentItemTypesBundles = contentItemTypesBundles;
     populateFilterPanel();
     refreshFilters();
@@ -240,8 +241,8 @@ public class FilterWidget extends Composite {
     private boolean opinion;
     private String filterName;
     
-    public ContentItemTypeFilterHandler(ContentItemType contentItemType, AssetType assetType, boolean opinion, 
-        String filterName) {
+    public ContentItemTypeFilterHandler(ContentItemType contentItemType, AssetType assetType,
+        boolean opinion, String filterName) {
       this.contentItemType = contentItemType;
       this.assetType = assetType;
       this.opinion = opinion;
@@ -267,7 +268,8 @@ public class FilterWidget extends Composite {
    * Return a key that is used for identifying a content item type filter option. The key is
    * composed of the content item type and the asset type if the content item is an asset.
    */
-  private String getContentItemFilterKey(ContentItemType contentItemType, AssetType assetType, boolean opinion) {
+  private String getContentItemFilterKey(ContentItemType contentItemType, AssetType assetType,
+      boolean opinion) {
     if (contentItemType == null) {
       return "";
     } else if (contentItemType == ContentItemType.ASSET && assetType != null) {
@@ -429,7 +431,8 @@ public class FilterWidget extends Composite {
     // are shown as selected.
     if (currentFilters != null && !filtersEqual(filter, currentFilters)) {
       keyToFilterRowMap.get(getContentItemFilterKey(
-          currentFilters.contentItemType, currentFilters.assetType, currentFilters.opinion)).unselect();
+          currentFilters.contentItemType, currentFilters.assetType, currentFilters.opinion))
+          .unselect();
       keyToFilterRowMap.get(getImportanceFilterKey(currentFilters.importantOnly)).unselect();
       keyToFilterRowMap.get(getTimeSortKey(currentFilters.oldestFirst)).unselect();
     }

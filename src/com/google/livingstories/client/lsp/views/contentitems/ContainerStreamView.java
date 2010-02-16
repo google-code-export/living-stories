@@ -113,7 +113,8 @@ public abstract class ContainerStreamView<T extends BaseContentItem> extends Com
       title.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          EventBus.INSTANCE.fireEvent(new BlockToggledEvent(!content.isOpen(), contentItem.getId()));
+          EventBus.INSTANCE.fireEvent(
+              new BlockToggledEvent(!content.isOpen(), contentItem.getId()));
         }
       });
       content.setContent(shortView, longView);

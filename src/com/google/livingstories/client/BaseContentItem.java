@@ -74,8 +74,8 @@ public abstract class BaseContentItem implements Serializable {
   // No-arg constructor to keep gwt happy
   public BaseContentItem() {}
   
-  public BaseContentItem(Long id, Date timestamp, ContentItemType contentItemType, Set<Long> contributorIds,
-      String content, Importance importance, Long livingStoryId) {
+  public BaseContentItem(Long id, Date timestamp, ContentItemType contentItemType,
+      Set<Long> contributorIds, String content, Importance importance, Long livingStoryId) {
     this.id = id;
     this.timestamp = timestamp;
     this.contentItemType = contentItemType;

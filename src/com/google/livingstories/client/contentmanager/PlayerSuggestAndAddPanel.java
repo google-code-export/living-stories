@@ -82,7 +82,7 @@ public class PlayerSuggestAndAddPanel extends Composite {
    */
   private void addClickHandlerForButton(ContentRpcServiceAsync contentService,
       boolean isContributor, final AsyncCallback<BaseContentItem> callbackWork) {
-    final OnTheFlyPlayerBox onTheFlyPlayerBox = new OnTheFlyPlayerBox(contentService, isContributor, 
+    final OnTheFlyPlayerBox onTheFlyPlayerBox = new OnTheFlyPlayerBox(contentService, isContributor,
         new AsyncCallback<BaseContentItem>() {
         @Override
         public void onFailure(Throwable caught) {

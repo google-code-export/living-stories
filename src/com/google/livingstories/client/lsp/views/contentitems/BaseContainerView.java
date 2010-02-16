@@ -96,7 +96,8 @@ public abstract class BaseContainerView<T extends BaseContentItem> extends Compo
   }
   
   protected Widget createNarrativeLinks() {
-    List<BaseContentItem> linkedNarratives = linkedContentItemsByType.get(ContentItemType.NARRATIVE);
+    List<BaseContentItem> linkedNarratives =
+        linkedContentItemsByType.get(ContentItemType.NARRATIVE);
     if (linkedNarratives == null || linkedNarratives.isEmpty()) {
       return null;
     } else {

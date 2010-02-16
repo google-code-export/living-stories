@@ -70,7 +70,8 @@ public class ThemeListWidget extends Composite {
           new ArrayList<Map.Entry<Long, ContentItemTypesBundle>>(themesMap.entrySet());
       Collections.sort(entries, new Comparator<Map.Entry<Long, ContentItemTypesBundle>>() {
         @Override
-        public int compare(Entry<Long, ContentItemTypesBundle> o1, Entry<Long, ContentItemTypesBundle> o2) {
+        public int compare(Entry<Long, ContentItemTypesBundle> o1,
+            Entry<Long, ContentItemTypesBundle> o2) {
           return o1.getValue().themeName.compareTo(o2.getValue().themeName);
         }
       });

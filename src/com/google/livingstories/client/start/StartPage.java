@@ -84,7 +84,8 @@ public class StartPage implements EntryPoint {
     });
   }
   
-  private void populate(List<LivingStory> stories, Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
+  private void populate(List<LivingStory> stories,
+      Map<Long, List<BaseContentItem>> storyIdToUpdateMap) {
     for (LivingStory story : stories) {
       GlobalUtil.addIfNotNull(startPageWidget,
           createStoryWidget(story, storyIdToUpdateMap.get(story.getId())));

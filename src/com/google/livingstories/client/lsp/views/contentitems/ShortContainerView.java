@@ -101,7 +101,8 @@ public class ShortContainerView<T extends BaseContentItem> extends BaseContainer
     if (!slideshowImages.isEmpty() && slideshowImages.get(0).getImportance() == Importance.HIGH) {
       AssetContentItem previewImage = slideshowImages.get(0);
       previewImage.setRelatedAssets(slideshowImages);
-      Widget previewPanel = LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
+      Widget previewPanel =
+          LinkedViewFactory.createView(previewImage, contentItem.getContributorIds());
       importantImages.add(previewPanel);
     }
 
@@ -118,7 +119,8 @@ public class ShortContainerView<T extends BaseContentItem> extends BaseContainer
       if (linkedAssets.getKey() != AssetType.IMAGE) {
         for (AssetContentItem assetContentItem : linkedAssets.getValue()) {
           if (assetContentItem.getImportance() == Importance.HIGH) {
-            importantAssets.add(LinkedViewFactory.createView(assetContentItem, contentItem.getContributorIds()));
+            importantAssets.add(
+                LinkedViewFactory.createView(assetContentItem, contentItem.getContributorIds()));
           }
         }
       }

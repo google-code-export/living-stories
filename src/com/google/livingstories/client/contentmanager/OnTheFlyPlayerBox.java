@@ -195,8 +195,8 @@ public class OnTheFlyPlayerBox extends PopupPanel {
         if (GlobalUtil.isContentEmpty(photoUrl)) {
           savePlayer(null);
         } else {
-          AssetContentItem photo = new AssetContentItem(null, new Date(), new HashSet<Long>(), photoUrl, 
-              Importance.MEDIUM, null, AssetType.IMAGE, name, previewPhotoUrl);
+          AssetContentItem photo = new AssetContentItem(null, new Date(), new HashSet<Long>(),
+              photoUrl, Importance.MEDIUM, null, AssetType.IMAGE, name, previewPhotoUrl);
           photo.setLocation(new Location(null, null, ""));
           photo.setPublishState(PublishState.PUBLISHED);
           contentService.createOrChangeContentItem(photo, new AsyncCallback<BaseContentItem>() {

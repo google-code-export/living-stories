@@ -96,7 +96,7 @@ public final class ToggleDisclosurePanel extends Composite implements HasAnimati
           ClickEvent.fireNativeEvent(event, this);
           boolean opened = !isOpen;
           // Need to set this open first here instead of relying on the event
-          // in case the user didn't specify an contentItem id for this widget.
+          // in case the user didn't specify a content item id for this widget.
           setOpen(opened, true);
           if (contentItemId != null) {
             EventBus.INSTANCE.fireEvent(new BlockToggledEvent(opened, contentItemId));
