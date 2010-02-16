@@ -81,22 +81,22 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>atomServlet</servlet-name>
+    <servlet-name>contentServlet</servlet-name>
     <servlet-class>com.google.livingstories.server.rpcimpl.ContentRpcImpl</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>atomServlet</servlet-name>
+    <servlet-name>contentServlet</servlet-name>
     <url-pattern>/ContentManager/contentservice</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>atomServlet</servlet-name>
+    <servlet-name>contentServlet</servlet-name>
     <url-pattern>/StartPage/contentservice</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>atomServlet</servlet-name>
+    <servlet-name>contentServlet</servlet-name>
     <url-pattern>/LivingStoryPage/contentservice</url-pattern>
   </servlet-mapping>
 
