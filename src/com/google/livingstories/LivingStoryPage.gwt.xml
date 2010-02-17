@@ -8,7 +8,13 @@
 
   <!-- i18n -->
   <extend-property name="locale" values="en"/>
-  <extend-property name="locale" values="es"/>
+  <!-- Example of additional internationalized locales -->
+  <!-- Change the locale value to suit your needs (it's ok to add -->
+  <!-- multiple locales here).  Then add additional -->
+  <!-- .properties files with the translated strings to use for each locale. -->
+  <!-- See http://code.google.com/p/living-stories/wiki/Internationalization for more info. -->
+  <!-- <extend-property name="locale" values="es"/> -->
+  <!-- <extend-property name="locale" values="de"/> -->
   <set-property-fallback name="locale" value="en"/>
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
