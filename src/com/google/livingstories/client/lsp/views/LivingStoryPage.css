@@ -166,8 +166,8 @@ p {
   padding-right: 10px;
 }
 
-@external atomList;
-.atomList {
+@external contentItemList;
+.contentItemList {
   padding: 0 16px;
 }
 
