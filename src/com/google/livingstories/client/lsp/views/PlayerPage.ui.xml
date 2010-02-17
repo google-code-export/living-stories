@@ -1,0 +1,73 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+    xmlns:lsp="urn:import:com.google.livingstories.client.lsp"
+
+    ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+    ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+    ui:generateLocales="default">
+  <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
+  <ui:style>
+    .page {
+      width: 100%;
+      padding-left: 10px;
+    }
+    @if user.agent ie6 {
+      .page {
+        height: literal("expression(this.scrollHeight &lt; 300 ? \"300px\" : \"auto\")");
+      }
+    } @else {
+      .page {
+        min-height: 300px;
+      }
+    }
+    
+    .title {
+      font-size: 24px;
+      padding-bottom: 10px;
+      padding-top: 10px;
+    }
+  </ui:style>
+  <g:HTMLPanel styleName="{style.page}">
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td valign="top">
+          <g:Label ui:field="name" styleName="{style.title}"/>
+        </td>
+        <td align="right" valign="top">
+          <g:Label ui:field="backLink" styleName="{res.css.clickable}">
+            <ui:msg description="link text for returning to the main body of a story">
+              &laquo; Back to story
+            </ui:msg>    
+          </g:Label>
+        </td>
+      </tr>
+    </table>
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td valign="top">
+          <g:SimplePanel ui:field="photo"/>
+        </td>
+        <td valign="top">
+          <g:SimplePanel ui:field="content"/>
+        </td>
+      </tr>
+    </table>
+    <lsp:PlayerPageContentItemListWidget ui:field="relatedContent"/>
+  </g:HTMLPanel>
+</ui:UiBinder> 
