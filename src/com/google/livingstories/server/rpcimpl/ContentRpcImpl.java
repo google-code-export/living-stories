@@ -595,7 +595,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
 
     Query query = pm.newQuery(BaseContentEntity.class);
     String contentItemIdClause = byContribution
-        ? "contributorIds == contentItemIdParam" : "linkedContentItemIds == contentItemIdParam";
+        ? "contributorIds == contentItemIdParam" : "linkedContentEntityIds == contentItemIdParam";
     query.setFilter(contentItemIdClause
         + " && publishState == '" + PublishState.PUBLISHED.name() + "'");
     // no need to explicitly set ordering, as we resort by display order.
