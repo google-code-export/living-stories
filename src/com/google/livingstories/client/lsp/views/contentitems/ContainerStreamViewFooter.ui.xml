@@ -1,0 +1,60 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!-- 
+  Renders the footer for an event or narrative stream view, including the
+  'read more' link, the 'share' link, and any nav links.
+-->
+
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:view="urn:import:com.google.livingstories.client.lsp.views"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+  <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
+  <ui:style src="../Constants.css">
+    .jumpText {
+      color: secondaryTextColor;
+    }
+  </ui:style>
+  <g:HTMLPanel>
+    <table cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td>
+          <g:DeckPanel ui:field="text">
+            <g:Label ui:field="readMore" styleName="{res.css.clickable}">
+              <ui:msg description="Link to read more about an event">Read more...</ui:msg>
+            </g:Label>
+            <g:Label ui:field="showLess" styleName="{res.css.clickable}">
+              <ui:msg description="Link to show less about an event">Show less</ui:msg>
+            </g:Label>
+          </g:DeckPanel>
+        </td>
+        <td align="right">
+          <g:DeckPanel ui:field="links">
+            <g:FlowPanel ui:field="navLinks" styleName="{res.css.hidden}">
+              <g:InlineLabel styleName="{style.jumpText}">
+                <ui:msg description="label text">Jump to:</ui:msg>&nbsp;
+              </g:InlineLabel>
+            </g:FlowPanel>
+            <view:ShareLinkWidget/>
+          </g:DeckPanel>
+        </td>
+      </tr>
+    </table>
+  </g:HTMLPanel>
+</ui:UiBinder> 
