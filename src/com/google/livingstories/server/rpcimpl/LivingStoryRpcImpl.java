@@ -16,14 +16,14 @@
 
 package com.google.livingstories.server.rpcimpl;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.appengine.repackaged.com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
+import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.ContentItemTypesBundle;
-import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.LivingStoryRpcService;
 import com.google.livingstories.client.NarrativeContentItem;

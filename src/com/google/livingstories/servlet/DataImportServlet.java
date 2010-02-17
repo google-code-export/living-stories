@@ -16,12 +16,12 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.appengine.repackaged.com.google.common.base.Function;
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableMapBuilder;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.appengine.repackaged.com.google.common.collect.Maps;
-import com.google.appengine.repackaged.com.google.common.collect.Sets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
 import com.google.livingstories.server.dataservices.entities.HasSerializableLivingStoryId;
@@ -91,11 +91,11 @@ public class DataImportServlet extends HttpServlet {
 
 
   private static final Map<Class<?>, Function<JSONObject, String>> identifierFunctionMap =
-      new ImmutableMapBuilder<Class<?>, Function<JSONObject, String>>()
+      new ImmutableMap.Builder<Class<?>, Function<JSONObject, String>>()
           .put(LivingStoryEntity.class, createIdentifierFunction("id"))
           .put(ThemeEntity.class, createIdentifierFunction("id"))
           .put(BaseContentEntity.class, createIdentifierFunction("id"))
-          .getMap();
+          .build();
 
   private static Function<JSONObject, String> createIdentifierFunction(final String parameterName) {
     return new Function<JSONObject, String>() {

@@ -16,7 +16,7 @@
 
 package com.google.livingstories.server.util;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.livingstories.client.LivingStory;
 
 import name.neil.fraser.plaintext.diff_match_patch;

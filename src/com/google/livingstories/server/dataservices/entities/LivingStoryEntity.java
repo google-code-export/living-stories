@@ -18,7 +18,7 @@ package com.google.livingstories.server.dataservices.entities;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
 
