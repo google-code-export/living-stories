@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/rome-0.9.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jtidy-r910.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-image-loader-1.1.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/google-collect-1.0.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

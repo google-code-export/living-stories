@@ -16,9 +16,9 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.livingstories.client.ContentItemType;
+import com.google.common.collect.Lists;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.EventContentItem;
 import com.google.livingstories.client.LivingStory;
