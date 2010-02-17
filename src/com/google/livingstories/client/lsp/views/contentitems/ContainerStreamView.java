@@ -28,8 +28,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.contentitemlist.ContentItemListElement;
 import com.google.livingstories.client.lsp.BylineWidget;
@@ -68,8 +68,6 @@ public abstract class ContainerStreamView<T extends BaseContentItem>
     // TODO: fix this when the next version of GWT comes out and the bug is fixed.
   }
   
-  @UiField ContainerStreamViewStyles style;
-  
   @UiField HTML title;
   @UiField SimplePanel byline;
   @UiField DateTimeRangeWidget timestamp;
@@ -98,7 +96,7 @@ public abstract class ContainerStreamView<T extends BaseContentItem>
     timestamp.setDateTime(getStartDate(), getEndDate());
 
     if (lowImportance) {
-      title.removeStyleName(style.headline());
+      title.removeStyleName(Resources.INSTANCE.css().headline());
       byline.setVisible(false);
       timestamp.setTimeVisible(false);
     }
