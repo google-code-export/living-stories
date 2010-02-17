@@ -70,15 +70,6 @@ public interface LspConstants extends com.google.gwt.i18n.client.Constants {
   String imageUnavailable();
 
   /**
-   * Translated "Jump to:".
-   * 
-   * @return translated "Jump to:"
-   */
-  @DefaultStringValue("Jump to:")
-  @Key("jumpTo")
-  String jumpTo();
-
-  /**
    * Translated "Location".
    * 
    * @return translated "Location"

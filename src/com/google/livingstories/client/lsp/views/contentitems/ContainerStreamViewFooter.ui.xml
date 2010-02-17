@@ -47,7 +47,9 @@
         <td align="right">
           <g:DeckPanel ui:field="links">
             <g:FlowPanel ui:field="navLinks" styleName="{res.css.hidden}">
-              <g:InlineLabel styleName="{style.jumpText}">Jump to:&nbsp;</g:InlineLabel>
+              <g:InlineLabel styleName="{style.jumpText}">
+                <ui:msg description="label text">Jump to:</ui:msg>&nbsp;
+              </g:InlineLabel>
             </g:FlowPanel>
             <view:ShareLinkWidget/>
           </g:DeckPanel>

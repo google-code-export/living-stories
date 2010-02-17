@@ -19,10 +19,15 @@
   Renders a map view.
 -->
 
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  ui:generateFormat="com.google.gwt.i18n.rebind.format.PropertiesFormat"
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
   <g:HTMLPanel>
-    <div class="{res.css.contentItemHeader}">Location</div>
+    <div class="{res.css.contentItemHeader}">
+      <ui:msg description="header above a map">Location</ui:msg>
+    </div>
     <g:SimplePanel ui:field="content"/>
   </g:HTMLPanel>
 </ui:UiBinder> 
