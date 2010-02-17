@@ -16,7 +16,7 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList;
 import com.google.gxp.base.GxpContext;
 import com.google.livingstories.gxps.GqlServletHtml;
 import com.google.livingstories.server.dataservices.impl.PMF;

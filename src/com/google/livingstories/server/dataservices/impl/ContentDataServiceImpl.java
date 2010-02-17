@@ -16,9 +16,9 @@
 
 package com.google.livingstories.server.dataservices.impl;
 
-import com.google.appengine.repackaged.com.google.common.base.Function;
-import com.google.livingstories.client.ContentItemType;
+import com.google.common.base.Function;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.Importance;
 import com.google.livingstories.client.PublishState;
 import com.google.livingstories.server.dataservices.ContentDataService;
