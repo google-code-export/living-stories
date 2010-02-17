@@ -60,6 +60,10 @@ p {
   display: none;
 }
 
+.headline {
+  font-size: 16px;
+}
+
 /** External GWT classes **/
 
 /** Default anchor style **/

@@ -24,16 +24,12 @@
   xmlns:view="urn:import:com.google.livingstories.client.lsp.views"
   xmlns:clientui="urn:import:com.google.livingstories.client.ui">
   <ui:with field="res" type="com.google.livingstories.client.lsp.views.Resources" />
-  <ui:style type="com.google.livingstories.client.lsp.views.contentitems.ContainerStreamViewStyles"
-      src="../Constants.css">
+  <ui:style src="../Constants.css">
     .wrapper {
       width: 100%;
       border-bottom: 1px solid #CCD5F1;
       padding-top: 7px;
       zoom: 1;  /* IE6 is dumb */
-    }
-    .headline {
-      font-size: 16px;
     }
     .timestamp {
       color: secondaryTextColor;
@@ -42,7 +38,7 @@
   </ui:style>
   <g:FlowPanel styleName="{style.wrapper}">
     <view:DateTimeRangeWidget ui:field="timestamp" styleName="{style.timestamp}"/>
-    <g:HTML ui:field="title" styleName="{style.headline}"/>
+    <g:HTML ui:field="title" styleName="{res.css.headline}"/>
     <g:SimplePanel ui:field="byline"/>
     <clientui:ToggleDisclosurePanel ui:field="content" headerOnTop="false"/>
   </g:FlowPanel>

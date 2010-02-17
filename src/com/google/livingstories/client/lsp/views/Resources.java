@@ -46,5 +46,6 @@ public interface Resources extends ClientBundle {
     String substituteHeaderSpacing();
     String linkedContentItemsPanel();
     String hidden();
+    String headline();
   }
 }
