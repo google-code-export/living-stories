@@ -17,16 +17,16 @@
 package com.google.livingstories.server.rpcimpl;
 
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.repackaged.com.google.common.base.Function;
-import com.google.appengine.repackaged.com.google.common.collect.ImmutableList;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.appengine.repackaged.com.google.common.collect.Maps;
-import com.google.appengine.repackaged.com.google.common.collect.Sets;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.livingstories.client.AssetContentItem;
-import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BackgroundContentItem;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.ContentRpcService;
 import com.google.livingstories.client.DisplayContentItemBundle;
 import com.google.livingstories.client.EventContentItem;

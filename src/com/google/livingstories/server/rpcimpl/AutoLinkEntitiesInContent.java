@@ -16,12 +16,11 @@
 
 package com.google.livingstories.server.rpcimpl;
 
-import com.google.appengine.repackaged.com.google.common.base.Pair;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
-import com.google.appengine.repackaged.com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BackgroundContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.PlayerType;
 import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
@@ -198,5 +197,19 @@ public class AutoLinkEntitiesInContent {
     public boolean matchesFound = false;
     public String newContent;
     public Set<Long> suggestedPlayerIds;
+  }
+  
+  private static class Pair<A, B> {
+    public final A first;
+    public final B second;
+    
+    private Pair(A first, B second) {
+      this.first = first;
+      this.second = second;
+    }
+    
+    public static <A, B> Pair<A, B> of (A first, B second) {
+      return new Pair<A, B>(first, second);
+    }
   }
 }
