@@ -16,10 +16,6 @@
 
 package com.google.livingstories.server.rpcimpl;
 
-import com.google.appengine.api.memcache.InvalidValueException;
-import com.google.appengine.api.memcache.MemcacheServiceException;
-import com.google.appengine.api.memcache.stdimpl.GCacheException;
-import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
 import com.google.common.base.Joiner;
 import com.google.livingstories.client.BaseContentItem;
 import com.google.livingstories.client.ContentItemTypesBundle;
@@ -32,65 +28,32 @@ import com.google.livingstories.client.Theme;
 import com.google.livingstories.server.util.LRUCache;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.cache.Cache;
-import javax.cache.CacheException;
-import javax.cache.CacheFactory;
-import javax.cache.CacheManager;
 
 /**
  * Class that stores references to different cache instances in the app.
  */
 public class Caches {
   // Use a no-expiration memcache to store the most commonly used things.
-  private static final Cache noExpirationCache = getCache(0);
-
-  @SuppressWarnings("unchecked")
-  private static <T> T get(String key) {
-    try {
-      return (T) noExpirationCache.get(key);
-    } catch (InvalidValueException ex) {
-      return null;
-    } catch (MemcacheServiceException ex) {
-      return null;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T> void put(String key, T value) {
-    try {
-      noExpirationCache.put(key, value);
-    } catch (MemcacheServiceException ex) {
-      remove(key);
-    } catch (GCacheException e) {
-      remove(key);
-    }
-  }
-  
-  private static void remove(String key) {
-    noExpirationCache.remove(key);
-  }
+  private static final ServerCache noExpirationCache = new AppEngineCacheImpl(0);
 
   public static void clearAll() {
     noExpirationCache.clear();
   }
-
-
+  
   /** Living story cache methods */
 
   public static List<LivingStory> getLivingStories() {
-    return get(getLivingStoryCacheKey());
+    return noExpirationCache.get(getLivingStoryCacheKey());
   }
 
   public static synchronized void setLivingStories(List<LivingStory> livingStories) {
-    put(getLivingStoryCacheKey(), livingStories);
+    noExpirationCache.put(getLivingStoryCacheKey(), livingStories);
   }
 
   public static void clearLivingStories() {
-    remove(getLivingStoryCacheKey());
+    noExpirationCache.remove(getLivingStoryCacheKey());
   }
 
   private static String getLivingStoryCacheKey() {
@@ -102,21 +65,22 @@ public class Caches {
 
   public static List<BaseContentItem> getLivingStoryContentItems(Long livingStoryId,
       boolean onlyPublished) {
-    return get(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished));
+    return noExpirationCache.get(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished));
   }
 
   public static void setLivingStoryContentItems(
       Long livingStoryId, boolean onlyPublished, List<BaseContentItem> livingStoryContentItems) {
-    put(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished), livingStoryContentItems);
+    noExpirationCache.put(getLivingStoryContentItemsCacheKey(livingStoryId, onlyPublished),
+        livingStoryContentItems);
   }
 
   public static void clearLivingStoryContentItems(Long livingStoryId) {
-    remove(getLivingStoryContentItemsCacheKey(livingStoryId, true));
-    remove(getLivingStoryContentItemsCacheKey(livingStoryId, false));
-    remove(getDisplayContentItemBundleCacheKey(livingStoryId));
-    remove(getContributorsForLivingStoryCacheKey(livingStoryId));
+    noExpirationCache.remove(getLivingStoryContentItemsCacheKey(livingStoryId, true));
+    noExpirationCache.remove(getLivingStoryContentItemsCacheKey(livingStoryId, false));
+    noExpirationCache.remove(getDisplayContentItemBundleCacheKey(livingStoryId));
+    noExpirationCache.remove(getContributorsForLivingStoryCacheKey(livingStoryId));
     // also, in case any non-living-story-specific information was changed here; e.g., authorship
-    remove(getDisplayContentItemBundleCacheKey(null));
+    noExpirationCache.remove(getDisplayContentItemBundleCacheKey(null));
   }
 
   private static String getLivingStoryContentItemsCacheKey(Long livingStoryId,
@@ -128,15 +92,15 @@ public class Caches {
   /** Theme cache methods **/
 
   public static List<Theme> getLivingStoryThemes(Long livingStoryId) {
-    return get(getLivingStoryThemesCacheKey(livingStoryId));
+    return noExpirationCache.get(getLivingStoryThemesCacheKey(livingStoryId));
   }
 
   public static void setLivingStoryThemes(Long livingStoryId, List<Theme> livingStoryThemes) {
-    put(getLivingStoryThemesCacheKey(livingStoryId), livingStoryThemes);
+    noExpirationCache.put(getLivingStoryThemesCacheKey(livingStoryId), livingStoryThemes);
   }
 
   public static void clearLivingStoryThemes(Long livingStoryId) {
-    remove(getLivingStoryThemesCacheKey(livingStoryId));
+    noExpirationCache.remove(getLivingStoryThemesCacheKey(livingStoryId));
   }
 
   private static String getLivingStoryThemesCacheKey(Long livingStoryId) {
@@ -144,16 +108,16 @@ public class Caches {
   }
 
   public static Map<Long, ContentItemTypesBundle> getLivingStoryThemeInfo(Long livingStoryId) {
-    return get(getLivingStoryThemeInfoCacheKey(livingStoryId));
+    return noExpirationCache.get(getLivingStoryThemeInfoCacheKey(livingStoryId));
   }
   
   public static void setLivingStoryThemeInfo(
       Long livingStoryId, Map<Long, ContentItemTypesBundle> themeInfo) {
-    put(getLivingStoryThemeInfoCacheKey(livingStoryId), themeInfo);
+    noExpirationCache.put(getLivingStoryThemeInfoCacheKey(livingStoryId), themeInfo);
   }
   
   public static void clearLivingStoryThemeInfo(Long livingStoryId) {
-    remove(getLivingStoryThemeInfoCacheKey(livingStoryId));
+    noExpirationCache.remove(getLivingStoryThemeInfoCacheKey(livingStoryId));
   }
 
   private static String getLivingStoryThemeInfoCacheKey(Long livingStoryId) {
@@ -163,16 +127,16 @@ public class Caches {
   /** Contributor cache methods **/
   
   public static Map<Long, PlayerContentItem> getContributorsForLivingStory(Long livingStoryId) {
-    return get(getContributorsForLivingStoryCacheKey(livingStoryId));
+    return noExpirationCache.get(getContributorsForLivingStoryCacheKey(livingStoryId));
   }
   
   public static void setContributorsForLivingStory(
       Long livingStoryId, Map<Long, PlayerContentItem> contributors) {
-    put(getContributorsForLivingStoryCacheKey(livingStoryId), contributors);
+    noExpirationCache.put(getContributorsForLivingStoryCacheKey(livingStoryId), contributors);
   }
   
   public static void clearContributorsForLivingStory(Long livingStoryId) {
-    remove(getContributorsForLivingStoryCacheKey(livingStoryId));
+    noExpirationCache.remove(getContributorsForLivingStoryCacheKey(livingStoryId));
   }
   
   private static String getContributorsForLivingStoryCacheKey(Long livingStoryId) {
@@ -186,7 +150,7 @@ public class Caches {
   public static DisplayContentItemBundle getDisplayContentItemBundle(Long livingStoryId,
       FilterSpec filter, Long focusedContentItemId, Date cutoff) {
     LRUCache<String, DisplayContentItemBundle> cache =
-        get(getDisplayContentItemBundleCacheKey(livingStoryId));
+        noExpirationCache.get(getDisplayContentItemBundleCacheKey(livingStoryId));
     if (cache != null) {
       return cache.get(getDisplayContentItemBundleMapKey(filter, focusedContentItemId, cutoff));
     } else {
@@ -197,17 +161,17 @@ public class Caches {
   public static void setDisplayContentItemBundle(Long livingStoryId,
       FilterSpec filter, Long focusedContentItemId, Date cutoff, DisplayContentItemBundle bundle) {
     String cacheKey = getDisplayContentItemBundleCacheKey(livingStoryId);
-    LRUCache<String, DisplayContentItemBundle> cache = get(cacheKey);
+    LRUCache<String, DisplayContentItemBundle> cache = noExpirationCache.get(cacheKey);
     if (cache == null) {
       cache = new LRUCache<String, DisplayContentItemBundle>(
           DISPLAY_CONTENT_ITEM_BUNDLE_CACHE_SIZE);
     }
     cache.put(getDisplayContentItemBundleMapKey(filter, focusedContentItemId, cutoff), bundle);
-    put(cacheKey, cache);
+    noExpirationCache.put(cacheKey, cache);
   }
 
   public static void clearDisplayContentItemBundles(Long livingStoryId) {
-    remove(getDisplayContentItemBundleCacheKey(livingStoryId));
+    noExpirationCache.remove(getDisplayContentItemBundleCacheKey(livingStoryId));
   }
 
   private static String getDisplayContentItemBundleCacheKey(Long livingStoryId) {
@@ -223,41 +187,18 @@ public class Caches {
   /** Start page cache methods **/
   
   public static StartPageBundle getStartPageBundle() {
-    return get(getStartPageBundleCacheKey());
+    return noExpirationCache.get(getStartPageBundleCacheKey());
   }
   
   public static void setStartPageBundle(StartPageBundle bundle) {
-    put(getStartPageBundleCacheKey(), bundle);
+    noExpirationCache.put(getStartPageBundleCacheKey(), bundle);
   }
   
   public static void clearStartPageBundle() {
-    remove(getStartPageBundleCacheKey());
+    noExpirationCache.remove(getStartPageBundleCacheKey());
   }
   
   private static String getStartPageBundleCacheKey() {
     return "startpage:";
-  }
-
-  /**
-   * Configures a cache instance with an expiration of expirationSeconds.
-   * If expirationSeconds is 0, the cache will not expire.
-   */
-  @SuppressWarnings("unchecked")
-  private static Cache getCache(int expirationSeconds) {
-    Cache memcache;
-
-    Map properties = new HashMap();
-    if (expirationSeconds > 0) {
-      properties.put(GCacheFactory.EXPIRATION_DELTA, expirationSeconds);
-    }
-    
-    try {
-      CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
-      memcache = cacheFactory.createCache(properties);
-    } catch (CacheException ex) {
-      throw new RuntimeException(ex);
-    }
-
-    return memcache;
   }
 }
