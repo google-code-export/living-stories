@@ -29,8 +29,8 @@ public class DataImplFactory {
   private static final LivingStoryDataService livingStoryService = new LivingStoryDataServiceImpl();
   private static final ThemeDataService themeService = new ThemeDataServiceImpl();
   private static final ContentDataService contentService = new ContentDataServiceImpl();
-  private static final UserDataService userDataService = new StubUserDataServiceImpl();
-  private static final UserLoginService userLoginService = new StubUserLoginServiceImpl();
+  private static final UserDataService userDataService = new UserDataServiceImpl();
+  private static final UserLoginService userLoginService = new UserLoginServiceImpl();
   
   public static LivingStoryDataService getLivingStoryService() {
     return livingStoryService;
