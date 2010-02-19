@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.server.rpcimpl;
+package com.google.livingstories.server.dataservices.impl;
+
+import com.google.livingstories.server.dataservices.ServerCache;
 
 /**
  * Stub implementation of a ServerCache that has a no-op for all the methods,
