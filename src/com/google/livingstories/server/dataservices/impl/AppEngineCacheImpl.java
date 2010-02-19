@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.server.rpcimpl;
+package com.google.livingstories.server.dataservices.impl;
 
 import com.google.appengine.api.memcache.InvalidValueException;
 import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.stdimpl.GCacheException;
 import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
+import com.google.livingstories.server.dataservices.ServerCache;
 
 import java.util.HashMap;
 import java.util.Map;
