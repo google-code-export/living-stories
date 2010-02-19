@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.livingstories.server.rpcimpl;
+package com.google.livingstories.server.dataservices;
 
 /**
  * Interface for a server side caching system.
