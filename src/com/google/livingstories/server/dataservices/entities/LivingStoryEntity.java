@@ -17,7 +17,6 @@
 package com.google.livingstories.server.dataservices.entities;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Text;
 import com.google.common.collect.Lists;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
@@ -73,12 +72,12 @@ public class LivingStoryEntity
     private Key id;
 
     @Persistent
-    private Text content;
+    private LongStringHolder content;
     @Persistent
     private Date timestamp;
 
     Summary(String content, Date timestamp) {
-      this.content = new Text(content);
+      this.content = new LongStringHolder(content);
       this.timestamp = timestamp;
     }
 
@@ -87,7 +86,7 @@ public class LivingStoryEntity
     }
 
     public void setContent(String content) {
-      this.content = new Text(content);
+      this.content = new LongStringHolder(content);
     }
     
     private Date getTimestamp() {
