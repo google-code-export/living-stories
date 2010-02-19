@@ -44,7 +44,6 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class UserEntity implements Serializable, JSONSerializable {
   
-  // The name property on this key is actually the user's email address.
   @PrimaryKey
   @Persistent
   private String emailAddress;
