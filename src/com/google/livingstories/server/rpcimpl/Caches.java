@@ -25,6 +25,8 @@ import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PlayerContentItem;
 import com.google.livingstories.client.StartPageBundle;
 import com.google.livingstories.client.Theme;
+import com.google.livingstories.server.dataservices.ServerCache;
+import com.google.livingstories.server.dataservices.impl.AppEngineCacheImpl;
 import com.google.livingstories.server.util.LRUCache;
 
 import java.util.Date;
