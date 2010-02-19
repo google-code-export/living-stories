@@ -18,7 +18,6 @@ package com.google.livingstories.server.dataservices.entities;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.users.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +47,7 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class UserEntity implements Serializable, JSONSerializable {
   
+  // The name property on this key is actually the user's email address.
   @PrimaryKey
   @Persistent
   private Key googleAccountId;
@@ -66,10 +66,10 @@ public class UserEntity implements Serializable, JSONSerializable {
   }
   
   /**
-   * Return the current Google Account User.
+   * Return the current user's login email.
    */
-  public User getUser() {
-    return new User(googleAccountId.getName(), "gmail.com");
+  public String getEmail() {
+    return googleAccountId.getName();
   }
   
   /**

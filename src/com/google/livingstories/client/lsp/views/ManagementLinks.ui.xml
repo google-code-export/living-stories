@@ -42,7 +42,6 @@
           <g:Anchor ui:field='logOut' visible='false'><ui:msg description='link text'>Log out</ui:msg></g:Anchor>
         </td>  
       </tr>
-      <tr>&nbsp;</tr>   <!--  assures the control soaks up consistent vertical space -->
     </table>
   </g:HTMLPanel>
 </ui:UiBinder>
