@@ -16,12 +16,11 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import com.google.appengine.api.datastore.Text;
 import com.google.livingstories.client.AssetContentItem;
 import com.google.livingstories.client.AssetType;
-import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.BackgroundContentItem;
 import com.google.livingstories.client.BaseContentItem;
+import com.google.livingstories.client.ContentItemType;
 import com.google.livingstories.client.DataContentItem;
 import com.google.livingstories.client.DefaultContentItem;
 import com.google.livingstories.client.EventContentItem;
@@ -90,7 +89,7 @@ public class BaseContentEntity
 
   // This is the HTML content.
   @Persistent
-  private Text content;
+  private LongStringHolder content;
   
   @Persistent
   private Importance importance = Importance.MEDIUM;
@@ -127,12 +126,12 @@ public class BaseContentEntity
     private Double longitude;
     
     @Persistent
-    private Text description;
+    private LongStringHolder description;
 
     LocationEntity(Double latitude, Double longitude, String description) {
       this.latitude = latitude;
       this.longitude = longitude;
-      this.description = new Text(description);
+      this.description = new LongStringHolder(description);
     }
 
     public Double getLatitude() {
@@ -156,7 +155,7 @@ public class BaseContentEntity
     }
 
     public void setDescription(String description) {
-      this.description = new Text(description);
+      this.description = new LongStringHolder(description);
     }
 
     public Location toClientObject() {
@@ -190,7 +189,7 @@ public class BaseContentEntity
   
   /*** Fields related to the source ***/
   @Persistent
-  private Text sourceDescription;
+  private LongStringHolder sourceDescription;
   
   @Persistent
   private Long sourceContentEntityId;
@@ -204,10 +203,10 @@ public class BaseContentEntity
   private Date endDate;
   
   @Persistent
-  private Text eventUpdate;
+  private LongStringHolder eventUpdate;
   
   @Persistent
-  private Text eventSummary;
+  private LongStringHolder eventSummary;
 
   /*** Property shared by Background and Player types ***/
   
@@ -257,7 +256,7 @@ public class BaseContentEntity
   private Date narrativeDate;
   
   @Persistent
-  private Text narrativeSummary;
+  private LongStringHolder narrativeSummary;
 
   private BaseContentEntity() {}
   
@@ -265,7 +264,7 @@ public class BaseContentEntity
       String content, Importance importance, Long livingStoryId) {
     this.timestamp = timestamp;
     this.contentItemType = contentItemType;
-    this.content = new Text(content);
+    this.content = new LongStringHolder(content);
     this.importance = importance;
     this.livingStoryId = livingStoryId;
   }
@@ -296,7 +295,7 @@ public class BaseContentEntity
   }
 
   public void setContent(String content) {
-    this.content = new Text(content);
+    this.content = new LongStringHolder(content);
   }
 
   public Importance getImportance() {
@@ -405,7 +404,7 @@ public class BaseContentEntity
 
   public void setSourceDescription(String sourceDescription) {
     if (sourceDescription != null) {
-      this.sourceDescription = new Text(sourceDescription);
+      this.sourceDescription = new LongStringHolder(sourceDescription);
     }
   }
 
@@ -442,11 +441,11 @@ public class BaseContentEntity
   }
 
   public void setEventUpdate(String eventUpdate) {
-    this.eventUpdate = new Text(eventUpdate);
+    this.eventUpdate = new LongStringHolder(eventUpdate);
   }
   
   public void setEventSummary(String eventSummary) {
-    this.eventSummary = new Text(eventSummary);
+    this.eventSummary = new LongStringHolder(eventSummary);
   }
   
   public String getName() {
@@ -551,7 +550,7 @@ public class BaseContentEntity
   }
 
   public void setNarrativeSummary(String narrativeSummary) {
-    this.narrativeSummary = new Text(narrativeSummary);
+    this.narrativeSummary = new LongStringHolder(narrativeSummary);
   }
     
   public void copyFields(BaseContentItem clientContentItem) {
