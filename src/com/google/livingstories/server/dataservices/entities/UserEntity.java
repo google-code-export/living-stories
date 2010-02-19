@@ -50,7 +50,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   
   @PrimaryKey
   @Persistent
-  private Key googleAccountId;
+  private String googleAccountIdString;
   
   @Persistent
   private String defaultLspView;
@@ -61,15 +61,23 @@ public class UserEntity implements Serializable, JSONSerializable {
   private List<UserLivingStoryEntity> livingStoryDataList = new ArrayList<UserLivingStoryEntity>();
   
   // This method is needed to tell JDO not to auto-generate the Key for this class.
+  private void setGoogleAccountIdString(String googleAccountIdString) {
+    this.googleAccountIdString = googleAccountIdString;
+  }
+  
   public void setGoogleAccountId(Key googleAccountId) {
-    this.googleAccountId = googleAccountId;
+    setGoogleAccountIdString(KeyFactory.keyToString(googleAccountId));
   }
   
   /**
    * Return the current Google Account User.
    */
   public User getUser() {
-    return new User(googleAccountId.getName(), "gmail.com");
+    return new User(getName(), "gmail.com");
+  }
+  
+  private String getName() {
+    return KeyFactory.stringToKey(googleAccountIdString).getName();
   }
   
   /**
@@ -120,7 +128,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   public JSONObject toJSON() {
     JSONObject object = new JSONObject();
     try {
-      object.put("googleAccountId", googleAccountId.getName());
+      object.put("googleAccountId", getName());
       object.put("defaultLspView", defaultLspView);
       JSONArray livingStoryDataListJSON = new JSONArray();
       for (UserLivingStoryEntity entity : livingStoryDataList) {
@@ -136,7 +144,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   public static UserEntity fromJSON(JSONObject json) {
     try {
       UserEntity entity = new UserEntity();
-      entity.setGoogleAccountId(KeyFactory.createKey(UserEntity.class.getSimpleName(),
+      entity.setGoogleAccountIdString(KeyFactory.createKeyString(UserEntity.class.getSimpleName(),
           json.getString("googleAccountId")));
       if (json.has("defaultLspView")) {
         entity.setDefaultLspView(json.getString("defaultLspView"));
