@@ -152,7 +152,7 @@ public class UserDataServiceImpl implements UserDataService {
       pm.makePersistent(userInfo);
     } catch (JDOObjectNotFoundException e) {
       UserEntity userInfo = new UserEntity();
-      userInfo.setGoogleAccountId(createKey(userId));
+      userInfo.setEmailAddress(userId);
       userInfo.setDefaultLspView(defaultView.getFilterParams());
       pm.makePersistent(userInfo);
     } finally {
@@ -218,7 +218,7 @@ public class UserDataServiceImpl implements UserDataService {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     try {
       UserEntity userInfo = new UserEntity();
-      userInfo.setGoogleAccountId(createKey(userEmail));
+      userInfo.setEmailAddress(userEmail);
       pm.makePersistent(userInfo);
       return userInfo;
     } finally {
