@@ -16,10 +16,6 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.users.User;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,9 +44,10 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class UserEntity implements Serializable, JSONSerializable {
   
+  // The name property on this key is actually the user's email address.
   @PrimaryKey
   @Persistent
-  private String googleAccountIdString;
+  private String emailAddress;
   
   @Persistent
   private String defaultLspView;
@@ -61,23 +58,15 @@ public class UserEntity implements Serializable, JSONSerializable {
   private List<UserLivingStoryEntity> livingStoryDataList = new ArrayList<UserLivingStoryEntity>();
   
   // This method is needed to tell JDO not to auto-generate the Key for this class.
-  private void setGoogleAccountIdString(String googleAccountIdString) {
-    this.googleAccountIdString = googleAccountIdString;
-  }
-  
-  public void setGoogleAccountId(Key googleAccountId) {
-    setGoogleAccountIdString(KeyFactory.keyToString(googleAccountId));
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
   }
   
   /**
-   * Return the current Google Account User.
+   * Return the current user's login email.
    */
-  public User getUser() {
-    return new User(getName(), "gmail.com");
-  }
-  
-  private String getName() {
-    return KeyFactory.stringToKey(googleAccountIdString).getName();
+  public String getEmailAddress() {
+    return emailAddress;
   }
   
   /**
@@ -128,7 +117,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   public JSONObject toJSON() {
     JSONObject object = new JSONObject();
     try {
-      object.put("googleAccountId", getName());
+      object.put("emailAddress", getEmailAddress());
       object.put("defaultLspView", defaultLspView);
       JSONArray livingStoryDataListJSON = new JSONArray();
       for (UserLivingStoryEntity entity : livingStoryDataList) {
@@ -144,8 +133,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   public static UserEntity fromJSON(JSONObject json) {
     try {
       UserEntity entity = new UserEntity();
-      entity.setGoogleAccountIdString(KeyFactory.createKeyString(UserEntity.class.getSimpleName(),
-          json.getString("googleAccountId")));
+      entity.setEmailAddress(json.getString("emailAddress"));
       if (json.has("defaultLspView")) {
         entity.setDefaultLspView(json.getString("defaultLspView"));
       }

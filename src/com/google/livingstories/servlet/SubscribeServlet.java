@@ -16,9 +16,9 @@
 
 package com.google.livingstories.servlet;
 
-import com.google.appengine.api.users.UserServiceFactory;
-import com.google.livingstories.client.UserRpcService;
-import com.google.livingstories.server.rpcimpl.UserRpcImpl;
+import com.google.livingstories.server.dataservices.UserDataService;
+import com.google.livingstories.server.dataservices.UserLoginService;
+import com.google.livingstories.server.dataservices.impl.DataImplFactory;
 
 import java.io.IOException;
 
@@ -29,18 +29,19 @@ import javax.servlet.http.HttpServletResponse;
 public class SubscribeServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    UserRpcService userService = new UserRpcImpl();
-
-    if (!userService.isUserLoggedIn()) {
+    UserLoginService userLoginService = DataImplFactory.getUserLoginService();
+    UserDataService userDataService = DataImplFactory.getUserDataService();
+    
+    if (!userLoginService.isUserLoggedIn()) {
       // User needs to login first
-      resp.sendRedirect(UserServiceFactory.getUserService().createLoginURL(
-          req.getRequestURL().toString()));
+      resp.sendRedirect(userLoginService.createLoginUrl(req.getRequestURL().toString()));
       return;
     }
     
     String livingStoryId = req.getParameter("livingStoryId");
     if (livingStoryId != null) {
-      userService.setSubscribedToEmails(Long.valueOf(livingStoryId), true);
+      userDataService.setEmailSubscription(
+          userLoginService.getUserId(), Long.valueOf(livingStoryId), true);
     }
 
     String lspUrl = req.getParameter("lspUrl");

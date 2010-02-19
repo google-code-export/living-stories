@@ -48,18 +48,23 @@ public class ManagementLinks extends Composite {
   public ManagementLinks() {
     bind();
     
-    String usernameString = LivingStoryData.getUsername();
-    if (LivingStoryData.getUsername() == null) {
-      logIn.setHref(LivingStoryData.getLoginUrl());
-      logIn.setVisible(true);
+    if (LivingStoryData.getLoginUrl() == null) {
+      // Login url may be null if we're using the stub login service that doesn't allow
+      // user logins.  If so, hide this.
+      root.setVisible(false);
     } else {
-      username.setText(usernameString);
-      usernameSeparator.setVisible(true);
-      logOut.setHref(LivingStoryData.getLogoutUrl());
-      logOut.setVisible(true);
+      String usernameString = LivingStoryData.getUsername();
+      if (usernameString == null) {
+        logIn.setHref(LivingStoryData.getLoginUrl());
+        logIn.setVisible(true);
+      } else {
+        username.setText(usernameString);
+        usernameSeparator.setVisible(true);
+        logOut.setHref(LivingStoryData.getLogoutUrl());
+        logOut.setVisible(true);
+      }
+      makePanelChildrenNonWrapping();
     }
-    
-    makePanelChildrenNonWrapping();
   }
   
   protected void bind() {

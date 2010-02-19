@@ -16,7 +16,6 @@
 
 package com.google.livingstories.server.rpcimpl;
 
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -42,6 +41,7 @@ import com.google.livingstories.client.util.dom.JavaNodeAdapter;
 import com.google.livingstories.server.dataservices.entities.BaseContentEntity;
 import com.google.livingstories.server.dataservices.entities.LivingStoryEntity;
 import com.google.livingstories.server.dataservices.entities.UserLivingStoryEntity;
+import com.google.livingstories.server.dataservices.impl.DataImplFactory;
 import com.google.livingstories.server.dataservices.impl.PMF;
 import com.google.livingstories.server.util.AlertSender;
 import com.google.livingstories.server.util.StringUtil;
@@ -288,7 +288,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
             .append("<span style=\"font-size:small\">This is an automated alert. ")
             .append("To unsubscribe, click the 'unsubscribe' link on the top right of ")
             .append("<a href=\"")
-            .append(UserServiceFactory.getUserService().createLoginURL(baseLspUrl))
+            .append(DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl))
             .append("\">this page</a>.</span>");
 
         if (fromAddress != null) {

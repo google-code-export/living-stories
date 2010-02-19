@@ -23,9 +23,12 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HasWordWrap;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.livingstories.client.UserRpcService;
 import com.google.livingstories.client.UserRpcServiceAsync;
 import com.google.livingstories.client.util.LivingStoryData;
@@ -34,27 +37,25 @@ import com.google.livingstories.client.util.LivingStoryData;
  * A pane containing links to manage the user's state, and for showing
  * the user controls relating to the current story or seeing all stories.
  */
-public class LivingStoryManagementLinks extends ManagementLinks {
+public class LivingStoryManagementLinks extends Composite {
   interface MyUiBinder extends UiBinder<HTMLPanel, LivingStoryManagementLinks> {}
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private final UserRpcServiceAsync userInfoService = GWT.create(UserRpcService.class);
 
+  @UiField HTMLPanel root;
   @UiField InlineLabel subscribeLink;
   @UiField InlineLabel unsubscribeLink;
+  @UiField InlineLabel subscribeLinkSeparator;
   @UiField Anchor rssFeed;
   
   public LivingStoryManagementLinks() {
-    super();
+    initWidget(uiBinder.createAndBindUi(this));
+    makePanelChildrenNonWrapping();
 
     setSubscribeLinkVisibility();
     rssFeed.setHref("/feeds/" + LivingStoryData.getLivingStoryUrl());
   }
 
-  @Override
-  protected void bind() {
-    initWidget(uiBinder.createAndBindUi(this));
-  }
-  
   @UiHandler({"subscribeLink", "unsubscribeLink"})
   void handleClick(ClickEvent e) {
     new SubscribePopup(this, !LivingStoryData.isSubscribedToEmails())
@@ -75,8 +76,24 @@ public class LivingStoryManagementLinks extends ManagementLinks {
   }
 
   private void setSubscribeLinkVisibility() {
-    boolean canUnsubscribe = LivingStoryData.isLoggedIn() && LivingStoryData.isSubscribedToEmails();
-    unsubscribeLink.setVisible(canUnsubscribe);
-    subscribeLink.setVisible(!canUnsubscribe);
+    if (LivingStoryData.getLoginUrl() == null) {
+      // Login url may be null if we're using the stub login service that doesn't allow
+      // user logins.  If so, hide the subscribe stuff.
+      unsubscribeLink.setVisible(false);
+      subscribeLink.setVisible(false);
+      subscribeLinkSeparator.setVisible(false);
+    } else {
+      boolean canUnsubscribe = LivingStoryData.isLoggedIn() && LivingStoryData.isSubscribedToEmails();
+      unsubscribeLink.setVisible(canUnsubscribe);
+      subscribeLink.setVisible(!canUnsubscribe);
+    }
+  }
+  
+  public void makePanelChildrenNonWrapping() {
+    for (Widget child : root) {
+      if (child instanceof HasWordWrap) {
+        ((HasWordWrap) child).setWordWrap(false);
+      }
+    }
   }
 }
