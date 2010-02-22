@@ -16,14 +16,10 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
@@ -51,11 +47,6 @@ public class UserEntity implements Serializable, JSONSerializable {
   @Persistent
   private String defaultLspView;
   
-  // Collection of child objects for this class. Has to be a list because Maps are not
-  // supported by the datastore for persistence.
-  @Persistent
-  private List<UserLivingStoryEntity> livingStoryDataList = new ArrayList<UserLivingStoryEntity>();
-  
   // This method is needed to tell JDO not to auto-generate the Key for this class.
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
@@ -67,17 +58,7 @@ public class UserEntity implements Serializable, JSONSerializable {
   public String getEmailAddress() {
     return emailAddress;
   }
-  
-  /**
-   * Add a new {@link UserLivingStoryEntity} object as a child of this class. Does not check if
-   * there is already another child for the same living story.
-   */
-  public UserLivingStoryEntity addNewLivingStoryTimestamp(Long livingStoryId) {
-    UserLivingStoryEntity newData = new UserLivingStoryEntity(livingStoryId, new Date());
-    livingStoryDataList.add(newData);
-    return newData;
-  }
-  
+    
   public String getDefaultLspView() {
     return defaultLspView;
   }
@@ -86,23 +67,6 @@ public class UserEntity implements Serializable, JSONSerializable {
     this.defaultLspView = defaultLspView;
   }
   
-  public List<UserLivingStoryEntity> getLivingStoryDataList() {
-    return livingStoryDataList;
-  }
-  
-  public UserLivingStoryEntity getUserDataPerLivingStory(Long livingStoryId) {
-    // A JDOQL query cannot be used to do this because the appengine datastore does not
-    // support join queries on the parent object via fields of the child object.
-    // TODO: remove the child list on this class and instead replace
-    // them with parent keys on each child object, so that a query can be used.
-    for (UserLivingStoryEntity livingStoryData : livingStoryDataList) {
-      if (livingStoryData.getLivingStoryId().equals(livingStoryId)) {
-        return livingStoryData;
-      }
-    }
-    return null;
-  }
-
   @Override
   public String toString() {
     try {
@@ -118,11 +82,6 @@ public class UserEntity implements Serializable, JSONSerializable {
     try {
       object.put("emailAddress", getEmailAddress());
       object.put("defaultLspView", defaultLspView);
-      JSONArray livingStoryDataListJSON = new JSONArray();
-      for (UserLivingStoryEntity entity : livingStoryDataList) {
-        livingStoryDataListJSON.put(entity.toJSON());
-      }
-      object.put("livingStoryDataList", livingStoryDataListJSON);
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
@@ -135,12 +94,6 @@ public class UserEntity implements Serializable, JSONSerializable {
       entity.setEmailAddress(json.getString("emailAddress"));
       if (json.has("defaultLspView")) {
         entity.setDefaultLspView(json.getString("defaultLspView"));
-      }
-      entity.livingStoryDataList = new ArrayList<UserLivingStoryEntity>();
-      JSONArray livingStoryDataListJSON = json.getJSONArray("livingStoryDataList");
-      for (int i = 0; i < livingStoryDataListJSON.length(); i++) {
-        entity.livingStoryDataList.add(
-            UserLivingStoryEntity.fromJSON(livingStoryDataListJSON.getJSONObject(i)));
       }
       return entity;
     } catch (JSONException ex) {

@@ -247,7 +247,7 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
           (List<UserLivingStoryEntity>) query.execute(eventContentItem.getLivingStoryId());
       List<String> users = new ArrayList<String>();
       for (UserLivingStoryEntity entity : userLivingStoryEntities) {
-        users.add(entity.getId().getParent().getName());
+        users.add(entity.getParentEmailAddress());
       }
       if (!users.isEmpty()) {
        // getServletContext() doesn't return a valid result at construction-time, so
