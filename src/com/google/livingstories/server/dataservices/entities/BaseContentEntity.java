@@ -55,6 +55,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.jdo.JDOException;
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.EmbeddedOnly;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -89,6 +90,9 @@ public class BaseContentEntity
 
   // This is the HTML content.
   @Persistent
+  @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="content"))
+  })
   private LongStringHolder content;
   
   @Persistent
@@ -126,6 +130,9 @@ public class BaseContentEntity
     private Double longitude;
     
     @Persistent
+    @Embedded(members={
+        @Persistent(name="value", columns=@Column(name="description"))
+    })
     private LongStringHolder description;
 
     LocationEntity(Double latitude, Double longitude, String description) {
@@ -189,6 +196,9 @@ public class BaseContentEntity
   
   /*** Fields related to the source ***/
   @Persistent
+  @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="sourceDescription"))
+  })
   private LongStringHolder sourceDescription;
   
   @Persistent
@@ -203,9 +213,15 @@ public class BaseContentEntity
   private Date endDate;
   
   @Persistent
+  @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="eventUpdate"))
+  })
   private LongStringHolder eventUpdate;
   
   @Persistent
+  @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="eventSummary"))
+  })
   private LongStringHolder eventSummary;
 
   /*** Property shared by Background and Player types ***/
@@ -256,6 +272,9 @@ public class BaseContentEntity
   private Date narrativeDate;
   
   @Persistent
+  @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="narrativeSummary"))
+  })
   private LongStringHolder narrativeSummary;
 
   private BaseContentEntity() {}
