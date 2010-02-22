@@ -23,8 +23,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 /* non-Javadoc:
- * This implementation leverages appengine-specific facilities. To use
- * other storage methods, replace this file with the contents of LongStringHolder.java.plainstring
+ * By default, this is a copy of LongStringHolder.java. If you have replaced the contents of
+ * LongStringholder.java with those of LongStringHolder.java.plainstring, however, this
+ * copy is kept for reference.
  */
 
 @PersistenceCapable

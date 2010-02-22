@@ -16,29 +16,27 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import com.google.appengine.api.datastore.Text;
-
 import javax.jdo.annotations.EmbeddedOnly;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
-/* non-Javadoc:
- * This implementation leverages appengine-specific facilities. To use
- * other storage methods, replace this file with the contents of LongStringHolder.java.plainstring
+/**
+ * LongStringHolder interface suitable for general, non-appengine-specific use.
+ * Copy the contents of this file over those of LongStringHolder.java if not using
+ * app engine
  */
-
 @PersistenceCapable
 @EmbeddedOnly
 public class LongStringHolder implements LongStringHolderInterface {
   @Persistent
-  Text value;
+  String value;
   
-  public LongStringHolder(String value) {
-    this.value = new Text(value);
+  public PlainLongStringHolder(String value) {
+    value = new String(value);
   }
   
   @Override
   public String getValue() {
-    return value == null ? null : value.getValue();
+    return value;
   }
 }

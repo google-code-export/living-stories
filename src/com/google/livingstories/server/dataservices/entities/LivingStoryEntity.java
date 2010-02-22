@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
@@ -72,7 +74,11 @@ public class LivingStoryEntity
     private Key id;
 
     @Persistent
+    @Embedded(members={
+      @Persistent(name="value", columns=@Column(name="content"))
+    })
     private LongStringHolder content;
+    
     @Persistent
     private Date timestamp;
 
