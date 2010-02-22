@@ -16,7 +16,6 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import com.google.appengine.api.datastore.Key;
 import com.google.common.collect.Lists;
 import com.google.livingstories.client.LivingStory;
 import com.google.livingstories.client.PublishState;
@@ -71,7 +70,8 @@ public class LivingStoryEntity
     @SuppressWarnings("unused")
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key id;
+    @Extension(vendorName="datanucleus", key="gae.encoded-pk", value="true")
+    private String id;
 
     @Persistent
     @Embedded(members={

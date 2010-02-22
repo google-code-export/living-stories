@@ -16,8 +16,6 @@
 
 package com.google.livingstories.server.dataservices.entities;
 
-import com.google.appengine.api.datastore.Key;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +42,10 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   // not manually set.
   @PrimaryKey
   @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-  private Key id;
+  private Long id;
+  
+  @Persistent
+  private String parentEmailAddress;
   
   @Persistent
   private Long livingStoryId;
@@ -58,14 +59,20 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   @Persistent
   private Integer visitCount;
   
-  public UserLivingStoryEntity(Long livingStoryId, Date lastVisitedTime) {
+  public UserLivingStoryEntity(String parentEmailAddress, Long livingStoryId,
+      Date lastVisitedTime) {
+    this.parentEmailAddress = parentEmailAddress;
     this.livingStoryId = livingStoryId;
     this.lastVisitedTime = lastVisitedTime;
     this.visitCount = 1;
   }
   
-  public Key getId() {
+  public Long getId() {
     return id;
+  }
+  
+  public String getParentEmailAddress() {
+    return parentEmailAddress;
   }
   
   public Long getLivingStoryId() {
@@ -122,6 +129,7 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
     JSONObject object = new JSONObject();
     try {
       object.put("id", id);
+      object.put("parentEmailAddress", parentEmailAddress);
       object.put("livingStoryId", livingStoryId);
       object.put("lastVisitedTime", SimpleDateFormat.getInstance().format(lastVisitedTime));
       object.put("visitCount", visitCount);
@@ -134,7 +142,8 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   
   public static UserLivingStoryEntity fromJSON(JSONObject json) {
     try {
-      UserLivingStoryEntity entity = new UserLivingStoryEntity(json.getLong("livingStoryId"),
+      UserLivingStoryEntity entity = new UserLivingStoryEntity(
+          json.getString("parentEmailAddress"), json.getLong("livingStoryId"),
           SimpleDateFormat.getInstance().parse(json.getString("lastVisitedTime")));
       // Note: if the JSON that you're importing uses a different naming convention for
       // the living story id, convert it before processing here.

@@ -44,18 +44,25 @@ public class UserDataServiceImpl implements UserDataService {
   }
   
   @Override
-  public synchronized Map<Long, Date> getAllLastVisitTimes(String userId) {
-    UserEntity userEntity = retrieveUserEntity(userId);
+  public synchronized Map<Long, Date> getAllLastVisitTimes(String userEmail) {
     Map<Long, Date> visitTimesMap = new HashMap<Long, Date>();
-    if (userEntity != null) {
-      List<UserLivingStoryEntity> storyDataList = userEntity.getLivingStoryDataList();
-      if (storyDataList != null) {
-        for (UserLivingStoryEntity entity : storyDataList) {
-          visitTimesMap.put(entity.getLivingStoryId(), entity.getLastVisitedTime());
-        }
+
+    PersistenceManager pm = PMF.get().getPersistenceManager();
+    Query query = pm.newQuery(UserLivingStoryEntity.class);
+    query.setFilter("parentEmailAddress == emailParam");
+    query.declareParameters("java.lang.String emailParam");
+    try {
+      @SuppressWarnings("unchecked")
+      List<UserLivingStoryEntity> userLivingStoryEntities =
+          (List<UserLivingStoryEntity>) query.execute(userEmail);
+      for (UserLivingStoryEntity entity : userLivingStoryEntities) {
+        visitTimesMap.put(entity.getLivingStoryId(), entity.getLastVisitedTime());
       }
+      return visitTimesMap;
+    } finally {
+      query.closeAll();
+      pm.close();
     }
-    return visitTimesMap;
   }
 
   @Override
@@ -82,17 +89,16 @@ public class UserDataServiceImpl implements UserDataService {
   }
 
   @Override
-  public synchronized void updateVisitDataForStory(String userId, Long livingStoryId) {
-    UserEntity userEntity = retrieveUserEntity(userId);
-    if (userEntity == null) {
-      userEntity = createNewUserEntity(userId);
-    }
-
+  public synchronized void updateVisitDataForStory(String userEmail, Long livingStoryId) {
     UserLivingStoryEntity userLivingStoryEntity =
-        userEntity.getUserDataPerLivingStory(livingStoryId);
+        retrieveUserLivingStoryEntity(userEmail, livingStoryId);
     if (userLivingStoryEntity == null) {
       // This means the user has not visited this living story before. A new row needs to be added.
-      createNewUserLivingStoryEntity(userId, livingStoryId, false);
+      // Check if a userEntity exists for this user.  If not, we need to create that first.
+      if (retrieveUserEntity(userEmail) == null) {
+        createNewUserEntity(userEmail);
+      }
+      createNewUserLivingStoryEntity(userEmail, livingStoryId, false);
     } else {
       // This means the user has visited this living story before and the timestamp needs to be
       // updated in place.
@@ -113,18 +119,17 @@ public class UserDataServiceImpl implements UserDataService {
   }
   
   @Override
-  public synchronized void setEmailSubscription(String userId, Long livingStoryId, 
+  public synchronized void setEmailSubscription(String userEmail, Long livingStoryId, 
       boolean subscribe) {
-    UserEntity userEntity = retrieveUserEntity(userId);
-    if (userEntity == null) {
-      userEntity = createNewUserEntity(userId);
-    }
-
     UserLivingStoryEntity userLivingStoryEntity =
-        userEntity.getUserDataPerLivingStory(livingStoryId);
+        retrieveUserLivingStoryEntity(userEmail, livingStoryId);
     if (userLivingStoryEntity == null) {
       // This means the user has not visited this living story before. A new row needs to be added.
-      createNewUserLivingStoryEntity(userId, livingStoryId, subscribe);
+      // Check if a userEntity exists for this user.  If not, we need to create that first.
+      if (retrieveUserEntity(userEmail) == null) {
+        createNewUserEntity(userEmail);
+      }
+      createNewUserLivingStoryEntity(userEmail, livingStoryId, subscribe);
     } else {
       // This means the user has visited this living story before and only the subscription needs
       // to be updated.
@@ -198,8 +203,20 @@ public class UserDataServiceImpl implements UserDataService {
   
   private UserLivingStoryEntity retrieveUserLivingStoryEntity(
       String userEmail, Long livingStoryId) {
-    UserEntity userEntity = retrieveUserEntity(userEmail);
-    return userEntity == null ? null : userEntity.getUserDataPerLivingStory(livingStoryId);
+    PersistenceManager pm = PMF.get().getPersistenceManager();
+    Query query = pm.newQuery(UserLivingStoryEntity.class);
+    query.setFilter("parentEmailAddress == emailParam && livingStoryId == livingStoryIdParam");
+    query.declareParameters("java.lang.String emailParam, java.lang.Long livingStoryIdParam");
+    
+    try {
+      @SuppressWarnings("unchecked")
+      List<UserLivingStoryEntity> userLivingStoryEntities =
+          (List<UserLivingStoryEntity>) query.execute(userEmail, livingStoryId);
+      return userLivingStoryEntities.isEmpty() ? null : userLivingStoryEntities.iterator().next();
+    } finally {
+      query.closeAll();
+      pm.close();
+    }
   }
   
   /**
@@ -232,13 +249,11 @@ public class UserDataServiceImpl implements UserDataService {
   private UserLivingStoryEntity createNewUserLivingStoryEntity(String userEmail,
       Long livingStoryId, boolean subscribedToEmails) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
-    
     try { 
-      UserEntity userInfo = pm.getObjectById(UserEntity.class, createKey(userEmail));
       UserLivingStoryEntity userLivingStoryEntity =
-          userInfo.addNewLivingStoryTimestamp(livingStoryId);
+          new UserLivingStoryEntity(userEmail, livingStoryId, new Date());
       userLivingStoryEntity.setSubscribedToEmails(subscribedToEmails);
-      pm.makePersistent(userInfo);
+      pm.makePersistent(userLivingStoryEntity);
       return userLivingStoryEntity;
     } finally {
       pm.close();
