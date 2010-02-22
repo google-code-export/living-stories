@@ -221,7 +221,8 @@ public class LivingStoryManager extends ManagerPane {
   @UiHandler("livingStorySelector")
   void changeLivingStories(ChangeEvent event) {
     if (livingStorySelector.hasSelection()) {
-      LivingStoryData.setLivingStoryId(Long.valueOf(livingStorySelector.getSelectedItemValue()));
+      Long livingStoryId = livingStorySelector.getSelectedLivingStoryId();
+      LivingStoryData.setLivingStoryId(livingStoryId);
 
       AsyncCallback<LivingStory> callback = new AsyncCallback<LivingStory>() {
         public void onFailure(Throwable caught) {
@@ -233,8 +234,9 @@ public class LivingStoryManager extends ManagerPane {
         }
       };
 
-      livingStoryService.getLivingStoryById(
-          Long.valueOf(livingStorySelector.getSelectedItemValue()), false, callback);
+      if (livingStoryId != null) {
+        livingStoryService.getLivingStoryById(livingStoryId, false, callback);
+      }
     }
   }
 
@@ -266,7 +268,7 @@ public class LivingStoryManager extends ManagerPane {
     changeLivingStories(null);
 
     if (livingStorySelector.hasSelection()) {
-      LivingStoryData.setLivingStoryId(Long.valueOf(livingStorySelector.getSelectedItemValue()));
+      LivingStoryData.setLivingStoryId(livingStorySelector.getSelectedLivingStoryId());
     }
   }
 }

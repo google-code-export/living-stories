@@ -89,7 +89,11 @@ public class LivingStorySelector extends ItemList<LivingStory> {
     if (selectedItemValue == null) {  // no selection
       throw new UnsupportedOperationException("no living story selected");
     }
-    return selectedItemValue.equals(UNASSIGNED) ? null : Long.valueOf(selectedItemValue);
+    try {
+      return selectedItemValue.equals(UNASSIGNED) ? null : Long.valueOf(selectedItemValue);
+    } catch (NumberFormatException e) {
+      return null;
+    }
   }
   
   /**
