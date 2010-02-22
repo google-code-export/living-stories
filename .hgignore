@@ -1,7 +1,6 @@
 syntax: glob
 
 *~
-.settings/*
 genfiles/*
 war/WEB-INF/classes/*
 war/ContentManager/*
