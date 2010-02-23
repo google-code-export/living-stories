@@ -1,0 +1,64 @@
+/**
+ * Copyright 2010 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS-IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.timelinePanel {
+  overflow: visible !important;
+}
+
+.timelineDate {
+  font-size: 8pt;
+}
+
+.hashMark {
+  height: 12px;
+  background: #999;
+  font-size: 1px;
+}
+
+.timelineEvent {
+  font-size: 9pt;
+  line-height: 1;
+  border: 1px solid transparent;
+  /* max height set programatically as an inline style. */
+  overflow: hidden;
+  padding: 0.2em;
+}
+
+div.timelineEvent:hover {
+  max-height: none !important;  /* !important overrides inline style */
+  overflow: visible;
+}
+
+div.clickableTimelineEvent:hover {
+  background-color: lightyellow;
+  border-color: #999;
+}
+
+div.arrowBody {
+  font-size: 1px;
+}
+
+img.disabledArrowHead, div.arrowBody {
+  background-color: #ebeff9;
+}
+
+img.enabledArrowHead {
+  background-color: #0075bd;
+}
+
+img.enabledArrowHead:hover {
+  background-color: #00a5ed;
+}
