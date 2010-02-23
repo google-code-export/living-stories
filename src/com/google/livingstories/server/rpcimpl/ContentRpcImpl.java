@@ -54,7 +54,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -262,13 +264,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
             eventContentItem.getLivingStoryId());
         String baseLspUrl = getBaseServerUrl() + "/lsps/" + livingStory.getUrl();
         
-        StringBuilder emailContent = new StringBuilder("<b>");
-        emailContent.append(eventContentItem.getEventUpdate()).append("</b>");
-        if (!GlobalUtil.isContentEmpty(publisherName)) {
-          emailContent.append("<span style=\"color: #777;\">&nbsp;-&nbsp;");
-          emailContent.append(publisherName);
-          emailContent.append("</span>");
-        }
+        ResourceBundle emailBundle = ResourceBundle.getBundle(
+            "com.google.livingstories.server.rpcimpl.emailTemplate", Locale.ENGLISH);
+        
+        String subject = emailBundle.getString("updateEmailSubject")
+            .replace("{0}", livingStory.getTitle());
+
         String eventSummary = eventContentItem.getEventSummary();
         String eventDetails = eventContentItem.getContent();
         if (GlobalUtil.isContentEmpty(eventSummary) 
@@ -276,24 +277,28 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
           eventSummary = SnippetUtil.createSnippet(JavaNodeAdapter.fromHtml(eventDetails), 
                   EMAIL_ALERT_SNIPPET_LENGTH);
         }
-        if (eventSummary != null && !eventSummary.isEmpty()) {
-          emailContent.append("<br><br>").append(StringUtil.stripForExternalSites(eventSummary));
-        }
-        emailContent.append("<br><a href=\"")
-            .append(baseLspUrl)
-            .append("#OVERVIEW:false,false,false,n,n,n:")
-            .append(eventContentItem.getId())
-            .append(";\">Read more</a>")
-            .append("<br><br>-----<br>")
-            .append("<span style=\"font-size:small\">This is an automated alert. ")
-            .append("To unsubscribe, click the 'unsubscribe' link on the top right of ")
-            .append("<a href=\"")
-            .append(DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl))
-            .append("\">this page</a>.</span>");
 
+        String template = emailBundle.getString("updateEmailTemplate");
+        // Some parts of this template aren't necessary if certain input strings are blank.
+        // Do some more replacement logic to correct this. Note the reluctant quantifiers.
+        if (GlobalUtil.isContentEmpty(publisherName)) {
+          template = template.replaceFirst("<span class=\"p_span\".*?</span>", "");
+        }
+        if (eventSummary == null || eventSummary.isEmpty()) {
+          template = template.replaceFirst("<div class=\"s_div\".*?</div>", "");
+        }
+        
+        // The transformations above may have taken some of these placeholders out of the
+        // template, but that's okay!
+        String body = template.replace("{0}", eventContentItem.getEventUpdate())
+            .replace("{1}", publisherName)
+            .replace("{2}", StringUtil.stripForExternalSites(eventSummary))
+            .replace("{3}", baseLspUrl + "#OVERVIEW:false,false,false,n,n,n:"
+                + eventContentItem.getId())
+            .replace("{4}", DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl));
+        
         if (fromAddress != null) {
-          AlertSender.sendEmail(fromAddress, users,
-              "Update: " + livingStory.getTitle(), emailContent.toString());
+          AlertSender.sendEmail(fromAddress, users, subject, body);
         }
         
       }
