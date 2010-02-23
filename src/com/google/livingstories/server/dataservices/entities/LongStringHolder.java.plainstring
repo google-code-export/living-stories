@@ -31,7 +31,7 @@ public class LongStringHolder implements LongStringHolderInterface {
   @Persistent
   String value;
   
-  public PlainLongStringHolder(String value) {
+  public LongStringHolder(String value) {
     value = new String(value);
   }
   
