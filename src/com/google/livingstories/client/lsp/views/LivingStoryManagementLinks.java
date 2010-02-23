@@ -83,7 +83,8 @@ public class LivingStoryManagementLinks extends Composite {
       subscribeLink.setVisible(false);
       subscribeLinkSeparator.setVisible(false);
     } else {
-      boolean canUnsubscribe = LivingStoryData.isLoggedIn() && LivingStoryData.isSubscribedToEmails();
+      boolean canUnsubscribe =
+          LivingStoryData.isLoggedIn() && LivingStoryData.isSubscribedToEmails();
       unsubscribeLink.setVisible(canUnsubscribe);
       subscribeLink.setVisible(!canUnsubscribe);
     }
