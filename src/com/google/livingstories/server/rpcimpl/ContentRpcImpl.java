@@ -62,6 +62,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -324,10 +326,23 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     String subject = emailBundle.getString("updateEmailSubject")
         .replace("{0}", placeholderMap.get("storyTitle"));
 
-    String template = emailBundle.getString("updateEmailTemplate");
+    // get the template in the .properties file, converting to the format expected by
+    // java.util.Formatter. A simple replaceAll won't suffice here 'cause the source format
+    // is 0-indexed, but the target format is 1-indexed. We use a StringBuffer below rather
+    // than a StringBuilder because Matcher is only compatible with the former.
+    StringBuffer sb = new StringBuffer();
+    Pattern p = Pattern.compile("\\{(\\d+)\\}");
+    Matcher m = p.matcher(emailBundle.getString("updateEmailTemplate"));
+    while (m.find()) {
+      int num = Integer.parseInt(m.group(1));
+      m.appendReplacement(sb, "%" + (num + 1) + "\\$s");
+    }
+    m.appendTail(sb);
+    
+    String template = sb.toString();
+    
     // Some parts of this template aren't necessary if certain placeholders are blank.
     // Do some replacement logic to correct this. Note the reluctant quantifiers.
-    
     String publisherName = placeholderMap.get("publisherName");
     if (GlobalUtil.isContentEmpty(publisherName)) {
       template = template.replaceFirst("<span class=\"p_span\".*?</span>", "");
@@ -339,12 +354,12 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
 
     // The transformations above may have taken some of these placeholders out of the
     // template, but that's okay!
-    String body = template
-        .replace("{0}", placeholderMap.get("updateTitle"))
-        .replace("{1}", publisherName)
-        .replace("{2}", snippet)
-        .replace("{3}", placeholderMap.get("linkUrl"))
-        .replace("{4}", placeholderMap.get("loginUrl"));
+    String body = String.format(template,
+        placeholderMap.get("updateTitle"),
+        publisherName,
+        snippet,
+        placeholderMap.get("linkUrl"),
+        placeholderMap.get("loginUrl"));
 
     if (cachedFromAddress != null) {
       AlertSender.sendEmail(cachedFromAddress, recipients, subject, body);
