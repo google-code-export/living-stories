@@ -18,6 +18,7 @@ package com.google.livingstories.client.start;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -73,6 +74,11 @@ public class StartPage implements EntryPoint {
     startPageWidget = new VerticalPanel();
     startPageWidget.setWidth("100%");
     RootPanel.get("storyList").add(startPageWidget);
+
+    String title = ClientMessageHolder.consts.startPageTitle();
+    Document doc = Document.get();
+    doc.setTitle(title);
+    doc.getElementById("logoImage").setAttribute("alt", title);
     
     livingStoryService.getStartPageBundle(new AsyncCallback<StartPageBundle>() {
       @Override

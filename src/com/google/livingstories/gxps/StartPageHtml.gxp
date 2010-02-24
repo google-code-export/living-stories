@@ -37,7 +37,7 @@
   <gxp:nomsg>
     <html>
       <head>
-        <title>Living Stories</title>
+        <!--  title is set on the client side, dynamically -->
 
         <script type="text/javascript" language="javascript" src="StartPage/StartPage.nocache.js"></script>
         <script type="text/javascript">
@@ -56,7 +56,7 @@
         <table width="100%">
           <tr>
             <td>
-              <img expr:src='logoLocation' alt="Living Stories"/>
+              <img id='logoImage' expr:src='logoLocation' alt=''/>  <!--  alt text is set programatically -->
             </td>
             <td style="vertical-align: top;">
               <div class="loginPane" id="managementLinks"></div>
