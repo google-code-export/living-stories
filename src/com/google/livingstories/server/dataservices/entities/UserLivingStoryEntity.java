@@ -145,6 +145,7 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
       object.put("lastVisitedTime", SimpleDateFormat.getInstance().format(lastVisitedTime));
       object.put("visitCount", visitCount);
       object.put("subscribedToEmails", subscribedToEmails);
+      object.put("subscriptionLocale", getSubscriptionLocale());
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
@@ -163,6 +164,7 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
       }
       if (json.has("subscribedToEmails")) {
         entity.setSubscribedToEmails(json.getBoolean("subscribedToEmails"));
+        entity.setSubscriptionLocale(json.getString("subscriptionLocale"));
       }
       return entity;
     } catch (JSONException ex) {
