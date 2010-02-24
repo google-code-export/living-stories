@@ -81,7 +81,7 @@ public interface UserDataService {
    * @param livingStoryId database id of the a living story
    * @param subscribe whether the subscription should be turned on or off
    */
-  void setEmailSubscription(String userId, Long livingStoryId, boolean subscribe);
+  void setEmailSubscription(String userId, Long livingStoryId, boolean subscribe, String localeId);
   
   /**
    * Set the default story view preference for the given user to the provided value.

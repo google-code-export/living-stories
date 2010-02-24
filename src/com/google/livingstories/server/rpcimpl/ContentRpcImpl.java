@@ -17,9 +17,12 @@
 package com.google.livingstories.server.rpcimpl;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.livingstories.client.AssetContentItem;
@@ -80,8 +83,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   private static final Logger logger =
       Logger.getLogger(ContentRpcImpl.class.getCanonicalName());
   
-  private InternetAddress fromAddress = null;
-  private String publisherName = null;
+  private InternetAddress cachedFromAddress = null;
+  private String cachedPublisherName = null;
 
   @Override
   public synchronized BaseContentItem createOrChangeContentItem(BaseContentItem contentItem) {
@@ -247,72 +250,105 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       @SuppressWarnings("unchecked")
       List<UserLivingStoryEntity> userLivingStoryEntities =
           (List<UserLivingStoryEntity>) query.execute(eventContentItem.getLivingStoryId());
-      List<String> users = new ArrayList<String>();
+      Multimap<String, String> usersByLocale = HashMultimap.create();
       for (UserLivingStoryEntity entity : userLivingStoryEntities) {
-        users.add(entity.getParentEmailAddress());
+        usersByLocale.put(entity.getSubscriptionLocale(), entity.getParentEmailAddress());
       }
-      if (!users.isEmpty()) {
-       // getServletContext() doesn't return a valid result at construction-time, so
-       // we initialize the external properties lazily.
-       if (fromAddress == null && publisherName == null) {
+      
+      if (!usersByLocale.isEmpty()) {
+        // Determine what all the placeholder text should be for the per-locale e-mails.
+
+        // getServletContext() doesn't return a valid result at construction-time, so
+        // we initialize the external properties lazily.
+        if (cachedFromAddress == null && cachedPublisherName == null) {
           ExternalServiceKeyChain externalKeys = new ExternalServiceKeyChain(getServletContext());
-          publisherName = externalKeys.getPublisherName();
-          fromAddress = externalKeys.getFromAddress();
+          cachedPublisherName = externalKeys.getPublisherName();
+          cachedFromAddress = externalKeys.getFromAddress();
         }
-        
+       
         LivingStoryEntity livingStory = pm.getObjectById(LivingStoryEntity.class,
             eventContentItem.getLivingStoryId());
         String baseLspUrl = getBaseServerUrl() + "/lsps/" + livingStory.getUrl();
         
-        ResourceBundle emailBundle = ResourceBundle.getBundle(
-            "com.google.livingstories.server.rpcimpl.emailTemplate", Locale.ENGLISH);
-        
-        String subject = emailBundle.getString("updateEmailSubject")
-            .replace("{0}", livingStory.getTitle());
-
         String eventSummary = eventContentItem.getEventSummary();
         String eventDetails = eventContentItem.getContent();
         if (GlobalUtil.isContentEmpty(eventSummary) 
             && !GlobalUtil.isContentEmpty(eventDetails)) {
           eventSummary = SnippetUtil.createSnippet(JavaNodeAdapter.fromHtml(eventDetails), 
-                  EMAIL_ALERT_SNIPPET_LENGTH);
+              EMAIL_ALERT_SNIPPET_LENGTH);
         }
 
-        String template = emailBundle.getString("updateEmailTemplate");
-        // Some parts of this template aren't necessary if certain input strings are blank.
-        // Do some more replacement logic to correct this. Note the reluctant quantifiers.
-        if (GlobalUtil.isContentEmpty(publisherName)) {
-          template = template.replaceFirst("<span class=\"p_span\".*?</span>", "");
-        }
-        if (eventSummary == null || eventSummary.isEmpty()) {
-          template = template.replaceFirst("<div class=\"s_div\".*?</div>", "");
-        }
-        
-        // The transformations above may have taken some of these placeholders out of the
-        // template, but that's okay!
-        String body = template.replace("{0}", eventContentItem.getEventUpdate())
-            .replace("{1}", publisherName)
-            .replace("{2}", StringUtil.stripForExternalSites(eventSummary))
-            .replace("{3}", baseLspUrl + "#OVERVIEW:false,false,false,n,n,n:"
+        ImmutableMap<String, String> placeholderMap = new ImmutableMap.Builder<String, String>()
+            .put("storyTitle", livingStory.getTitle())
+            .put("updateTitle", eventContentItem.getEventUpdate())
+            .put("publisherName", cachedPublisherName)
+            .put("snippet", StringUtil.stripForExternalSites(eventSummary))
+            .put("linkUrl", baseLspUrl + "#OVERVIEW:false,false,false,false,n,n,n:"
                 + eventContentItem.getId())
-            .replace("{4}", DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl));
-        
-        if (fromAddress != null) {
-          AlertSender.sendEmail(fromAddress, users, subject, body);
+            .put("loginUrl", DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl))
+            .build();
+       
+        for (String locale : usersByLocale.keySet()) {
+          sendEmailsForLocale(placeholderMap, locale, usersByLocale.get(locale));
         }
-        
       }
     } finally {
       query.closeAll();
       pm.close();
     }
-
   }
   
   private String getBaseServerUrl() {
     HttpServletRequest request = super.getThreadLocalRequest();
     StringBuffer url = request.getRequestURL();
     return url.substring(0, url.length() - request.getRequestURI().length());
+  }
+
+  private void sendEmailsForLocale(
+      Map<String, String> placeholderMap, String localeString, Collection<String> recipients) {
+    // We reconstruct the Locale from the locale string. This ignores the possibility that
+    // a language variant is being specified, a script is being specified, etc.
+    // TODO: fix that.
+    Locale locale;
+    if (localeString.isEmpty()) {
+      locale = Locale.ENGLISH;
+    } else {
+      String[] splitRes = localeString.split("_");
+      locale = splitRes.length == 1 ? new Locale(splitRes[0])
+          : new Locale(splitRes[0], splitRes[1]);
+    }
+    
+    ResourceBundle emailBundle = ResourceBundle.getBundle(
+        "com.google.livingstories.server.rpcimpl.emailTemplate", locale);
+
+    String subject = emailBundle.getString("updateEmailSubject")
+        .replace("{0}", placeholderMap.get("storyTitle"));
+
+    String template = emailBundle.getString("updateEmailTemplate");
+    // Some parts of this template aren't necessary if certain placeholders are blank.
+    // Do some replacement logic to correct this. Note the reluctant quantifiers.
+    
+    String publisherName = placeholderMap.get("publisherName");
+    if (GlobalUtil.isContentEmpty(publisherName)) {
+      template = template.replaceFirst("<span class=\"p_span\".*?</span>", "");
+    }
+    String snippet = placeholderMap.get("snippet");
+    if (snippet == null || snippet.isEmpty()) {
+      template = template.replaceFirst("<div class=\"s_div\".*?</div>", "");
+    }
+
+    // The transformations above may have taken some of these placeholders out of the
+    // template, but that's okay!
+    String body = template
+        .replace("{0}", placeholderMap.get("updateTitle"))
+        .replace("{1}", publisherName)
+        .replace("{2}", snippet)
+        .replace("{3}", placeholderMap.get("linkUrl"))
+        .replace("{4}", placeholderMap.get("loginUrl"));
+
+    if (cachedFromAddress != null) {
+      AlertSender.sendEmail(cachedFromAddress, recipients, subject, body);
+    }
   }
   
   @SuppressWarnings("unchecked")

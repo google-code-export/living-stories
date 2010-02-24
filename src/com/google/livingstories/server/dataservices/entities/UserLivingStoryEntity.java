@@ -58,6 +58,9 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   
   @Persistent
   private Integer visitCount;
+
+  @Persistent
+  private String subscriptionLocale;
   
   public UserLivingStoryEntity(String parentEmailAddress, Long livingStoryId,
       Date lastVisitedTime) {
@@ -113,6 +116,14 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
     } else {
       visitCount++;
     }
+  }
+  
+  public String getSubscriptionLocale() {
+    return subscriptionLocale == null ? "en" : subscriptionLocale;
+  }
+  
+  public void setSubscriptionLocale(String subscriptionLocale) {
+    this.subscriptionLocale = subscriptionLocale; 
   }
   
   @Override
