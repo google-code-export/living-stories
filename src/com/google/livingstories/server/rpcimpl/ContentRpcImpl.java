@@ -311,10 +311,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
     // We reconstruct the Locale from the locale string. This ignores the possibility that
     // a language variant is being specified, a script is being specified, etc.
     // TODO: fix that.
-    Locale locale;
-    if (localeString.isEmpty()) {
-      locale = Locale.ENGLISH;
-    } else {
+    Locale locale = Locale.ENGLISH;
+    if (!localeString.isEmpty()) {
       String[] splitRes = localeString.split("_");
       locale = splitRes.length == 1 ? new Locale(splitRes[0])
           : new Locale(splitRes[0], splitRes[1]);
