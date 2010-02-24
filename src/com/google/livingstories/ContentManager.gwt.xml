@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.6.4//EN" "http://google-web-toolkit.googlecode.com/svn/tags/1.6.4/distro-source/core/src/gwt-module.dtd">
+<module rename-to='ContentManager'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.i18n.I18N" />
+  <inherits name='com.google.gwt.json.JSON' />
+  <inherits name="com.google.gwt.dom.DOM" />
+
+  <!-- i18n -->
+  <extend-property name="locale" values="en"/>
+  <!-- Example of additional internationalized locales -->
+  <!-- Change the locale value to suit your needs (it's ok to add -->
+  <!-- multiple locales here).  Then add additional -->
+  <!-- .properties files with the translated strings to use for each locale. -->
+  <!-- See http://code.google.com/p/living-stories/wiki/Internationalization for more info. -->
+  <!-- <extend-property name="locale" values="es"/> -->
+  <!-- <extend-property name="locale" values="de"/> -->
+  <set-property-fallback name="locale" value="en"/>
+  
+  <!-- Inherit the default GWT style sheet.  You can change       -->
+  <!-- the theme of your GWT application by uncommenting          -->
+  <!-- any one of the following lines.                            -->
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+
+  <!-- Other module inherits                                      -->
+  <inherits name='com.google.gwt.ajaxloader.AjaxLoader' />
+  <inherits name='com.google.gwt.maps.GoogleMaps' />
+  <inherits name='com.reveregroup.gwt.imagepreloader.ImagePreloader' />
+
+  <source path="client" excludes="util/dom/JavaNodeAdapter.java"/>
+
+  <!-- Use the the RichTextUtil class as the default -->
+  <replace-with class="com.google.livingstories.client.util.RichTextUtil">
+    <when-type-is class="com.google.livingstories.client.util.RichTextUtil"/>
+  </replace-with>
+
+  <!-- IE has a completely different rich text implementation -->
+  <replace-with class="com.google.livingstories.client.util.RichTextUtilIE">
+    <when-type-is class="com.google.livingstories.client.util.RichTextUtil"/>
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
+
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='com.google.livingstories.client.contentmanager.ContentManager'/>
+</module>

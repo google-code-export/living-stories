@@ -1,0 +1,89 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!-- 
+  Encapsulates the content of the subscribe/unsubscribe popup
+-->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+  <ui:style>
+    .explanation {
+      width: 270px;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    .thinMargin {
+      margin: 5px;
+    }
+  </ui:style>
+  <g:FlowPanel styleName="{style.thinMargin}">
+    <g:HTML ui:field="subscribeInstructions" visible="false" styleName="{style.explanation}">
+      <ui:msg description="text shown to subscribe to story updates">
+        <p>If you subscribe, new updates on the story
+          <ui:ph name="lspTitle" example="The Sinking of the Lusitania">
+            <span ui:field="title0" class="{style.bold}"/>
+          </ui:ph>
+          will be sent to your Google Account email address, 
+          <ui:ph name="emailAddress" example="test.address@gmail.com">
+            <span ui:field="username" class="{style.bold}"/><!--
+       --></ui:ph>.</p>
+        <p>Your other subscriptions, if any, will be unaffected, and you may choose to
+          unsubscribe from this story at any time.</p>
+        <p>Subscribe to e-mail updates?</p>
+      </ui:msg>
+    </g:HTML>
+    <g:HTML ui:field="logInAndSubscribeInstructions" visible="false" styleName="{style.explanation}">
+      <ui:msg description="text shown to subscribe to story updates">
+        <p>If you subscribe, you will be prompted to log in with a Google Account email address
+          and password. Once you log in, updates on the story
+          <ui:ph name="lspTitle" example="The Sinking of the Lusitania">
+            <span ui:field="title1" class="{style.bold}"/>
+          </ui:ph>
+          will be sent to your email address.</p> 
+        <p>Your other subscriptions, if any, will be unaffected, and you may choose to
+          unsubscribe from this story at any time.</p>
+        <p>Log in and subscribe to e-mail updates?</p>
+      </ui:msg>
+    </g:HTML>
+    <g:HTML ui:field="unsubscribeInstructions" visible="false" styleName="{style.explanation}">
+      <ui:msg description="text shown to unsubscribe from story updates">
+        <p>This will remove your e-mail subscription to the story
+          <ui:ph name="lspTitle" example="The Sinking of the Lusitania">
+            <span ui:field="title2" class="{style.bold}"/><!--
+       --></ui:ph>.</p>
+        <p>Your other subscriptions, if any, will be unaffected, and you may choose to
+          resubscribe to this story at any time.</p>
+        <p>Unsubscribe from e-mail updates?</p>
+      </ui:msg>
+    </g:HTML>
+    <g:Button ui:field="subscribe" visible="false">
+      <ui:msg description="button text">Subscribe</ui:msg>
+    </g:Button>
+    <g:Button ui:field="logInAndSubscribe" visible="false">
+      <ui:msg description="button text">Log in and Subscribe</ui:msg>
+    </g:Button>
+    <g:Button ui:field="unsubscribe" visible="false">
+      <ui:msg description="button text">Unsubscribe</ui:msg>
+    </g:Button>
+    <g:Button ui:field="cancel">
+      <ui:msg description="button text">Cancel</ui:msg>
+    </g:Button>
+  </g:FlowPanel>
+</ui:UiBinder> 
