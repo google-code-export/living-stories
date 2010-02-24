@@ -22,63 +22,59 @@
         <property name="timestamp" direction="asc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
-        <property name="atomType" direction="asc"/>
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
+        <property name="contentItemType" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
-        <property name="atomType" direction="asc"/>
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
+        <property name="contentItemType" direction="asc"/>
         <property name="isStandalone" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="UserLspEntity" ancestor="true" source="auto">
-        <property name="lspDataList_INTEGER_IDX" direction="asc"/>
-    </datastore-index>
-
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
         <property name="livingStoryId" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
         <property name="importance" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
-        <property name="atomType" direction="asc"/>
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
+        <property name="contentItemType" direction="asc"/>
         <property name="importance" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
         <property name="assetType" direction="asc"/>
-        <property name="atomType" direction="asc"/>
+        <property name="contentItemType" direction="asc"/>
         <property name="importance" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
     </datastore-index>
 
-    <datastore-index kind="BaseAtomEntityImpl" ancestor="false" source="auto">
+    <datastore-index kind="BaseContentEntity" ancestor="false" source="auto">
         <property name="assetType" direction="asc"/>
-        <property name="atomType" direction="asc"/>
+        <property name="contentItemType" direction="asc"/>
         <property name="livingStoryId" direction="asc"/>
         <property name="publishState" direction="asc"/>
         <property name="timestamp" direction="desc"/>
