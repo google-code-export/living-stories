@@ -62,7 +62,8 @@ public class StubUserDataServiceImpl implements UserDataService {
   }
 
   @Override
-  public void setEmailSubscription(String userId, Long livingStoryId, boolean subscribe) {
+  public void setEmailSubscription(String userId, Long livingStoryId, boolean subscribe,
+      String localeId) {
   }
 
   @Override

@@ -35,7 +35,8 @@ public interface UserRpcServiceAsync {
 
   void isSubscribedToEmails(Long livingStoryId, AsyncCallback<Boolean> callback);
   
-  void setSubscribedToEmails(Long livingStoryId, boolean value, AsyncCallback<Void> callback);
+  void setSubscribedToEmails(Long livingStoryId, boolean value, String localeId,
+      AsyncCallback<Void> callback);
   
   void getDefaultStoryView(AsyncCallback<FilterSpec> callback);
 

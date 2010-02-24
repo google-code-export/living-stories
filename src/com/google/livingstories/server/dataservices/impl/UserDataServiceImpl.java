@@ -98,7 +98,7 @@ public class UserDataServiceImpl implements UserDataService {
       if (retrieveUserEntity(userEmail) == null) {
         createNewUserEntity(userEmail);
       }
-      createNewUserLivingStoryEntity(userEmail, livingStoryId, false);
+      createNewUserLivingStoryEntity(userEmail, livingStoryId, false, null);
     } else {
       // This means the user has visited this living story before and the timestamp needs to be
       // updated in place.
@@ -120,7 +120,7 @@ public class UserDataServiceImpl implements UserDataService {
   
   @Override
   public synchronized void setEmailSubscription(String userEmail, Long livingStoryId, 
-      boolean subscribe) {
+      boolean subscribe, String localeId) {
     UserLivingStoryEntity userLivingStoryEntity =
         retrieveUserLivingStoryEntity(userEmail, livingStoryId);
     if (userLivingStoryEntity == null) {
@@ -129,7 +129,7 @@ public class UserDataServiceImpl implements UserDataService {
       if (retrieveUserEntity(userEmail) == null) {
         createNewUserEntity(userEmail);
       }
-      createNewUserLivingStoryEntity(userEmail, livingStoryId, subscribe);
+      createNewUserLivingStoryEntity(userEmail, livingStoryId, subscribe, localeId);
     } else {
       // This means the user has visited this living story before and only the subscription needs
       // to be updated.
@@ -140,6 +140,7 @@ public class UserDataServiceImpl implements UserDataService {
         userLivingStoryEntity = pm.getObjectById(
             UserLivingStoryEntity.class, userLivingStoryEntity.getId());
         userLivingStoryEntity.setSubscribedToEmails(subscribe);
+        userLivingStoryEntity.setSubscriptionLocale(localeId);
         pm.makePersistent(userLivingStoryEntity);
       } finally {
         pm.close();
@@ -247,12 +248,15 @@ public class UserDataServiceImpl implements UserDataService {
    * Save information for an existing user, but a new living story.
    */
   private UserLivingStoryEntity createNewUserLivingStoryEntity(String userEmail,
-      Long livingStoryId, boolean subscribedToEmails) {
+      Long livingStoryId, boolean subscribedToEmails, String localeId) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     try { 
       UserLivingStoryEntity userLivingStoryEntity =
           new UserLivingStoryEntity(userEmail, livingStoryId, new Date());
       userLivingStoryEntity.setSubscribedToEmails(subscribedToEmails);
+      if (localeId != null) {
+        userLivingStoryEntity.setSubscriptionLocale(localeId);
+      }
       pm.makePersistent(userLivingStoryEntity);
       return userLivingStoryEntity;
     } finally {
