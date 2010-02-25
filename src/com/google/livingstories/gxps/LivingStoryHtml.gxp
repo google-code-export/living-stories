@@ -49,11 +49,11 @@
       <title><gxp:eval expr="livingStory.getTitle()"/></title>
 
       <link id='rssLink' rel="alternate" type="application/rss+xml"
-            expr:href='"/feeds/" + livingStory.getUrl()'/>
+            expr:href='"../feeds/" + livingStory.getUrl()'/>
 
 <!--  title attribute is set client-side, equivalent to expr:title='"RSS Feed for " + livingStory.getTitle()' -->
 
-      <script type="text/javascript" src="/LivingStoryPage/LivingStoryPage.nocache.js"></script>
+      <script type="text/javascript" src="../LivingStoryPage/LivingStoryPage.nocache.js"></script>
       
       <!-- Include the Google Friend Connect javascript library. -->
       <script type="text/javascript" src="http://www.google.com/friendconnect/script/friendconnect.js"></script>
@@ -77,8 +77,8 @@
         };
       </script>
 
-      <link rel="stylesheet" href="/LivingStoryPage/gwt/standard/standard.css"/>
-      <link rel="stylesheet" href="/Timeline.css"/>
+      <link rel="stylesheet" href="../LivingStoryPage/gwt/standard/standard.css"/>
+      <link rel="stylesheet" href="../Timeline.css"/>
       
       <call:AnalyticsBlock expr:analyticsAccountId='analyticsAccountId'/>
       

@@ -28,7 +28,7 @@
         <!--                                                               -->
         <!-- Consider inlining CSS to reduce the number of requested files -->
         <!--                                                               -->
-        <link type="text/css" rel="stylesheet" href="/ContentManager.css"/>
+        <link type="text/css" rel="stylesheet" href="ContentManager.css"/>
         <title>Living Stories Content Manager</title>
         
         <script type="text/javascript" language="javascript" src="ContentManager/ContentManager.nocache.js"></script>
