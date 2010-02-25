@@ -32,7 +32,7 @@ public class LongStringHolder implements LongStringHolderInterface {
   String value;
   
   public LongStringHolder(String value) {
-    value = new String(value);
+    this.value = new String(value);
   }
   
   @Override
