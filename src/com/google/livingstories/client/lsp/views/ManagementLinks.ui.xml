@@ -1,0 +1,47 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!-- 
+  Encapsulates the management links that appear in the upper-right-hand corner of
+  user-facing pages.
+-->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:lsp="urn:import:com.google.livingstories.client.ui"
+  
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+  <ui:style>
+    .pointer { cursor : pointer; }
+  </ui:style>
+
+  <g:HTMLPanel ui:field='root'>
+    <!-- Any of the widgets below that are not initially visible will be selectively made visible
+         in code. -->
+    <table cellspacing='0' cellpadding='0'>
+      <tr>
+        <td align='right'>
+          <g:InlineLabel ui:field='username'/>
+          <g:InlineLabel ui:field='usernameSeparator' visible='false'>|</g:InlineLabel>   <!--  separator -->
+          <g:Anchor ui:field='logIn' visible='false'><ui:msg description='link text'>Log in</ui:msg></g:Anchor>
+          <g:Anchor ui:field='logOut' visible='false'><ui:msg description='link text'>Log out</ui:msg></g:Anchor>
+        </td>  
+      </tr>
+    </table>
+  </g:HTMLPanel>
+</ui:UiBinder>

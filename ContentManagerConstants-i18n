@@ -1,0 +1,4 @@
+#!/bin/sh
+APPDIR=`dirname $0`;
+java -cp "$APPDIR/src:$APPDIR/bin:$SDKJAR" com.google.gwt.i18n.tools.I18NSync -out $APPDIR/src com.google.livingstories.client.contentmanager.ContentManagerConstants  ;
+

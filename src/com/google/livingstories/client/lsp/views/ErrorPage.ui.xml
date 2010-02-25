@@ -1,0 +1,34 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- 
+ Copyright 2010 Google Inc.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS-IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!-- 
+  Encapsulates the error page.
+-->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  ui:generateFormat='com.google.gwt.i18n.rebind.format.PropertiesFormat'
+  ui:generateKeys="com.google.gwt.i18n.rebind.keygen.MD5KeyGenerator"
+  ui:generateLocales="default">
+  <g:HTMLPanel>
+    <g:Label>
+      <ui:msg description="error explanation">Sorry, an error has occurred. Please refresh the page and try again.</ui:msg>
+    </g:Label>  
+    <g:Label>
+      <ui:msg description="label introducing an error message">Error message:</ui:msg>
+    </g:Label>
+    <g:Label ui:field="errorMessage"/>
+  </g:HTMLPanel>
+</ui:UiBinder> 
