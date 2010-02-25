@@ -68,8 +68,8 @@ public class UserRpcImpl extends RemoteServiceServlet implements UserRpcService 
    * for this user/living-story pair.
    */
   @Override
-  public void setSubscribedToEmails(Long livingStoryId, boolean subscribe) {
-    userDataService.setEmailSubscription(getLoggedInUserId(), livingStoryId, subscribe);
+  public void setSubscribedToEmails(Long livingStoryId, boolean subscribe, String localeId) {
+    userDataService.setEmailSubscription(getLoggedInUserId(), livingStoryId, subscribe, localeId);
   }
   
   @Override

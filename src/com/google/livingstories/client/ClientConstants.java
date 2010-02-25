@@ -276,6 +276,15 @@ public interface ClientConstants extends com.google.gwt.i18n.client.Constants {
   String startPageLoadFailed();
 
   /**
+   * Translated "Living Stories".
+   * 
+   * @return translated "Living Stories"
+   */
+  @DefaultStringValue("Living Stories")
+  @Key("startPageTitle")
+  String startPageTitle();
+
+  /**
    * Translated "View all »".
    * 
    * @return translated "View all »"

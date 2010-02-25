@@ -16,7 +16,7 @@
 
 package com.google.livingstories.server.util;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -34,7 +34,7 @@ import javax.mail.internet.MimeMultipart;
  * Utility class for sending email alerts
  */
 public class AlertSender {
-  public static void sendEmail(InternetAddress fromAddress, List<String> recipients, String subject,
+  public static void sendEmail(InternetAddress fromAddress, Collection<String> recipients, String subject,
       String msgBody) {
     Session session = Session.getDefaultInstance(new Properties(), null);
 

@@ -21,6 +21,7 @@ import com.google.livingstories.server.dataservices.UserLoginService;
 import com.google.livingstories.server.dataservices.impl.DataImplFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,8 +41,9 @@ public class SubscribeServlet extends HttpServlet {
     
     String livingStoryId = req.getParameter("livingStoryId");
     if (livingStoryId != null) {
-      userDataService.setEmailSubscription(
-          userLoginService.getUserId(), Long.valueOf(livingStoryId), true);
+      Locale locale = req.getLocale();
+      userDataService.setEmailSubscription(userLoginService.getUserId(),
+          Long.valueOf(livingStoryId), true, locale.getLanguage() + "_" + locale.getCountry());
     }
 
     String lspUrl = req.getParameter("lspUrl");
