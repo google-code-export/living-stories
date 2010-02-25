@@ -58,6 +58,9 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
   
   @Persistent
   private Integer visitCount;
+
+  @Persistent
+  private String subscriptionLocale;
   
   public UserLivingStoryEntity(String parentEmailAddress, Long livingStoryId,
       Date lastVisitedTime) {
@@ -115,6 +118,14 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
     }
   }
   
+  public String getSubscriptionLocale() {
+    return subscriptionLocale == null ? "en" : subscriptionLocale;
+  }
+  
+  public void setSubscriptionLocale(String subscriptionLocale) {
+    this.subscriptionLocale = subscriptionLocale; 
+  }
+  
   @Override
   public String toString() {
     try {
@@ -134,6 +145,7 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
       object.put("lastVisitedTime", SimpleDateFormat.getInstance().format(lastVisitedTime));
       object.put("visitCount", visitCount);
       object.put("subscribedToEmails", subscribedToEmails);
+      object.put("subscriptionLocale", getSubscriptionLocale());
     } catch (JSONException ex) {
       throw new RuntimeException(ex);
     }
@@ -152,6 +164,7 @@ public class UserLivingStoryEntity implements Serializable, JSONSerializable {
       }
       if (json.has("subscribedToEmails")) {
         entity.setSubscribedToEmails(json.getBoolean("subscribedToEmails"));
+        entity.setSubscriptionLocale(json.getString("subscriptionLocale"));
       }
       return entity;
     } catch (JSONException ex) {

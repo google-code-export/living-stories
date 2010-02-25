@@ -37,7 +37,7 @@ public interface UserRpcService extends RemoteService {
   
   boolean isSubscribedToEmails(Long livingStoryId);
   
-  void setSubscribedToEmails(Long livingStoryId, boolean value);
+  void setSubscribedToEmails(Long livingStoryId, boolean value, String localeId);
 
   FilterSpec getDefaultStoryView();
   

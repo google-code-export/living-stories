@@ -17,9 +17,12 @@
 package com.google.livingstories.server.rpcimpl;
 
 import com.google.common.base.Function;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.livingstories.client.AssetContentItem;
@@ -54,9 +57,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -78,8 +85,8 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
   private static final Logger logger =
       Logger.getLogger(ContentRpcImpl.class.getCanonicalName());
   
-  private InternetAddress fromAddress = null;
-  private String publisherName = null;
+  private InternetAddress cachedFromAddress = null;
+  private String cachedPublisherName = null;
 
   @Override
   public synchronized BaseContentItem createOrChangeContentItem(BaseContentItem contentItem) {
@@ -245,69 +252,116 @@ public class ContentRpcImpl extends RemoteServiceServlet implements ContentRpcSe
       @SuppressWarnings("unchecked")
       List<UserLivingStoryEntity> userLivingStoryEntities =
           (List<UserLivingStoryEntity>) query.execute(eventContentItem.getLivingStoryId());
-      List<String> users = new ArrayList<String>();
+      Multimap<String, String> usersByLocale = HashMultimap.create();
       for (UserLivingStoryEntity entity : userLivingStoryEntities) {
-        users.add(entity.getParentEmailAddress());
+        usersByLocale.put(entity.getSubscriptionLocale(), entity.getParentEmailAddress());
       }
-      if (!users.isEmpty()) {
-       // getServletContext() doesn't return a valid result at construction-time, so
-       // we initialize the external properties lazily.
-       if (fromAddress == null && publisherName == null) {
+      
+      if (!usersByLocale.isEmpty()) {
+        // Determine what all the placeholder text should be for the per-locale e-mails.
+
+        // getServletContext() doesn't return a valid result at construction-time, so
+        // we initialize the external properties lazily.
+        if (cachedFromAddress == null && cachedPublisherName == null) {
           ExternalServiceKeyChain externalKeys = new ExternalServiceKeyChain(getServletContext());
-          publisherName = externalKeys.getPublisherName();
-          fromAddress = externalKeys.getFromAddress();
+          cachedPublisherName = externalKeys.getPublisherName();
+          cachedFromAddress = externalKeys.getFromAddress();
         }
-        
+       
         LivingStoryEntity livingStory = pm.getObjectById(LivingStoryEntity.class,
             eventContentItem.getLivingStoryId());
         String baseLspUrl = getBaseServerUrl() + "/lsps/" + livingStory.getUrl();
         
-        StringBuilder emailContent = new StringBuilder("<b>");
-        emailContent.append(eventContentItem.getEventUpdate()).append("</b>");
-        if (!GlobalUtil.isContentEmpty(publisherName)) {
-          emailContent.append("<span style=\"color: #777;\">&nbsp;-&nbsp;");
-          emailContent.append(publisherName);
-          emailContent.append("</span>");
-        }
         String eventSummary = eventContentItem.getEventSummary();
         String eventDetails = eventContentItem.getContent();
         if (GlobalUtil.isContentEmpty(eventSummary) 
             && !GlobalUtil.isContentEmpty(eventDetails)) {
           eventSummary = SnippetUtil.createSnippet(JavaNodeAdapter.fromHtml(eventDetails), 
-                  EMAIL_ALERT_SNIPPET_LENGTH);
+              EMAIL_ALERT_SNIPPET_LENGTH);
         }
-        if (eventSummary != null && !eventSummary.isEmpty()) {
-          emailContent.append("<br><br>").append(StringUtil.stripForExternalSites(eventSummary));
-        }
-        emailContent.append("<br><a href=\"")
-            .append(baseLspUrl)
-            .append("#OVERVIEW:false,false,false,n,n,n:")
-            .append(eventContentItem.getId())
-            .append(";\">Read more</a>")
-            .append("<br><br>-----<br>")
-            .append("<span style=\"font-size:small\">This is an automated alert. ")
-            .append("To unsubscribe, click the 'unsubscribe' link on the top right of ")
-            .append("<a href=\"")
-            .append(DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl))
-            .append("\">this page</a>.</span>");
 
-        if (fromAddress != null) {
-          AlertSender.sendEmail(fromAddress, users,
-              "Update: " + livingStory.getTitle(), emailContent.toString());
+        ImmutableMap<String, String> placeholderMap = new ImmutableMap.Builder<String, String>()
+            .put("storyTitle", livingStory.getTitle())
+            .put("updateTitle", eventContentItem.getEventUpdate())
+            .put("publisherName", cachedPublisherName)
+            .put("snippet", StringUtil.stripForExternalSites(eventSummary))
+            .put("linkUrl", baseLspUrl + "#OVERVIEW:false,false,false,false,n,n,n:"
+                + eventContentItem.getId())
+            .put("loginUrl", DataImplFactory.getUserLoginService().createLoginUrl(baseLspUrl))
+            .build();
+       
+        for (String locale : usersByLocale.keySet()) {
+          sendEmailsForLocale(placeholderMap, locale, usersByLocale.get(locale));
         }
-        
       }
     } finally {
       query.closeAll();
       pm.close();
     }
-
   }
   
   private String getBaseServerUrl() {
     HttpServletRequest request = super.getThreadLocalRequest();
     StringBuffer url = request.getRequestURL();
     return url.substring(0, url.length() - request.getRequestURI().length());
+  }
+
+  private void sendEmailsForLocale(
+      Map<String, String> placeholderMap, String localeString, Collection<String> recipients) {
+    // We reconstruct the Locale from the locale string. This ignores the possibility that
+    // a language variant is being specified, a script is being specified, etc.
+    // TODO: fix that.
+    Locale locale = Locale.ENGLISH;
+    if (!localeString.isEmpty()) {
+      String[] splitRes = localeString.split("_");
+      locale = splitRes.length == 1 ? new Locale(splitRes[0])
+          : new Locale(splitRes[0], splitRes[1]);
+    }
+    
+    ResourceBundle emailBundle = ResourceBundle.getBundle(
+        "com.google.livingstories.server.rpcimpl.emailTemplate", locale);
+
+    String subject = emailBundle.getString("updateEmailSubject")
+        .replace("{0}", placeholderMap.get("storyTitle"));
+
+    // get the template in the .properties file, converting to the format expected by
+    // java.util.Formatter. A simple replaceAll won't suffice here 'cause the source format
+    // is 0-indexed, but the target format is 1-indexed. We use a StringBuffer below rather
+    // than a StringBuilder because Matcher is only compatible with the former.
+    StringBuffer sb = new StringBuffer();
+    Pattern p = Pattern.compile("\\{(\\d+)\\}");
+    Matcher m = p.matcher(emailBundle.getString("updateEmailTemplate"));
+    while (m.find()) {
+      int num = Integer.parseInt(m.group(1));
+      m.appendReplacement(sb, "%" + (num + 1) + "\\$s");
+    }
+    m.appendTail(sb);
+    
+    String template = sb.toString();
+    
+    // Some parts of this template aren't necessary if certain placeholders are blank.
+    // Do some replacement logic to correct this. Note the reluctant quantifiers.
+    String publisherName = placeholderMap.get("publisherName");
+    if (GlobalUtil.isContentEmpty(publisherName)) {
+      template = template.replaceFirst("<span class=\"p_span\".*?</span>", "");
+    }
+    String snippet = placeholderMap.get("snippet");
+    if (snippet == null || snippet.isEmpty()) {
+      template = template.replaceFirst("<div class=\"s_div\".*?</div>", "");
+    }
+
+    // The transformations above may have taken some of these placeholders out of the
+    // template, but that's okay!
+    String body = String.format(template,
+        placeholderMap.get("updateTitle"),
+        publisherName,
+        snippet,
+        placeholderMap.get("linkUrl"),
+        placeholderMap.get("loginUrl"));
+
+    if (cachedFromAddress != null) {
+      AlertSender.sendEmail(cachedFromAddress, recipients, subject, body);
+    }
   }
   
   @SuppressWarnings("unchecked")
